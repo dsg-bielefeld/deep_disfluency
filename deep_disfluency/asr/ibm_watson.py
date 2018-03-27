@@ -5,7 +5,7 @@ from copy import deepcopy
 
 class IBMWatsonASR(ASR):
 
-    def __init__(self, credentials_file, new_hypothesis_callback=None,
+    def __init__(self, credentials_file=None, new_hypothesis_callback=None,
                  settings=None):
         ASR.__init__(self, credentials_file,  new_hypothesis_callback,
                      settings)
