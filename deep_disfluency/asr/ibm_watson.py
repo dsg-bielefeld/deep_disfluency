@@ -25,6 +25,10 @@ class FakeIBMWatsonStreamer(fluteline.Producer):
             self.put(update)
 
 
+class Printer(fluteline.Consumer):
+    def consume(self, msg):
+        print(msg)
+
 
 class IBMWatsonAdapter(fluteline.Consumer):
     '''
@@ -34,8 +38,8 @@ class IBMWatsonAdapter(fluteline.Consumer):
     '''
     def enter(self):
         self.running_id = itertools.count()
-        # Messages that went down the pipeline, indexed by start_time.
-        self.memory = {}
+        # Messages that went down the pipeline.
+        self.memory = []
         # Track when Watson commits changes to clear the memory.
         self.result_index = 0
 
@@ -47,7 +51,7 @@ class IBMWatsonAdapter(fluteline.Consumer):
 
     def clear_memory_if_necessary(self, data):
         if data['result_index'] > self.result_index:
-            self.memory = {}
+            self.memory = []
             self.result_index = data['result_index']
 
     def process_timestamp(self, timestamp):
@@ -57,7 +61,13 @@ class IBMWatsonAdapter(fluteline.Consumer):
         if self.is_new(start_time):
             id_ = next(self.running_id)
         else:
-            id_ = self.get_id_if_update(start_time, word)
+            old = self.get_message_to_update(word, start_time, end_time)
+            if old:
+                id_ = old['id']
+                self.memory = [m for m in self.memory if m['id'] < id_]
+                self.running_id = itertools.count(id_ + 1)
+            else:
+                id_ = None
 
         if id_ is not None:
             msg = {
@@ -66,7 +76,7 @@ class IBMWatsonAdapter(fluteline.Consumer):
                 'word': word,
                 'id': id_
             }
-            self.memory[start_time] = msg
+            self.memory.append(msg)
             self.put(msg)
 
 
@@ -78,28 +88,32 @@ class IBMWatsonAdapter(fluteline.Consumer):
         return word
 
     def is_new(self, start_time):
-        if len(self.memory.keys()) == 0:
+        if not self.memory:
             return True
-        last_update = sorted(self.memory.keys(), reverse=True)[0]
-        return start_time >= self.memory[last_update]['end_time']
+        return start_time >= self.memory[-1]['end_time']
 
-    def get_id_if_update(self, start_time, word):
-        """Returns the first id being updated.
-        Removes/revokes the ids also implicitly being removed
-        (i.e. the words chronologically after the update.
-        If no update return None."""
-        update_id = None
-        update_start_times_to_revoke = []
-        for old_id in sorted(self.memory.keys(), reverse=True):
-            if start_time >= self.memory[old_id]['end_time']:
-                # we've found the update
-                break
-            update_start_times_to_revoke.append(old_id)
-            update_id = self.memory[old_id]['id']
-        for start_time in update_start_times_to_revoke:
-            self.memory.pop(start_time, None)
-        self.running_id = itertools.count(update_id+1)  # set the counter
-        return update_id
+    def get_message_to_update(self, word, start_time, end_time):
+        '''
+        Returns the message from memory that the current one updates.
+        If no update return None.
+        '''
+        for old in self.memory:
+            # Search for overlap
+            overlap_conditions = [
+                old['start_time'] < start_time < old['end_time'],
+                old['end_time'] < end_time < old['end_time'],
+            ]
+            if any(overlap_conditions):
+                return old
+            # Search for word change
+            word_change_conditions = [
+                old['start_time'] == start_time,
+                old['end_time'] == end_time,
+                old['word'] != word,
+            ]
+            if all(word_change_conditions):
+                return old
+
 
 if __name__ == '__main__':
     fake_updates_raw = [
@@ -130,7 +144,8 @@ if __name__ == '__main__':
 
     nodes = [
        FakeIBMWatsonStreamer(fake_updates_data),
-       IBMWatsonAdapter()
+       IBMWatsonAdapter(),
+       Printer(),
     ]
 
     tic = time.clock()
