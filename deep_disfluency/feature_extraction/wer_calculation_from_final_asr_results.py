@@ -4,8 +4,10 @@ from deep_disfluency.utils.accuracy import wer
 
 
 final_file = open('wer_test.text', "w")
-ranges1 = [line.strip() for line in open("/media/data/jh/simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfHeldoutASR_ranges.text")]
-ranges2 = [line.strip() for line in open("/media/data/jh/simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfTestASR_ranges.text")]
+ranges1 = [line.strip() for line in open(
+    "/media/data/jh/simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfHeldoutASR_ranges.text")]
+ranges2 = [line.strip() for line in open(
+    "/media/data/jh/simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfTestASR_ranges.text")]
 
 for ranges in [ranges1, ranges2]:
     final_file.write("\n\n")
@@ -35,9 +37,12 @@ for l in results:
         print no_ho
         no_ho = 0
         file.close()
-        file = open("../../../simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfTestASRgood_ranges.text", "w")
+        file = open(
+            "../../../simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfTestASRgood_ranges.text",
+            "w")
         continue
-    if float(l.strip('\n').split(" ")[2]) < 0.4:  # both speakers are under 40% error rate- likely half decent separation
+    if float(l.strip('\n').split(" ")[
+             2]) < 0.4:  # both speakers are under 40% error rate- likely half decent separation
         # print l
         if ingood and "B" in l.strip("\n").split(" ")[1]:
             no_ho += 1

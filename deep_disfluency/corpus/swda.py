@@ -97,7 +97,7 @@ class CorpusReader:
         the Metadata object used throughout.
         """
         self.src_dirname = src_dirname
-        if not metadata_path == None:
+        if not metadata_path is None:
             metadata_filename = os.path.join(src_dirname, metadata_path)
             self.metadata = Metadata(metadata_filename)
         else:
@@ -199,7 +199,7 @@ class Transcript:
         # The ptd filename in the right format for the current OS:
         self.ptd_basename = os.sep.join(row0dict['ptb_basename'].split("/"))
         # The dictionary of metadata for this transcript:
-        if not self.metadata == None:
+        if not self.metadata is None:
             transcript_metadata = self.metadata[self.conversation_no]
             for key, _ in transcript_metadata.iteritems():
                 setattr(self, key, transcript_metadata[key])
@@ -209,7 +209,7 @@ class Transcript:
         self.utterances = map((lambda x: Utterance(x, transcript_metadata)),
                               rows)
         # Coder's Manual: ``We also removed any line with a "@"
-        #(since @ marked slash-units with bad segmentation).''
+        # (since @ marked slash-units with bad segmentation).''
         self.utterances = filter((lambda x: not re.search(r"[@]", x.act_tag)),
                                  self.utterances)
 
@@ -228,7 +228,7 @@ class Transcript:
                     and utt.caller == myUtt.caller):
                 return utt
         # print("WARNING: No next utterance same speaker for FILE "
-        #+ str(myUtt.swda_filename) + ", UTT number: " + \
+        # + str(myUtt.swda_filename) + ", UTT number: " + \
         # str(myUtt.transcript_index))
         return None
 
@@ -357,7 +357,7 @@ class Utterance:
             setattr(self, att_name, row_value)
         ##################################################
         # Caller data:
-        if not transcript_metadata == None:
+        if not transcript_metadata is None:
             for key in ('caller_sex', 'caller_education', 'caller_birth_year',
                         'caller_dialect_area'):
                 full_key = 'from_' + key
@@ -399,7 +399,7 @@ class Utterance:
                     tag = 'arp_nd'
                 elif tag in ('fo', 'o', 'fw',
                              '"', 'by', 'bc'):
-                             tag = 'fo_o_fw_"_by_bc'
+                    tag = 'fo_o_fw_"_by_bc'
             d_tags.append(tag)
         # Dan J says (p.c.) that it makes sense to take the first;
         # there are only a handful of examples with 2 tags here.

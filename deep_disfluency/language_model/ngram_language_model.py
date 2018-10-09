@@ -154,7 +154,8 @@ class LanguageModel(object):
         of tokens"""
         return sum(self.tokens_logprob(tokens, self.order)) / len(tokens)
 
-    def logprob_weighted_by_inverse_unigram_logprob(self, tokens, special=None):
+    def logprob_weighted_by_inverse_unigram_logprob(
+            self, tokens, special=None):
         """WML in Clark et al. 2013. The logprob sum weighted by inverse of
         the sum of the unigram logprobs.
         Returns the sum of the n-grams logprobs divided by the inverse of
@@ -234,7 +235,7 @@ class NgramGraph(object):
         self.total_logprob = self.delta * [0]
         self.total_unigram_logprob = self.delta * [0]
         self.word_graph = self.delta * ["<s>"]  # initialise
-        if words != None:  # can initialise with words
+        if words is not None:  # can initialise with words
             for word in words[self.delta:]:
                 self.append(word, lm)  # will calculate all this automatically?
 
@@ -282,7 +283,7 @@ class NgramGraph(object):
             self.total_logprob.append(self.total_logprob[-1] + log(newngram))
 
     def logprob_weighted_by_sequence_length(self, indices=None):
-        if indices == None:
+        if indices is None:
             return float(self.total_logprob[-1]) / float(len(self.word_graph))
         elif len(indices) == 1:  # just specifying end
             return float(self.total_logprob[0:indices[0]]) / float(indices[0])
@@ -295,7 +296,7 @@ class NgramGraph(object):
     def logprob_weighted_by_inverse_unigram_logprob(self, indices=None):
         """indices is an int list of length 1 or 2, if 1, just end point,
         if two, start and end point"""
-        if indices == None:
+        if indices is None:
             return float(self.total_logprob[-1]) / \
                 float(-1.0 * self.total_unigram_logprob[-1])
         elif (len(indices) == 1):
@@ -360,31 +361,31 @@ class KneserNeySmoothingModel(LanguageModel):
         self.bigram_history_entropies = defaultdict(float)  # Omitting these
         self.trigram_history_entropies = defaultdict(float)
 
-        if train_corpus != None:
+        if train_corpus is not None:
             self.train(train_corpus)
-        if second_corpus != None:
+        if second_corpus is not None:
             print "using second corpus"
             self.train(second_corpus)
-        if heldout_corpus != None:
+        if heldout_corpus is not None:
             print "using heldout corpus"
             self.train(heldout_corpus, heldout=True)
 
-        if train_corpus != None:  # this is required to
+        if train_corpus is not None:  # this is required to
             # order the unigrams and bigrams for entropies,
             # can probably discard after entropy cacheing,
             print str(self.train_length), "total words of training data"
             for ngram, val in sorted(self.unigram_counts.items(),
                                      key=itemgetter(1), reverse=True):
-                                                                            self.unigrams.append(ngram)
+                self.unigrams.append(ngram)
             self.vocab_size = len(self.unigrams)
             for ngram, val in sorted(self.bigram_counts.items(),
                                      key=itemgetter(1), reverse=True):
-                                                                            self.bigrams.append(ngram)
+                self.bigrams.append(ngram)
             self.init_entropy_cache(0.40)  # initialise max ent
 
         # if this gets loaded instead of trained,
         # populates everything from pickled db
-        if saved_file != None:
+        if saved_file is not None:
             self.load(saved_file)
 
         # self.init_cache() #TODO we could look at cacheing
@@ -409,7 +410,8 @@ class KneserNeySmoothingModel(LanguageModel):
         smoothing,
         taken from Goodman 2001 and generalized to arbitrary orders"""
         l = len(tokens)
-        for i in xrange(order - 1, l):  # tokens should have a prefix of order - 1
+        for i in xrange(
+                order - 1, l):  # tokens should have a prefix of order - 1
             # print i
             for d in xrange(order, 0, -1):  # go through all the different 'n's
                 if d == 1:
@@ -557,7 +559,7 @@ class KneserNeySmoothingModel(LanguageModel):
         # if we've never seen it at all, it defacto will
         # have no probability as a numerator
         uni_num = self.ngram_numerator_map.get(self.glue_tokens(ngram[-1], 1))
-        if uni_num == None:
+        if uni_num is None:
             uni_num = 0
         probability = previous_prob = float(uni_num) / \
             float(self.unigram_denominator)
@@ -573,7 +575,7 @@ class KneserNeySmoothingModel(LanguageModel):
         for d in xrange(2, order + 1):
             ngram_den = self.ngram_denominator_map.get(
                 self.glue_tokens(ngram[-(d):-1], d))
-            if ngram_den == None:
+            if ngram_den is None:
                 ngram_den = 0
             # for bigrams this is the number of different continuation types
             # (number of trigram types with these two words)
@@ -583,7 +585,7 @@ class KneserNeySmoothingModel(LanguageModel):
                 ngram_num = self.ngram_numerator_map.get(
                     self.glue_tokens(ngram[-(d):], d))
                 # this is adding one, use get?
-                if ngram_num == None:
+                if ngram_num is None:
                     ngram_num = 0
                 if ngram_num != 0:
                     current_prob = (ngram_num - discount) / float(ngram_den)
@@ -591,7 +593,7 @@ class KneserNeySmoothingModel(LanguageModel):
                     current_prob = 0.0
                 nonzero = self.ngram_non_zero_map.get(
                     self.glue_tokens(ngram[-(d):-1], d))
-                if nonzero == None:
+                if nonzero is None:
                     nonzero = 0
                 current_prob += nonzero * discount / ngram_den * previous_prob
                 previous_prob = current_prob
@@ -609,7 +611,7 @@ class KneserNeySmoothingModel(LanguageModel):
         ngram must be a list of tokens (the order parameter is there
         just to avoid having to compute it).
         Taken from Goodman 2001 and generalized to arbitrary orders"""
-        if not special == None:
+        if not special is None:
             return self.raw_ngram_prob_special(ngram,
                                                self.discount, order, special)
         return self.raw_ngram_prob(ngram, self.discount, order,
@@ -661,7 +663,7 @@ class KneserNeySmoothingModel(LanguageModel):
             test = self.trigram_history_entropies.get(' '.join(contexttokens))
         elif order == 2:
             test = self.bigram_history_entropies.get(contexttokens[0])
-        if not test == None:
+        if not test is None:
             return test
         if returnDist == True:
             pass
@@ -737,7 +739,8 @@ class KneserNeySmoothingModel(LanguageModel):
                 if self.bigrams[i].split()[-1] == "</s>":
                     continue
                 self.trigram_history_entropies[self.bigrams[i]] = \
-                    self.entropy_continuation_very_fast(self.bigrams[i].split(), 3)
+                    self.entropy_continuation_very_fast(
+                        self.bigrams[i].split(), 3)
             # print len(self.trigram_history_entropies)
         # now do bigrams
         self.bigram_history_entropies["<s>"] = \
@@ -753,7 +756,7 @@ class KneserNeySmoothingModel(LanguageModel):
     def sum_information_gain_very_fast(self, tokens, order=None):
         """computes entropy of the context tokens and actual probability \
         of each ngram to give the total uncertainty reduction"""
-        if order == None:
+        if order is None:
             order = self.order
         delta = order - 1
         return sum([log(-self.logprob_weighted_by_sequence_length(
@@ -937,7 +940,7 @@ class KneserNeySmoothingModel(LanguageModel):
         Z = 0  # normalising constant
         missing = 0
         for key in self.unigrams.keys():
-            if not prefix in key == None:
+            if not prefix in key is None:
                 missing += 1
                 continue  # TODO what's the best way of smoothing?
             prob = self.ngram_prob([key], 1)  # unigram prob

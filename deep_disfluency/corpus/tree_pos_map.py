@@ -220,7 +220,8 @@ class TreeMap(list):
 
                     depth = len(newpath)
                 # append (word index,category,depth) triple
-                treeDepths.append([[transcript_index, n], myMothers[-1], depth])
+                treeDepths.append(
+                    [[transcript_index, n], myMothers[-1], depth])
         return treeDepths
 
     def get_word_tree_path_lengths(self, transcript_index, mytree,
@@ -397,7 +398,7 @@ class TreeMapCorpus(dict):
             print "treemaplist length: " + str(len(self))
 
     def get_treemap(self, trans, utt):
-        if utt == None:
+        if utt is None:
             # print "WARNING null utt from treemap"
             return None
         map_key = str(utt.conversation_no) + ":" + str(utt.transcript_index)
@@ -409,18 +410,18 @@ class TreeMapCorpus(dict):
                 print warning
                 print utt.text_words()
                 print treemap
-                if not self.errorlog == None:
+                if not self.errorlog is None:
                     self.errorlog.write(warning)
                 raw_input()
                 return None
             return treemap
-        except:
+        except BaseException:
             if not len(utt.trees) == 0 and not utt.damsl_act_tag() == "x":
                 warning = "WARNING NO TREE MAP FOR" + utt.swda_filename +\
                     str(utt.transcript_index) + " from map key" +\
                     str(map_key) + "\n"
                 print warning
-                if not self.errorlog == None:
+                if not self.errorlog is None:
                     self.errorlog.write(warning)
             return None
 
@@ -580,11 +581,11 @@ class POSMapCorpus(dict):
             print "posmaplist length: " + str(len(self))
 
     def get_POSmap(self, trans, utt):
-        if utt == None:
+        if utt is None:
             # print "null utt"
             return None
         map_key = str(utt.conversation_no) + ":" + str(utt.transcript_index)
-        if not self.get(map_key) == None:
+        if not self.get(map_key) is None:
             posmap = self[map_key]
             if len(posmap) != len(utt.text_words()):
                 warning = "WARNING: posMAP HERE NOT IN LINE WITH UTT" +\
@@ -593,7 +594,7 @@ class POSMapCorpus(dict):
                 print utt.text_words()
                 print posmap
                 print sorted(self.keys())
-                if not self.errorlog == None:
+                if not self.errorlog is None:
                     self.errorlog.write(warning)
                 raw_input()
                 return None
@@ -606,7 +607,7 @@ class POSMapCorpus(dict):
                 print utt.text_words()
                 print sorted(self.keys())[:20]
                 print "map key", map_key
-                if not self.errorlog == None:
+                if not self.errorlog is None:
                     self.errorlog.write(warning)
                 raw_input()
             return None

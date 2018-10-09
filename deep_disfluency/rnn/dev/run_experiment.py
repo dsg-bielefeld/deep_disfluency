@@ -29,7 +29,8 @@ from experiment_util import save_predictions_and_quick_eval
 
 theano.config.optimizer = 'None'  # speeds things up marginally
 
-full_label2idx = load_tags("../data/tag_representations/swbd1_trp_tags.csv")  # NB mainly for experiments
+# NB mainly for experiments
+full_label2idx = load_tags("../data/tag_representations/swbd1_trp_tags.csv")
 full_idx2label = dict((k, v) for v, k in full_label2idx.iteritems())  # fir
 
 
@@ -43,18 +44,23 @@ def run_experiment(args):
     # raw_input()
 
     if s['acoustic']:
-        s['acoustic'] = 350  # dimension of acoustic features vector (essentially 7 * 50)
+        # dimension of acoustic features vector (essentially 7 * 50)
+        s['acoustic'] = 350
 
-    pre_load_training = True  # TODO if not on Bender this is quite big so can't load training- switch to true on Bender
+    # TODO if not on Bender this is quite big so can't load training- switch
+    # to true on Bender
+    pre_load_training = True
 
-    print "loading data and tag sets"  # NB Don't get the tag sets here directly anymore
+    # NB Don't get the tag sets here directly anymore
+    print "loading data and tag sets"
     _, _, _, train_dict = switchboard_data(train_data=s['train_data'],
                                            tags=s['tags'])
 
     # get relevant dictionaries
-    idx2label = dict((k, v) for v, k in train_dict['labels2idx'].iteritems())  # first half (28) the same as the test
+    # first half (28) the same as the test
+    idx2label = dict((k, v) for v, k in train_dict['labels2idx'].iteritems())
     idx2word = dict((k, v) for v, k in train_dict['words2idx'].iteritems())
-    if not train_dict.get('pos2idx') == None:
+    if not train_dict.get('pos2idx') is None:
         idx2pos = dict((k, v) for v, k in train_dict['pos2idx'].iteritems())
 
     range_dir = "../data/disfluency_detection/swda_divisions_disfluency_detection/"
@@ -68,7 +74,8 @@ def run_experiment(args):
     ]
 
     # get the filenames for the train/heldout/test division
-    data = defaultdict(list)  # we will shuffle the train dialogues, keep heldout and test non-scrambled:
+    # we will shuffle the train dialogues, keep heldout and test non-scrambled:
+    data = defaultdict(list)
     divisions = ["heldout", "test", "heldout_asr", "test_asr"]
     if not s['use_saved_model']:
         divisions = ["train", "heldout", "test"]
@@ -81,14 +88,19 @@ def run_experiment(args):
             if "asr" in key:
                 corpus = key[:key.find("_")]
                 corpus = corpus[0].upper() + corpus[1:]
-                increco_file = "../data/asr_results/SWDisf{}_pos_increco.text".format(corpus)
-                data[key] = load_increco_data_from_file(increco_file, train_dict['words2idx'], train_dict['pos2idx'])
+                increco_file = "../data/asr_results/SWDisf{}_pos_increco.text".format(
+                    corpus)
+                data[key] = load_increco_data_from_file(
+                    increco_file, train_dict['words2idx'], train_dict['pos2idx'])
 
             else:
                 #corpus = corpus[0].upper() + corpus[1:]
-                file = "../data/disfluency_detection/switchboard/swbd_{}_partial_timings_data.csv".format(key)
-                data[key] = load_data_from_timings_file(file, train_dict['words2idx'], train_dict['pos2idx'])
-                # print filter(lambda x : x[0] == "4649A",[ data[key][i] for i in range(0, len(data[key]))])[0]
+                file = "../data/disfluency_detection/switchboard/swbd_{}_partial_timings_data.csv".format(
+                    key)
+                data[key] = load_data_from_timings_file(
+                    file, train_dict['words2idx'], train_dict['pos2idx'])
+                # print filter(lambda x : x[0] == "4649A",[ data[key][i] for i
+                # in range(0, len(data[key]))])[0]
             continue
         # if not using saved model load from pickles
         for f in file_ranges:
@@ -105,19 +117,20 @@ def run_experiment(args):
                                                                  tags=s["tags"],
                                                                  full_idx_to_label_dict=full_idx2label,
                                                                  idx_to_label=idx2label)
-                data[key].append((f + part, dialogue_speaker_data))  # tuple of name + data/file location
+                # tuple of name + data/file location
+                data[key].append((f + part, dialogue_speaker_data))
 
     vocsize = len(train_dict['words2idx'].items())
     nclasses = len(train_dict['labels2idx'].items())
     #nsentences = len(train_lex)
     possize = None
-    if not train_dict.get('pos2idx') == None:
+    if not train_dict.get('pos2idx') is None:
         possize = len(idx2pos.items())
     #nwords = len(list(itertools.chain(*train_y)))
 
     print str(len(train_dict['labels2idx'].items())) + " training classes"
     print str(len(train_dict['words2idx'].items())) + " words in vocab"
-    if not train_dict.get('pos2idx') == None:
+    if not train_dict.get('pos2idx') is None:
         print str(len(train_dict['pos2idx'].items())) + " pos tags in vocab"
     # print str(nsentences) + " training sequences"
     na = 0
@@ -154,7 +167,8 @@ def run_experiment(args):
 
     if s['decoder_file']:
         print "instantiating hmm decoder..."
-        # add the interregnum tag (not predicted by the rnn, derived from context)
+        # add the interregnum tag (not predicted by the rnn, derived from
+        # context)
         hmm_dict = deepcopy(train_dict['labels2idx'])
         intereg_ind = len(hmm_dict.keys())
         hmm_dict["<i/><cc>"] = intereg_ind  # add the interregnum tag
@@ -173,18 +187,26 @@ def run_experiment(args):
 
     if s['embeddings']:
         print "loading embeddings..."
-        pretrained = gensim.models.Word2Vec.load("../embeddings/" + s['embeddings'])  # load pre-trained embeddings
+        pretrained = gensim.models.Word2Vec.load(
+            "../embeddings/" + s['embeddings'])  # load pre-trained embeddings
         print pretrained[pretrained.index2word[0]].shape
         # print pretrained[0].shape
-        emb = populate_embeddings(s['emb_dimension'], vocsize, train_dict['words2idx'], pretrained)  # assign and fill in the gaps
+        emb = populate_embeddings(
+            s['emb_dimension'],
+            vocsize,
+            train_dict['words2idx'],
+            pretrained)  # assign and fill in the gaps
         rnn.load_weights(emb)
 
     # make folder for the whole experiment
-    folder = os.path.basename(__file__).split('.')[0].replace("run_experiment", "") + s['exp_id']
+    folder = os.path.basename(__file__).split(
+        '.')[0].replace("run_experiment", "") + s['exp_id']
     #folder  = "/home/dsg-labuser/Desktop/rnn_experiments/"+ s['exp_id']
     if os.path.exists(folder):
         if not s['use_saved_model']:
-            quit = raw_input('Overwrite contents of folder for experiment {}? [y][n]'.format(s['exp_id']))
+            quit = raw_input(
+                'Overwrite contents of folder for experiment {}? [y][n]'.format(
+                    s['exp_id']))
             if quit != "y":
                 return
     else:
@@ -192,9 +214,17 @@ def run_experiment(args):
 
     # make results files
     if not s['use_saved_model']:
-        resultsFile = open("results/learning_curves/" + s['exp_id'] + ".csv", "w")
+        resultsFile = open(
+            "results/learning_curves/" +
+            s['exp_id'] +
+            ".csv",
+            "w")
         resultsFile.write("epoch,heldout_loss,heldout_class_loss,val_tags_f,heldout_f_rmtto,heldout_frm,heldout_tto1,heldout_tto2,test_loss,test_class_loss,test_tags_f,test_f_rmtto,test_frm,test_tto1,test_tto2,train_loss\n")
-        summariesFile = open("results/tag_accuracies/" + s['exp_id'] + ".text", "w")
+        summariesFile = open(
+            "results/tag_accuracies/" +
+            s['exp_id'] +
+            ".text",
+            "w")
 
     # set current learning rate as the initial learning rate
     s['clr'] = s['lr']
@@ -205,14 +235,16 @@ def run_experiment(args):
     start = 1
     end = s['nepochs']
     if s['use_saved_model']:
-        start = s['use_saved_model']  # start from the epoch of the stored model
+        # start from the epoch of the stored model
+        start = s['use_saved_model']
         end = start
     for e in range(start, end + 1):
 
         s['current_epoch'] = e
         tic = time.time()
 
-        epochfolder = folder + "/epoch_" + str(e)  # make folder to store this epoch
+        # make folder to store this epoch
+        epochfolder = folder + "/epoch_" + str(e)
         if not os.path.exists(epochfolder) and not s['use_saved_model']:
             os.mkdir(epochfolder)
 
@@ -226,7 +258,11 @@ def run_experiment(args):
             #    rnn.load_weights(emb, Wx, Wh, W, bh, b, h0)
         else:
             if s['pos']:
-                train_loss = rnn.fit(data['train'], s['clr'], acoustic=args.acoustic, load_data=pre_load_training == False)
+                train_loss = rnn.fit(
+                    data['train'],
+                    s['clr'],
+                    acoustic=args.acoustic,
+                    load_data=pre_load_training == False)
             else:
                 pass
 
@@ -236,16 +272,20 @@ def run_experiment(args):
         print "saving predictions and evaluating tags..."
 
         results = {}
-        for corpus in ['heldout', 'test']:  # nb for training just test and heldout
+        for corpus in ['heldout',
+                       'test']:  # nb for training just test and heldout
             # if not corpus == 'heldout': continue
             print corpus
-            predictions_file = epochfolder + '/predictions_{}.csv'.format(corpus)
+            predictions_file = epochfolder + \
+                '/predictions_{}.csv'.format(corpus)
             incremental_eval = False
             if s['use_saved_model']:
-                predictions_file = epochfolder + '/predictions_inc_{}.csv'.format(corpus)
+                predictions_file = epochfolder + \
+                    '/predictions_inc_{}.csv'.format(corpus)
                 incremental_eval = True
             corpus_results = save_predictions_and_quick_eval(predictions_filename=predictions_file,
-                                                             groundtruth_filename=s['{}_file'.format(corpus.replace("_asr", ""))],
+                                                             groundtruth_filename=s['{}_file'.format(
+                                                                 corpus.replace("_asr", ""))],
                                                              model=rnn,
                                                              hmm=hmm,
                                                              dialogues=data[corpus],
@@ -286,7 +326,13 @@ def run_experiment(args):
                           str(results['test_f1_tto2']) + "," +
                           str(train_loss) + "\n")
         resultsFile.flush()
-        summariesFile.write(str(e) + "\n" + results['heldout_tag_summary'] + "\n" + results['test_tag_summary'] + "\n%%%%%%%%%%\n")
+        summariesFile.write(
+            str(e) +
+            "\n" +
+            results['heldout_tag_summary'] +
+            "\n" +
+            results['test_tag_summary'] +
+            "\n%%%%%%%%%%\n")
         summariesFile.flush()
 
         # check to see if it beats the current best on the class of interest
@@ -310,7 +356,9 @@ def run_experiment(args):
             break
         # decay
         if s['decay'] and abs(s['best_epoch'] - s['current_epoch']) >= 2:
-            s['clr'] *= 0.85  # just a steady decay if things aren't improving for 2 epochs, more a hyper param?
+            # just a steady decay if things aren't improving for 2 epochs, more
+            # a hyper param?
+            s['clr'] *= 0.85
             print "learning rate decayed, now ", s['clr']
         if s['clr'] < 1e-5:
             print "stopping, below learning rate threshold"
@@ -359,4 +407,5 @@ if __name__ == '__main__':
 
     # for exp in range(31,40):
     #    args.exp = exp
-    #    run_experiment(args) #could in theory try multiple instances for multiple experiments
+    # run_experiment(args) #could in theory try multiple instances for
+    # multiple experiments

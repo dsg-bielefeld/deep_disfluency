@@ -73,7 +73,7 @@ def translate_to_PennPOS(pos, pos2, word, word2):
         pos = "POS"
     elif pos.startswith("PU"):
         pos = pos
-    elif pos in ('TO0') and (not word2 == None and pos2.startswith("V")):
+    elif pos in ('TO0') and (not word2 is None and pos2.startswith("V")):
         pos = "IN"
     elif pos in ('TO0'):
         pos = "TO"

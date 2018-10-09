@@ -92,7 +92,8 @@ class Utils:
     @staticmethod
     def getAuthenticationToken(hostname, serviceName, username, password):
 
-        uri = hostname + "/authorization/api/v1/token?url=" + hostname + '/' + serviceName + "/api"
+        uri = hostname + "/authorization/api/v1/token?url=" + \
+            hostname + '/' + serviceName + "/api"
         uri = uri.replace("wss://", "https://")
         uri = uri.replace("ws://", "https://")
         print uri
@@ -105,7 +106,8 @@ class Utils:
 
 class WSInterfaceFactory(WebSocketClientFactory):
 
-    def __init__(self, queue, summary, dirOutput, contentType, model, url=None, headers=None, debug=None):
+    def __init__(self, queue, summary, dirOutput, contentType,
+                 model, url=None, headers=None, debug=None):
         WebSocketClientFactory.__init__(self, url=url, headers=headers)
         self.queue = queue
         self.summary = summary
@@ -117,7 +119,8 @@ class WSInterfaceFactory(WebSocketClientFactory):
         self.openHandshakeTimeout = 10
         self.closeHandshakeTimeout = 10
 
-        # start the thread that takes care of ending the reactor so the script can finish automatically (without ctrl+c)
+        # start the thread that takes care of ending the reactor so the script
+        # can finish automatically (without ctrl+c)
         endingThread = threading.Thread(target=self.endReactor, args=())
         endingThread.daemon = True
         endingThread.start()
@@ -137,12 +140,18 @@ class WSInterfaceFactory(WebSocketClientFactory):
         print "about to stop the reactor!"
         reactor.stop()
 
-    # this function gets called every time connectWS is called (once per WebSocket connection/session)
+    # this function gets called every time connectWS is called (once per
+    # WebSocket connection/session)
     def buildProtocol(self, addr):
 
         try:
             utt = self.queueProto.get_nowait()
-            proto = WSInterfaceProtocol(self, self.queue, self.summary, self.dirOutput, self.contentType)
+            proto = WSInterfaceProtocol(
+                self,
+                self.queue,
+                self.summary,
+                self.dirOutput,
+                self.contentType)
             proto.setUtterance(utt)
             return proto
         except Queue.Empty:
@@ -150,7 +159,8 @@ class WSInterfaceFactory(WebSocketClientFactory):
             return None
 
 # WebSockets interface to the STT service
-# note: an object of this class is created for each WebSocket connection, every time we call connectWS
+# note: an object of this class is created for each WebSocket connection,
+# every time we call connectWS
 
 
 class WSInterfaceProtocol(WebSocketClientProtocol):
@@ -176,13 +186,15 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
         self.uttFilename = utt[1]
         self.summary[self.uttNumber] = {"hypothesis": "",
                                         "status": {"code": "", "reason": ""}}
-        self.fileJson = self.dirOutput + "/" + str(self.uttNumber) + ".json.txt"
+        self.fileJson = self.dirOutput + "/" + \
+            str(self.uttNumber) + ".json.txt"
         try:
             os.remove(self.fileJson)
         except OSError:
             pass
 
-    # helper method that sends a chunk of audio if needed (as required what the specified pacing is)
+    # helper method that sends a chunk of audio if needed (as required what
+    # the specified pacing is)
     def maybeSendChunk(self, data):
 
         def sendChunk(chunk, final=False):
@@ -204,7 +216,11 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
 
     def onOpen(self):
         print "onOpen"
-        data = {"action": "start", "content-type": str(self.contentType), "continuous": True, "interim_results": True, "inactivity_timeout": 600}
+        data = {"action": "start",
+                "content-type": str(self.contentType),
+                "continuous": True,
+                "interim_results": True,
+                "inactivity_timeout": 600}
         data['word_confidence'] = True
         data['timestamps'] = True
         data['max_alternatives'] = 3
@@ -212,7 +228,8 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
         # send the initialization parameters
         self.sendMessage(json.dumps(data).encode('utf8'))
 
-        # start sending audio right away (it will get buffered in the STT service)
+        # start sending audio right away (it will get buffered in the STT
+        # service)
         print self.uttFilename
         f = open(str(self.uttFilename), 'rb')
         self.bytesSent = 0
@@ -227,7 +244,8 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
         else:
             print(u"Text message received: {0}".format(payload.decode('utf8')))
 
-            # if uninitialized, receive the initialization response from the server
+            # if uninitialized, receive the initialization response from the
+            # server
             jsonObject = json.loads(payload.decode('utf8'))
             if 'state' in jsonObject:
                 self.listeningMessages += 1
@@ -262,11 +280,19 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
     def onClose(self, wasClean, code, reason):
 
         print("onClose")
-        print("WebSocket connection closed: {0}".format(reason), "code: ", code, "clean: ", wasClean, "reason: ", reason)
+        print(
+            "WebSocket connection closed: {0}".format(reason),
+            "code: ",
+            code,
+            "clean: ",
+            wasClean,
+            "reason: ",
+            reason)
         self.summary[self.uttNumber]['status']['code'] = code
         self.summary[self.uttNumber]['status']['reason'] = reason
 
-        # create a new WebSocket connection if there are still utterances in the queue that need to be processed
+        # create a new WebSocket connection if there are still utterances in
+        # the queue that need to be processed
         self.queue.task_done()
 
         if self.factory.prepareUtterance() == False:
@@ -285,7 +311,9 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
 def check_positive_int(value):
     ivalue = int(value)
     if ivalue < 1:
-        raise argparse.ArgumentTypeError("\"%s\" is an invalid positive int value" % value)
+        raise argparse.ArgumentTypeError(
+            "\"%s\" is an invalid positive int value" %
+            value)
     return ivalue
 
 # function to check the credentials format
@@ -296,26 +324,62 @@ def check_credentials(credentials):
     if (len(elements) == 2):
         return elements
     else:
-        raise argparse.ArgumentTypeError("\"%s\" is not a valid format for the credentials " % credentials)
+        raise argparse.ArgumentTypeError(
+            "\"%s\" is not a valid format for the credentials " %
+            credentials)
 
 
 if __name__ == '__main__':
     # parse command line parameters
-    parser = argparse.ArgumentParser(description='client to do speech recognition using the WebSocket interface to the Watson STT service')
+    parser = argparse.ArgumentParser(
+        description='client to do speech recognition using the WebSocket interface to the Watson STT service')
     parser.add_argument('-credentials', action='store', dest='credentials', help='Basic Authentication credentials in the form \'username:password\'',
                         default=None, required=True, type=check_credentials)
-    parser.add_argument('-in', action='store', dest='fileInput', default='./recordings2.txt', help='text file containing audio files')
-    parser.add_argument('-out', action='store', dest='dirOutput', default='./asr_2', help='output directory')
-    parser.add_argument('-type', action='store', dest='contentType', default='audio/wav', help='audio content type, for example: \'audio/l16; rate=44100\'')
-    parser.add_argument('-model', action='store', dest='model', default='en-US_NarrowbandModel', help='STT model that will be used')
-    parser.add_argument('-threads', action='store', dest='threads', default='1', help='number of simultaneous STT sessions', type=check_positive_int)
-    parser.add_argument('-tokenauth', action='store_true', dest='tokenauth', help='use token based authentication')
+    parser.add_argument(
+        '-in',
+        action='store',
+        dest='fileInput',
+        default='./recordings2.txt',
+        help='text file containing audio files')
+    parser.add_argument(
+        '-out',
+        action='store',
+        dest='dirOutput',
+        default='./asr_2',
+        help='output directory')
+    parser.add_argument(
+        '-type',
+        action='store',
+        dest='contentType',
+        default='audio/wav',
+        help='audio content type, for example: \'audio/l16; rate=44100\'')
+    parser.add_argument(
+        '-model',
+        action='store',
+        dest='model',
+        default='en-US_NarrowbandModel',
+        help='STT model that will be used')
+    parser.add_argument(
+        '-threads',
+        action='store',
+        dest='threads',
+        default='1',
+        help='number of simultaneous STT sessions',
+        type=check_positive_int)
+    parser.add_argument(
+        '-tokenauth',
+        action='store_true',
+        dest='tokenauth',
+        help='use token based authentication')
     args = parser.parse_args()
 
     # create output directory if necessary
     if (os.path.isdir(args.dirOutput)):
         while True:
-            answer = raw_input("the output directory \"" + args.dirOutput + "\" already exists, overwrite? (y/n)? ")
+            answer = raw_input(
+                "the output directory \"" +
+                args.dirOutput +
+                "\" already exists, overwrite? (y/n)? ")
             if (answer == "n"):
                 sys.stderr.write("exiting...")
                 sys.exit()
@@ -351,7 +415,15 @@ if __name__ == '__main__':
     # create a WS server factory with our protocol
     url = "wss://" + hostname + "/speech-to-text/api/v1/recognize?model=" + args.model
     summary = {}
-    factory = WSInterfaceFactory(q, summary, args.dirOutput, args.contentType, args.model, url, headers, debug=False)
+    factory = WSInterfaceFactory(
+        q,
+        summary,
+        args.dirOutput,
+        args.contentType,
+        args.model,
+        url,
+        headers,
+        debug=False)
     factory.protocol = WSInterfaceProtocol
 
     for i in range(min(int(args.threads), q.qsize())):
@@ -381,7 +453,11 @@ if __name__ == '__main__':
                 emptyHypotheses += 1
         else:
             print key + ": ", value['status']['code'], " REASON: ", value['status']['reason']
-        f.write(str(counter) + ": " + value['hypothesis'].encode('utf-8') + "\n")
+        f.write(
+            str(counter) +
+            ": " +
+            value['hypothesis'].encode('utf-8') +
+            "\n")
         counter += 1
     f.close()
     print "successful sessions: ", successful, " (", len(summary) - successful, " errors) (" + str(emptyHypotheses) + " empty hypotheses)"

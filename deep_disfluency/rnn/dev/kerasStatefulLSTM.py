@@ -17,11 +17,18 @@ passed in order for the network to learn.
 
 data = [.1, .1, .4, .1, .2]
 data = data * 300
-numOfPrevSteps = 1  # We will only pass in 1 timestep at a time. The network will guess the next step from the previous step and its internal state.
-batchSize = 1  # We are only tracking a single set of features through time per epoch.
-featurelen = 1  # Only a single feature is being trained on. If our data was guess a list of numbers instead of 1 number each time, this would be set equal to the length of that list.
+# We will only pass in 1 timestep at a time. The network will guess the
+# next step from the previous step and its internal state.
+numOfPrevSteps = 1
+# We are only tracking a single set of features through time per epoch.
+batchSize = 1
+# Only a single feature is being trained on. If our data was guess a list
+# of numbers instead of 1 number each time, this would be set equal to the
+# length of that list.
+featurelen = 1
 testingSize = 100  # 100 data points will be used as a test set
-totalTimeSteps = len(data)  # Each element in the data represents one timestep of our single feature.
+# Each element in the data represents one timestep of our single feature.
+totalTimeSteps = len(data)
 
 
 print('Formatting Data')
@@ -50,7 +57,15 @@ could probably be trained off of only 1 layer. Remember to set
 return_sequences=False for the last hidden layer.
 '''
 model = Sequential()
-model.add(LSTM(10, return_sequences=True, batch_input_shape=(batchSize, numOfPrevSteps, featurelen), stateful=True))
+model.add(
+    LSTM(
+        10,
+        return_sequences=True,
+        batch_input_shape=(
+            batchSize,
+            numOfPrevSteps,
+            featurelen),
+        stateful=True))
 model.add(Dropout(0.2))
 model.add(LSTM(10, return_sequences=False, stateful=True))
 model.add(Dropout(0.2))
@@ -70,7 +85,8 @@ for e in range(num_epochs):
 print('training complete')
 
 
-print('warming up on training data')  # Predict on all training data in order to warm up for testing data
+# Predict on all training data in order to warm up for testing data
+print('warming up on training data')
 warmupPredictions = []
 for i in range(0, totalTimeSteps - testingSize):
     pred = model.predict(X[:, numOfPrevSteps * i:(i + 1) * numOfPrevSteps, :])
@@ -79,7 +95,9 @@ for i in range(0, totalTimeSteps - testingSize):
 
 print('testing network')
 predictions = []
-testStart = totalTimeSteps - testingSize - 1  # We subtract one because we want the last element of the training set to be first element of the testing set
+# We subtract one because we want the last element of the training set to
+# be first element of the testing set
+testStart = totalTimeSteps - testingSize - 1
 for i in range(testStart, totalTimeSteps - 1):
     pred = model.predict(X[:, numOfPrevSteps * i:(i + 1) * numOfPrevSteps, :])
     predictions.append(pred)

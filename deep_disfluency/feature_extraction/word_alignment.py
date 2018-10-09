@@ -7,7 +7,8 @@ def cleanup(astring):
     """this allows us to do agreement per word (without weird characters)"""
     # i.e. if this returns "" then don't consider it..
     astring = re.sub("<[^>]+>", "", astring)  # gets rid of tags
-    unwantedchars = ['{', '{f', '{F', '}', '.', '+', '(', ')', '\'', ',', '-', '$unc$']
+    unwantedchars = ['{', '{f', '{F', '}', '.',
+                     '+', '(', ')', '\'', ',', '-', '$unc$']
     for achar in unwantedchars:
         astring = astring.replace(achar, "")
     #astring = astring.strip()
@@ -45,13 +46,16 @@ def align(string1, string2):
     # print string1
     # print string2
 
-    def sub(source, goal, initial):  # 2 words #initial = the table's content initialised as [i,j,"",currentScore,""]
+    # 2 words #initial = the table's content initialised as
+    # [i,j,"",currentScore,""]
+    def sub(source, goal, initial):
         if source == goal:
             return initial[0:2] + ["ID"] + [initial[3], diag]  # NO COST
         elif cleanup(source) == cleanup(goal):
             return initial[0:2] + ["ID"] + [initial[3], diag]  # NO COST ?
         else:
-            return initial[0:2] + ["S_ARB"] + [initial[3] + 2, diag]  # 2 for arbitrary sub
+            return initial[0:2] + ["S_ARB"] + \
+                [initial[3] + 2, diag]  # 2 for arbitrary sub
 
     def delete(source, initial):
         category = "DEL"
@@ -98,7 +102,8 @@ def align(string1, string2):
             # print deltest
             instest = insert(string2[j], [i, j, "", D[i][j - 1], ""])
             # print instest
-            subtest = sub(string1[i], string2[j], [i, j, "", D[i - 1][j - 1], ""])
+            subtest = sub(string1[i], string2[j], [
+                          i, j, "", D[i - 1][j - 1], ""])
             # print subtest
             # print "%%%%%%%"
             # get the min cost set
@@ -131,7 +136,8 @@ def align(string1, string2):
     #    print ptr[p]
 
     # return all and rank by best first approach
-    # if there is a branch, follow and pop the first pointer, effectively removing the path
+    # if there is a branch, follow and pop the first pointer, effectively
+    # removing the path
     def backtrace(D, ptr, i, j, mymap, mymaps):
         if i == 0 and j == 0:  # should always get there directly
             mymaps.append(mymap)
@@ -145,7 +151,8 @@ def align(string1, string2):
             backtrace(D, ptr, i, j, list(mymap), mymaps)
             #ptr[i][j] = filter(lambda x: not x[0] == "\\", ptr[i][j])
             # coarse approximation
-        mymap.insert(0, tuple([max(0, i - 1), max(0, j - 1), alignment, score]))
+        mymap.insert(
+            0, tuple([max(0, i - 1), max(0, j - 1), alignment, score]))
 
         if arrow == "\\":
             backtrace(D, ptr, i - 1, j - 1, mymap, mymaps)
@@ -160,7 +167,9 @@ def align(string1, string2):
             bestscores = []
             if len(mymaps) == 1:
                 return mymaps + tail
-            for mymap in mymaps:  # should this recurse to the last mapping to j (i.e. highest value for i)? yes
+            # should this recurse to the last mapping to j (i.e. highest value
+            # for i)? yes
+            for mymap in mymaps:
                 for mapping in mymap:
                     if mapping[1] == j:
                         bestscore = mapping[3]
@@ -170,7 +179,8 @@ def align(string1, string2):
             best = min(bestscores)
             # print "best"
             # print best
-            # maintain all the best for further sorting; separately sort the tail?
+            # maintain all the best for further sorting; separately sort the
+            # tail?
             i = 0
             a = 0
             while i < len(bestscores):
@@ -193,7 +203,8 @@ def align(string1, string2):
         # print "ranking"
         # print len(mymaps)
         # print mymaps
-        mymaps = rank(mymaps, 0, n)  # sorts the list by best first as you pass left to right in the repair
+        # sorts the list by best first as you pass left to right in the repair
+        mymaps = rank(mymaps, 0, n)
     # for mapping in mymaps:
     #    print mapping
     # print "returning:"
@@ -206,7 +217,8 @@ def matchBlock(ss):
     character blocks for each match. If there are 3 sequences (expected), then it need
     only return the best two alignments. The direction of alignment will be outputted too.
     In using these one can reverse the order if there is no link from a given sequence to the next"""
-    # step 1 do pairwise sequence matching on all in ss and store alignments and scores
+    # step 1 do pairwise sequence matching on all in ss and store alignments
+    # and scores
     s = SequenceMatcher()
     matchstore = []
     for i in range(len(ss)):
@@ -225,13 +237,18 @@ def matchBlock(ss):
             s.set_seq2(y)
             # print s.ratio()
             # print s.get_matching_blocks()
-            matchstore.append((no_1, no_2, s.ratio(), tuple(s.get_matching_blocks())))
-    bestlist = sorted(matchstore, key=lambda x: x[2], reverse=True)  # step 2 find best match in that pairwise agreement
+            matchstore.append(
+                (no_1, no_2, s.ratio(), tuple(
+                    s.get_matching_blocks())))
+    # step 2 find best match in that pairwise agreement
+    bestlist = sorted(matchstore, key=lambda x: x[2], reverse=True)
     best = bestlist[0]
     # print best
     bestset = set()
     bestset.add(tuple(best))
-    remainder = set(xrange(len(ss)))  # step 3 align the remaining sequence to the sequence it matches best to to that sequence
+    # step 3 align the remaining sequence to the sequence it matches best to
+    # to that sequence
+    remainder = set(xrange(len(ss)))
     remainder.remove(best[0])
     remainder.remove(best[1])
     for i in remainder:  # should only be one
@@ -251,10 +268,10 @@ if __name__ == '__main__':
     string1 = ["I", "like", "john"]
     string2 = ["<laughter/>I", "like", "john"]
     print align(string2, string1)
-    #===========================================================================
+    # ===========================================================================
     # a = "<breathing/> Wo man richtig geil drauf chillen kann"
     # b = "Wo man richtig geil drauf chillen kann"
     # c = "wo man richtig geil drauf chillen kann"
     # ss = [a,b,c]
     # print matchBlock(ss)
-    #===========================================================================
+    # ===========================================================================

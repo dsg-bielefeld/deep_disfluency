@@ -39,9 +39,11 @@ def load_data_from_array(data, n_acoust, cs=2, bs=9,
     frames = data[0, :]
     acoustic_data = data[1: n_acoust + 1, :]  # 1 to n_acoust+1 is all acoustic
     # print 'acoustic_data', acoustic_data.shape, acoustic_data[0][0:10]
-    lex_data = data[-3, :]  # NB these should be windows from the outset really?
+    # NB these should be windows from the outset really?
+    lex_data = data[-3, :]
     # print 'lex data', lex_data.shape, lex_data[0:10]
-    pos_data = data[-2, :]  # NB these should be windows from the outset really?
+    # NB these should be windows from the outset really?
+    pos_data = data[-2, :]
     # print 'pos data', pos_data.shape, pos_data[0:10]
     labels = data[-1, :]
     # print 'labels', labels.shape, labels[0:10]
@@ -57,9 +59,12 @@ def load_data_from_array(data, n_acoust, cs=2, bs=9,
     # raw_input()
 
     # these need to be created
-    # indices = data[:, -3:-1] #anti-penult = start, penult = stop; columns show how the slicing of context should be done in training
+    # indices = data[:, -3:-1] #anti-penult = start, penult = stop; columns
+    # show how the slicing of context should be done in training
     labels = list(data[-1, :])  # last one is the label column
-    if "simple" not in tags:  # TODO this is a hack as the data should be in the right format remove after exps.
+    # TODO this is a hack as the data should be in the right format remove
+    # after exps.
+    if "simple" not in tags:
         for i in range(0, len(labels)):
             # if 'simple' in tags:
             labels[i] = convert_from_full_tag_set_to_idx(
@@ -70,7 +75,11 @@ def load_data_from_array(data, n_acoust, cs=2, bs=9,
     # print 'labels', labels.shape, labels[0:10]
 
     # print 'CREATED'
-    indices = np.asarray(indices_from_length(len(lex_data), bs, 0)).astype('int32')
+    indices = np.asarray(
+        indices_from_length(
+            len(lex_data),
+            bs,
+            0)).astype('int32')
     # print 'indices', indices.shape, indices[0:10]
 
     # raw_input()
@@ -80,18 +89,45 @@ def load_data_from_array(data, n_acoust, cs=2, bs=9,
 def switchboard_data(train_data=None, tags=None):
     """Returns the training, validation and test data and the tag and word index representations for switchboard"""
 
-    ftrain = open(os.path.sep.join([DATAPREFIX, 'disfluency_detection', 'switchboard', train_data + '_partial_data.csv']))
-    fvalid = open(os.path.sep.join([DATAPREFIX, 'disfluency_detection', 'switchboard', 'swbd_heldout_partial_data.csv']))
-    ftest = open(os.path.sep.join([DATAPREFIX, 'disfluency_detection', 'switchboard', 'swbd_test_partial_data.csv']))
+    ftrain = open(os.path.sep.join([DATAPREFIX,
+                                    'disfluency_detection',
+                                    'switchboard',
+                                    train_data + '_partial_data.csv']))
+    fvalid = open(os.path.sep.join([DATAPREFIX,
+                                    'disfluency_detection',
+                                    'switchboard',
+                                    'swbd_heldout_partial_data.csv']))
+    ftest = open(os.path.sep.join([DATAPREFIX,
+                                   'disfluency_detection',
+                                   'switchboard',
+                                   'swbd_test_partial_data.csv']))
     test_dict = defaultdict()
-    test_dict['words2idx'] = load_word_rep(os.path.sep.join([DATAPREFIX, 'tag_representations', 'swbd_word_rep.csv']))
-    test_dict['pos2idx'] = load_word_rep(os.path.sep.join([DATAPREFIX, 'tag_representations', 'swbd_pos_rep.csv']))
-    test_dict['labels2idx'] = load_tags(os.path.sep.join([DATAPREFIX, 'tag_representations', 'swbd' + tags + '_tags.csv']))
+    test_dict['words2idx'] = load_word_rep(os.path.sep.join(
+        [DATAPREFIX, 'tag_representations', 'swbd_word_rep.csv']))
+    test_dict['pos2idx'] = load_word_rep(os.path.sep.join(
+        [DATAPREFIX, 'tag_representations', 'swbd_pos_rep.csv']))
+    test_dict['labels2idx'] = load_tags(os.path.sep.join(
+        [DATAPREFIX, 'tag_representations', 'swbd' + tags + '_tags.csv']))
 
     # load testing corpora
-    train = load_data_from_file(ftrain, test_dict['words2idx'], test_dict['pos2idx'], test_dict['labels2idx'], representation=tags)
-    valid = load_data_from_file(fvalid, test_dict['words2idx'], test_dict['pos2idx'], test_dict['labels2idx'], representation=tags)
-    test = load_data_from_file(ftest, test_dict['words2idx'], test_dict['pos2idx'], test_dict['labels2idx'], representation=tags)
+    train = load_data_from_file(
+        ftrain,
+        test_dict['words2idx'],
+        test_dict['pos2idx'],
+        test_dict['labels2idx'],
+        representation=tags)
+    valid = load_data_from_file(
+        fvalid,
+        test_dict['words2idx'],
+        test_dict['pos2idx'],
+        test_dict['labels2idx'],
+        representation=tags)
+    test = load_data_from_file(
+        ftest,
+        test_dict['words2idx'],
+        test_dict['pos2idx'],
+        test_dict['labels2idx'],
+        representation=tags)
 
     return train, valid, test, test_dict
 
@@ -100,7 +136,8 @@ def load_word_rep(filepath, dimension=None, word_rep_type="one_hot"):
     """Returns a word_rep_dictionary from word(string) indicating an index by an integer"""
     word_rep_dictionary = None
     if word_rep_type == "one_hot":
-        word_rep_dictionary = defaultdict(int)  # TODO could use sparse matrices instead?
+        # TODO could use sparse matrices instead?
+        word_rep_dictionary = defaultdict(int)
         f = open(filepath)
         for line in f:
             l = line.strip("\n").split(",")
@@ -126,7 +163,8 @@ def load_tags(filepath):
     return tag_dictionary
 
 
-def load_data_from_file(f, word_rep, pos_rep, tag_rep, representation="1", limit=8, n_seq=None):
+def load_data_from_file(f, word_rep, pos_rep, tag_rep,
+                        representation="1", limit=8, n_seq=None):
     """Loads from file into five lists of arrays of equal length:
     one for utterance iDs (IDs))
     one for the timings of the tags (start, stop)
@@ -152,7 +190,8 @@ def load_data_from_file(f, word_rep, pos_rep, tag_rep, representation="1", limit
     currentPOS = []
     currentTags = []
     currentTimings = []
-    current_fake_time = 0  # marks the current fake time for the dialogue (i.e. end of word)
+    # marks the current fake time for the dialogue (i.e. end of word)
+    current_fake_time = 0
     current_dialogue = ""
 
     # corpus = "" # can write to file
@@ -166,11 +205,14 @@ def load_data_from_file(f, word_rep, pos_rep, tag_rep, representation="1", limit
                 if "0" in representation:  # turn taking only
                     currentTags = [""] * len(currentTags)
                 else:
-                    currentTags = convert_from_eval_tags_to_inc_disfluency_tags(currentTags, currentWords, representation=representation, limit=limit)
+                    currentTags = convert_from_eval_tags_to_inc_disfluency_tags(
+                        currentTags, currentWords, representation=representation, limit=limit)
                 if 'trp' in representation:
                     currentTags = add_word_continuation_tags(currentTags)
                 if 'simple' in representation:
-                    currentTags = map(lambda x: convert_to_simple_label(x, rep=representation), currentTags)
+                    currentTags = map(
+                        lambda x: convert_to_simple_label(
+                            x, rep=representation), currentTags)
                 # corpus+=utt_reference #write data to a file for checking
                 # convert to vectors
                 words = []
@@ -179,14 +221,15 @@ def load_data_from_file(f, word_rep, pos_rep, tag_rep, representation="1", limit
                 for i in range(0, len(currentTags)):
                     w = word_rep.get(currentWords[i])
                     pos = pos_rep.get(currentPOS[i])
-                    tag = tag_rep.get(currentTags[i])  # NB POS tags in switchboard at l[2]
-                    if w == None:
+                    # NB POS tags in switchboard at l[2]
+                    tag = tag_rep.get(currentTags[i])
+                    if w is None:
                         logging.info("No word rep for :" + currentWords[i])
                         w = word_rep.get("<unk>")
-                    if pos == None:
+                    if pos is None:
                         logging.info("No pos rep for :" + currentPOS[i])
                         pos = pos_rep.get("<unk>")
-                    if tag == None:
+                    if tag is None:
                         logging.info("No tag rep for:" + currentTags[i])
                         print utt_reference, currentTags, words
                         raise Exception("No tag rep for:" + currentTags[i])
@@ -222,25 +265,29 @@ def load_data_from_file(f, word_rep, pos_rep, tag_rep, representation="1", limit
         if "0" in representation:  # turn taking only
             currentTags = [""] * len(currentTags)
         else:
-            currentTags = convert_from_eval_tags_to_inc_disfluency_tags(currentTags, currentWords, representation=representation, limit=limit)
+            currentTags = convert_from_eval_tags_to_inc_disfluency_tags(
+                currentTags, currentWords, representation=representation, limit=limit)
         if 'trp' in representation:
             currentTags = add_word_continuation_tags(currentTags)
         if 'simple' in representation:
-            currentTags = map(lambda x: convert_to_simple_label(x, rep=representation), currentTags)
+            currentTags = map(
+                lambda x: convert_to_simple_label(
+                    x, rep=representation), currentTags)
         words = []
         pos_tags = []
         tags = []
         for i in range(0, len(currentTags)):
             w = word_rep.get(currentWords[i])
             pos = pos_rep.get(currentPOS[i])
-            tag = tag_rep.get(currentTags[i])  # NB POS tags in switchboard at l[2]
-            if w == None:
+            # NB POS tags in switchboard at l[2]
+            tag = tag_rep.get(currentTags[i])
+            if w is None:
                 logging.info("No word rep for :" + currentWords[i])
                 w = word_rep.get("<unk>")
-            if pos == None:
+            if pos is None:
                 logging.info("No pos rep for :" + currentPOS[i])
                 pos = pos_rep.get("<unk>")
-            if tag == None:
+            if tag is None:
                 logging.info("No tag rep for:" + currentTags[i])
                 print utt_reference, currentTags, words
                 raise Exception("No tag rep for:" + currentTags[i])
@@ -298,7 +345,8 @@ def load_increco_data_from_file(increco_filename, word_2_ind, pos_2_ind):
                 acoustic_data = [0, ] * len(lex_data)  # fakes..
                 indices = [0, ] * len(lex_data)
                 labels = [0, ] * len(lex_data)
-                all_speakers.append((conv_no, (frames, acoustic_data, lex_data, pos_data, indices, labels)))
+                all_speakers.append(
+                    (conv_no, (frames, acoustic_data, lex_data, pos_data, indices, labels)))
                 # reset
                 lex_data = []
                 pos_data = []
@@ -335,7 +383,8 @@ def load_increco_data_from_file(increco_filename, word_2_ind, pos_2_ind):
     acoustic_data = [0, ] * len(lex_data)  # fakes..
     indices = [0, ] * len(lex_data)
     labels = [0, ] * len(lex_data)
-    all_speakers.append((conv_no, (frames, acoustic_data, lex_data, pos_data, indices, labels)))
+    all_speakers.append(
+        (conv_no, (frames, acoustic_data, lex_data, pos_data, indices, labels)))
     print len(all_speakers), "speakers with increco input"
     return all_speakers
 
@@ -373,7 +422,8 @@ def load_data_from_timings_file(filename, word_2_ind, pos_2_ind):
                             shift = i
                             break
                     if shift > -1:
-                        latest_increco = fill_in_time_approximations(latest_increco, shift)
+                        latest_increco = fill_in_time_approximations(
+                            latest_increco, shift)
                     lex_data.append(deepcopy(latest_increco))
                     pos_data.append(deepcopy(latest_pos))
                     # convert to the disfluency tags for this
@@ -385,7 +435,8 @@ def load_data_from_timings_file(filename, word_2_ind, pos_2_ind):
                 acoustic_data = [0, ] * len(lex_data)  # fakes..
                 indices = [0, ] * len(lex_data)
 
-                all_speakers.append((conv_no, (frames, acoustic_data, lex_data, pos_data, indices, labels)))
+                all_speakers.append(
+                    (conv_no, (frames, acoustic_data, lex_data, pos_data, indices, labels)))
                 # reset
                 lex_data = []
                 pos_data = []
@@ -435,7 +486,8 @@ def load_data_from_timings_file(filename, word_2_ind, pos_2_ind):
     frames = [x[-1][-1] for x in lex_data]  # last word end time
     acoustic_data = [0, ] * len(lex_data)  # fakes..
     indices = [0, ] * len(lex_data)
-    all_speakers.append((conv_no, (frames, acoustic_data, lex_data, pos_data, indices, labels)))
+    all_speakers.append(
+        (conv_no, (frames, acoustic_data, lex_data, pos_data, indices, labels)))
     print len(all_speakers), "speakers with timings input"
     return all_speakers
 
@@ -459,7 +511,8 @@ def get_tag_data_from_corpus_file(f, representation="1", limit=8):
     targets = []
     timings = []
     currentTimings = []
-    current_fake_time = 0  # marks the current fake time for the dialogue (i.e. end of word)
+    # marks the current fake time for the dialogue (i.e. end of word)
+    current_fake_time = 0
     current_dialogue = ""
 
     reader = csv.reader(f, delimiter='\t')
@@ -480,7 +533,8 @@ def get_tag_data_from_corpus_file(f, representation="1", limit=8):
                 if 'trp' in representation:
                     currentTags = add_word_continuation_tags(currentTags)
                 if 'simple' in representation:
-                    currentTags = map(lambda x: convert_to_simple_label(x), currentTags)
+                    currentTags = map(
+                        lambda x: convert_to_simple_label(x), currentTags)
                 # corpus+=utt_reference #write data to a file for checking
                 # convert to vectors
                 seq.append(tuple(currentWords))
@@ -510,7 +564,9 @@ def get_tag_data_from_corpus_file(f, representation="1", limit=8):
         if 'trp' in representation:
             currentTags = add_word_continuation_tags(currentTags)
         if 'simple' in representation:
-            currentTags = map(lambda x: convert_to_simple_label(x), currentTags)
+            currentTags = map(
+                lambda x: convert_to_simple_label(x),
+                currentTags)
         seq.append(tuple(currentWords))
         pos_seq.append(tuple(currentPOS))
         targets.append(tuple(currentTags))

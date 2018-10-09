@@ -48,7 +48,8 @@ class LSTM(object):
         npos :: number of pos tags
         '''
 
-        self.emb = init_weight((ne + 1, de), 'emb')  # add one to ne for PADDING
+        # add one to ne for PADDING
+        self.emb = init_weight((ne + 1, de), 'emb')
         self.n_in = (de * cs) + (npos * cs)
         self.n_lstm = n_lstm
         self.n_out = n_out

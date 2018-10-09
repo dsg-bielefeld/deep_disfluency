@@ -81,5 +81,5 @@ class DeepTaggerModule(fluteline.Consumer):
                 # print self.word_graph[idx]
                 # output the new tags for the updated word
                 self.output.put(self.word_graph[idx])
-        except:
+        except BaseException:
             print "Disfluency tagger failed to update with new word"

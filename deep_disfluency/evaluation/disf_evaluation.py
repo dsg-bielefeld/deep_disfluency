@@ -304,9 +304,9 @@ def final_output_disfluency_eval(prediction_speakers_dict,
     for s in sorted(prediction_speakers_dict.keys()):
 
         # print s
-        if gold_speakers_dict.get(s) == None:
+        if gold_speakers_dict.get(s) is None:
             s_test = s.replace("-", "")
-            if gold_speakers_dict.get(s_test) == None:
+            if gold_speakers_dict.get(s_test) is None:
                 print s, "not in gold"
                 continue
             else:
@@ -571,7 +571,7 @@ def incremental_output_disfluency_eval(prediction_speakers_dict,
             carry_on = True
         if not carry_on:
             continue
-        if gold_speakers_dict.get(s) == None:
+        if gold_speakers_dict.get(s) is None:
             print s, "not in gold"
             continue
         hyp = prediction_speakers_dict[s]
@@ -629,7 +629,7 @@ def incremental_output_disfluency_eval(prediction_speakers_dict,
         for s in sorted(prediction_speakers_dict.keys()):
 
             # print s
-            if gold_speakers_dict.get(s) == None:
+            if gold_speakers_dict.get(s) is None:
                 print s, "not in gold"
                 continue
             if outputfilename:

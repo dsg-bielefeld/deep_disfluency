@@ -8,7 +8,8 @@
 # Does this via the following steps:
 # 1. Use SOX to convert .sph to .wav
 # 2. Use SOX to split channels into 2 separate .wav files (ideally remove cross talk noise too)
-# 3. Get audio features from OpenSmile for each channel (TODO could also get IBM ASR results too)
+# 3. Get audio features from OpenSmile for each channel (TODO could also
+# get IBM ASR results too)
 
 
 # In[6]:
@@ -34,7 +35,8 @@ if not converted_to_wav:
     sph_files = os.listdir(rootdir)
     sph_files = filter(lambda x: x[-4:] == ".sph", sph_files)
     for sph in sph_files:
-        c = 'sox ' + '"' + rootdir + sph + '"' + " -e signed-integer " + '"' + rootdir + "wav/" + sph.replace(".sph", ".wav") + '"'
+        c = 'sox ' + '"' + rootdir + sph + '"' + " -e signed-integer " + \
+            '"' + rootdir + "wav/" + sph.replace(".sph", ".wav") + '"'
         print c
         os.system(c)
 
@@ -53,8 +55,10 @@ for wav in sorted(wavfiles):
         continue
     print wav
     wavfile = rootdir + "wav/" + wav
-    commandl = 'sox ' + '"' + wavfile + '" ' + '"' + sep_dir + wav.replace(".wav", "_l.wav") + '" ' + ' remix 1'
-    commandr = 'sox ' + '"' + wavfile + '" ' + '"' + sep_dir + wav.replace(".wav", "_r.wav") + '" ' + ' remix 2'
+    commandl = 'sox ' + '"' + wavfile + '" ' + '"' + sep_dir + \
+        wav.replace(".wav", "_l.wav") + '" ' + ' remix 1'
+    commandr = 'sox ' + '"' + wavfile + '" ' + '"' + sep_dir + \
+        wav.replace(".wav", "_r.wav") + '" ' + ' remix 2'
     #commanddel = "rm " + rootdir+"wav/"+wav
     print wavfile
     # print commandl
@@ -88,7 +92,8 @@ wavfiles = os.listdir(rootdir + "/wav")
 for wav in sorted(wavfiles):
     wavfile = rootdir + "wav/" + wav
     csv = wavfile.replace("/wav/", "/audio_features/").replace(".wav", ".csv")
-    c = '/Applications/openSMILE-2.1.0/inst/bin/SMILExtract -nologfile -C {} -I "{}" -O "{}"'.format(config, wavfile, csv)
+    c = '/Applications/openSMILE-2.1.0/inst/bin/SMILExtract -nologfile -C {} -I "{}" -O "{}"'.format(
+        config, wavfile, csv)
     # print c
     print wavfile
     os.system(c)

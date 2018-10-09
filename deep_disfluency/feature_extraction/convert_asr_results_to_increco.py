@@ -1,4 +1,5 @@
-# script to take in asr results in JSON format to increco style (incremental asr results) format
+# script to take in asr results in JSON format to increco style
+# (incremental asr results) format
 import json
 import os
 import shutil
@@ -9,8 +10,12 @@ from feature_utils import sort_into_dialogue_speakers, wer, get_diff_and_new_pre
 
 asr_dir = "/home/dsg-labuser/git/simple_rnn_disf/rnn_disf_detection/data/asr_results/"
 div_dir = "/home/dsg-labuser/git/simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/"
-heldout_ranges = [line.strip("\n") for line in open(div_dir + "SWDisfHeldout_ranges.text")]
-test_ranges = [line.strip("\n") for line in open(div_dir + "SWDisfTest_ranges.text")]
+heldout_ranges = [
+    line.strip("\n") for line in open(
+        div_dir +
+        "SWDisfHeldout_ranges.text")]
+test_ranges = [line.strip("\n")
+               for line in open(div_dir + "SWDisfTest_ranges.text")]
 
 heldout_file = open(asr_dir + "SWDisfHeldout_increco.text", "w")
 test_file = open(asr_dir + "SWDisfTest_increco.text", "w")
@@ -18,15 +23,19 @@ leftout_ranges = [line.strip("\n") for line in open(asr_dir + "leftout_asr")]
 
 
 # split the big disfluency marked -up files into individual file tuples
-# it is possible to do the matching on the utterance level as they should have consistent mark-up between the two
+# it is possible to do the matching on the utterance level as they should
+# have consistent mark-up between the two
 disf_dir = "../data/disfluency_detection/switchboard"
 disfluency_files = [
     disf_dir + "/swbd_heldout_partial_data.csv",
     disf_dir + "/swbd_test_partial_data.csv"]
 dialogue_speakers = []
 for key, disf_file in zip(["heldout", "test"], disfluency_files):
-    IDs, mappings, utts, pos_tags, labels = load_data_from_disfluency_corpus_file(disf_file)
-    dialogue_speakers.extend(sort_into_dialogue_speakers(IDs, mappings, utts, pos_tags, labels))
+    IDs, mappings, utts, pos_tags, labels = load_data_from_disfluency_corpus_file(
+        disf_file)
+    dialogue_speakers.extend(
+        sort_into_dialogue_speakers(
+            IDs, mappings, utts, pos_tags, labels))
 word_pos_data = {}  # map from the file name to the data
 for data in dialogue_speakers:
     dialogue, a, b, c, d = data
@@ -89,7 +98,8 @@ for filename in sorted(os.listdir(asr_dir)):
         if diff == []:
             continue
         results_string += "Time: " + str(time_stamp) + "\n"
-        results_string += "\n".join(["\t".join([str(mya) for mya in abc]) for abc in diff])
+        results_string += "\n".join(["\t".join([str(mya)
+                                                for mya in abc]) for abc in diff])
         results_string += "\n\n"
         # raw_input()
     # break
@@ -107,9 +117,11 @@ for filename in sorted(os.listdir(asr_dir)):
             best = ""
             if assigned == "":
                 for speaker in ["A", "B"]:
-                    first100 = [x.replace("$unc", "").replace("$", "").lower() for x in word_pos_data[conv_no_overall + speaker][1]]
+                    first100 = [x.replace("$unc", "").replace("$", "").lower(
+                    ) for x in word_pos_data[conv_no_overall + speaker][1]]
 
-                    f100 = [x[0].replace("%HESITATION", "uh") for x in single[p][1]]
+                    f100 = [x[0].replace("%HESITATION", "uh")
+                            for x in single[p][1]]
                     first100results = []
                     for word in f100:
                         capital = True
@@ -117,15 +129,20 @@ for filename in sorted(os.listdir(asr_dir)):
                             if not letter in "ABCDEFGHIJKLMNOPQRSTUVWXYZ":
                                 capital = False
                         if capital and len(word) > 1:
-                            first100results.extend([x.lower().encode('utf8') for x in word])
+                            first100results.extend(
+                                [x.lower().encode('utf8') for x in word])
                         else:
-                            first100results.append(word.lower().replace("'", "").encode('utf8'))
+                            first100results.append(
+                                word.lower().replace(
+                                    "'", "").encode('utf8'))
                         # print first100results
                         # raw_input()
 
                     print len(first100)
                     print len(first100results)
-                    WER = wer(" ".join(first100).split(), " ".join(first100results).split())
+                    WER = wer(
+                        " ".join(first100).split(),
+                        " ".join(first100results).split())
                     print first100
                     print first100results
                     print "wer", WER
@@ -151,7 +168,8 @@ for filename in sorted(os.listdir(asr_dir)):
         else:
             for single in pair:
                 filename = single[single.keys()[0]][-1]
-                results = single[single.keys()[0]][0].replace("%HESITATION", "uh")
+                results = single[single.keys()[0]][0].replace(
+                    "%HESITATION", "uh")
                 average_wer.append(single[single.keys()[0]][-2])
                 file.write("File: " + filename + "\n")
                 file.write(results)

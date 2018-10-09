@@ -49,7 +49,8 @@ def swbd_folds_disfluency_corpus(input, num_files=496, num_folds=10):
 
     # calculate the dividing points based on nearest int
     divs = []
-    for i in range(1, num_folds):  # goes up to n-1th fold to get the split point
+    for i in range(
+            1, num_folds):  # goes up to n-1th fold to get the split point
         split_point = int((i / num_folds) * num_files)
         divs.append(split_point)
     divs.append(num_files - 1)  # add the last one
@@ -307,7 +308,7 @@ class IncrementalLanguageModelFeatureExtractor():
                 wordLocalWMLBoost = wordWML - originalLocalWordWML
                 wordLocalProbBoost = wordlogprob - originalLocalWordLogProb
                 # wordCleanTest = nonEditPrefixWords[:k-1] + \
-                #[nonEditPrefixWords[-1]] #the last one
+                # [nonEditPrefixWords[-1]] #the last one
 
                 wordCleanTest = self.word_graph.subgraph([0, k - 1], self.lm)
                 wordCleanTest.extend(self.word_graph.subgraph([
@@ -398,7 +399,7 @@ class IncrementalLanguageModelFeatureExtractor():
                             self.pos_model.order)
                     # uncleaned bigram around the rm0 boundary- should be high
                     # POSCleanTest = nonEditPrefixPOS[:k-1] + \
-                    #[nonEditPrefixPOS[-1]]
+                    # [nonEditPrefixPOS[-1]]
                     POSCleanTest = self.pos_graph.subgraph([0, k - 1],
                                                            self.pos_model)
                     POSCleanTest.extend(self.pos_graph.subgraph(

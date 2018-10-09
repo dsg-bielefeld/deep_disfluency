@@ -99,7 +99,7 @@ class TreeMapWriter:
 
             # iterating through transcript utterance by utterance
             # create list of tuples i.e. map from word to the index(ices)
-            #(possibly multiple or null) of the relevant leaf/ves
+            # (possibly multiple or null) of the relevant leaf/ves
             # of a given tree i.e. utt.tree[0].leaves[0] would be a pair (0,0))
             while count < translength:
                 utt = trans.utterances[count]
@@ -127,7 +127,8 @@ class TreeMapWriter:
                 # initialise pairs of trees and ptb pairs
                 trees = []
                 for l in range(0, len(utt.trees)):
-                    trees.append((utt.ptb_treenumbers[l], count, l, utt.trees[l]))
+                    trees.append(
+                        (utt.ptb_treenumbers[l], count, l, utt.trees[l]))
                 # print "TREES = "
                 # for tree in trees:
                 #    print tree
@@ -144,7 +145,8 @@ class TreeMapWriter:
                 lastTreeMap = None
                 if previousUttSame:
                     # print "search for previous full act utt
-                    # for " + str(utt.swda_filename) + str(utt.transcript_index)
+                    # for " + str(utt.swda_filename) +
+                    # str(utt.transcript_index)
                     lastTreeMap = wordTreeMapList.get_treemap(
                         trans,
                         previousUttSame)
@@ -209,7 +211,7 @@ class TreeMapWriter:
                         # than its antecdent's, rare mistake
                         elif utt.ptb_treenumbers[0] < lastTrees[-1][0]:
                             # continue with this utterance and trees
-                            #(if there are any), but replace its first
+                            # (if there are any), but replace its first
                             # tree with its antecdents last one
                             forwardtrack = 1
                             trees = [lastTrees[-1]] + origtrees[1:]
@@ -231,7 +233,7 @@ class TreeMapWriter:
                             if len(lastTreeMap[t][1]) > 0:
                                 # print "last treemapping of last
                                 # caller utterance =
-                                #" + str(lastTreeMap[t][1][-1])
+                                # " + str(lastTreeMap[t][1][-1])
                                 j = lastTreeMap[t][1][-1][1] + 1
                                 found_treemap = True
                                 # print "found last mapping, j -1 = " + str(j-1)
@@ -323,7 +325,7 @@ class TreeMapWriter:
                                     # str(utt.swda_filename) + " " + \
                                     # utt.caller + "." +  \
                                     # str(utt.utterance_index) + \
-                                    #"." + str(utt.subutterance_index))
+                                    # "." + str(utt.subutterance_index))
                                     del words[0]  # word is consumed
                                     if len(words) > 0:
                                         word = words[0]  # next word
@@ -428,7 +430,7 @@ class TreeMapWriter:
                                 str(utt.subutterance_index) + \
                                 "POSSIBLE COMMENT = " + str(possibleComment)
                             # print errormessage
-                            if not errorLog == None:
+                            if not errorLog is None:
                                 errorLog.write(errormessage + "\n")
                             # raw_input()
                             if backtrack == 1:
@@ -590,7 +592,7 @@ class TreeMapWriter:
             wordTreeMapList = TreeMapCorpus(False, errorLog)  # reset each time
         print "\n" + str(incorrectTrees) + " incorrect trees"
         corpus_file.close()
-        if not errorLog == None:
+        if not errorLog is None:
             errorLog.close()
 
 
@@ -846,7 +848,8 @@ class POSMapWriter:
                                     wordtest = wordtest.replace("'", "")
                                 if len(wordPOSMap) > 0:
                                     found = False
-                                    for n in range(len(wordPOSMap) - 1, -1, -1):
+                                    for n in range(
+                                            len(wordPOSMap) - 1, -1, -1):
                                         if len(wordPOSMap[n][1]) > 0:
                                             j = wordPOSMap[n][1][-1] + 1
                                             # print j
@@ -866,7 +869,8 @@ class POSMapWriter:
                                 mapping for ''" + words[0] + "'' in file/utt:"\
                                     + str(utt.swda_filename) + "-" + \
                                     str(utt.transcript_index) + \
-                                    "POSSIBLE COMMENT = " + str(possibleComment)
+                                    "POSSIBLE COMMENT = " + \
+                                    str(possibleComment)
                                 del words[0]  # remove word
                                 if len(words) > 0:
                                     word = words[0]

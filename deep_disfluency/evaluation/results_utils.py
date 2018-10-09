@@ -13,7 +13,7 @@ final_result_to_latex_dict = OrderedDict((key, val) for key, val in [
     ("f1_<rm_word", """$F_{rm}$ (per word)"""),
     ("f1_<rps_word", """$F_{rps}$ (per word)"""),
     ("f1_<e_word", """$F_{e}$ (per word)"""),
-    ("f1_t/>_word",  """$F_{uttSeg}$ (per word)"""),
+    ("f1_t/>_word", """$F_{uttSeg}$ (per word)"""),
     ("f1_<rps_relaxed_interval", """$F_{rps}$ (per 10s window)"""),
     ("p_<rps_relaxed_interval", """$P_{rps}$ (per 10s window)"""),
     ("r_<rps_relaxed_interval", """$R_{rps}$ (per 10s window)"""),
@@ -115,7 +115,7 @@ def extract_accuracies_from_file(accuracyFile, learningCurveDict):
             if e % 2 != 0:
                 tag = data[0]
                 # print tag
-                if not learningCurveDict.get(tag) == None:
+                if not learningCurveDict.get(tag) is None:
                     learningCurveDict[tag].append(float(data[3]))
             # now the rest
             for line in accuracyFile:
@@ -124,7 +124,7 @@ def extract_accuracies_from_file(accuracyFile, learningCurveDict):
                     break
                 if e % 2 == 0:
                     tag = data[0]
-                    if not learningCurveDict.get(tag) == None:
+                    if not learningCurveDict.get(tag) is None:
                         learningCurveDict[tag].append(float(data[3]))
 
                 # if e > limit: break

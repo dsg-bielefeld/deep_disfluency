@@ -20,6 +20,7 @@ from copy import deepcopy
 from word_alignment import align
 from feature_utils import load_data_from_disfluency_corpus_file
 from feature_utils import sort_into_dialogue_speakers
+from functools import reduce
 
 
 def get_best_word_alignment(ms_words, swda_words, ms_start_times,
@@ -148,7 +149,7 @@ def timings_for_MS_SWDAwords_from_MSwords(current_MSwords,
                     j = j - 1
                     break
             # we have inserted words, give them start times of the previous word
-            #(or next one after the INS tags if its the beginning of the utt)
+            # (or next one after the INS tags if its the beginning of the utt)
             if len(final_start_times) > 0:
                 # print "INS case 1"
                 shared_length = final_end_times[-1] - final_start_times[-1]
@@ -300,7 +301,8 @@ def clean_word(word):
         word = "<laughter>" + word + "</laughter>"
         return word
     if "[" in word and "/" in word:
-        # TODO our vernacular dictionary #for now using the actually heard word?
+        # TODO our vernacular dictionary #for now using the actually heard
+        # word?
         word = word[word.find("/") + 1:-1]  # [arear/area]
     if "_1" in word:
         word = word.replace("_1", "")
@@ -381,7 +383,8 @@ def map_MS_to_SWDA(MSfilename, SWDAindices, SWDAwords, laughter=False,
     currentUttIndex = ""
     current_SWDAwords = []
     current_SWDAindices = []
-    current_MSwords = []  # will be tuples of (MSword, MS2_SWDA_infil_alignment)
+    # will be tuples of (MSword, MS2_SWDA_infil_alignment)
+    current_MSwords = []
     current_MS_SWDAwords = []
     current_start_times = []
     current_end_times = []
@@ -469,7 +472,8 @@ def map_MS_to_SWDA(MSfilename, SWDAindices, SWDAwords, laughter=False,
         MSSWDAalignment = data[4]
         current_start_time = float(data[2].strip())
         word = data[5].replace("\n", "")  # take the SWDA word to be mapped
-        MSword = data[6].replace("\n", "")  # the MSword to be mapped to the SWDA
+        # the MSword to be mapped to the SWDA
+        MSword = data[6].replace("\n", "")
         current_end_time = float(data[3].strip())  # always resets
         if laughter_status:
             if current_SWDAindices:
@@ -612,7 +616,8 @@ def map_MS_to_SWDA(MSfilename, SWDAindices, SWDAwords, laughter=False,
             if final_insert_words:  # extend any extras at the beginning
                 # print "final insert words found", final_insert_words
                 current_MS_SWDAwords.extend(deepcopy(final_insert_words))
-                current_MSwords.extend(len(final_insert_words) * [("", "<INS>")])
+                current_MSwords.extend(
+                    len(final_insert_words) * [("", "<INS>")])
                 dummy_start_time = 0
                 dummy_end_time = current_start_time
                 if len(end_times) > 0:  # use the last value if it exists
@@ -775,7 +780,7 @@ if __name__ == '__main__':
     # path to the MS aligned transcripts
     alignments_dir = args.wordAlignmentFolder
     write_mapping = True
-    #"../../../swbd/MSaligned/alignments"
+    # "../../../swbd/MSaligned/alignments"
     # nb don't really need the below, just for writing map
     if write_mapping:
         timings_corpus_file = open(args.corpusLocation.replace("data.csv",
@@ -807,7 +812,8 @@ if __name__ == '__main__':
     # to map to them,
     # then use the delete/insert/sub operations in the files to get the pointer.
     # So the mapping is MSnew -> MSSWDAold -> SWDAold,
-    # where the last mapping is done through min. edit distance string alignment
+    # where the last mapping is done through min. edit distance string
+    # alignment
     tests = ["2549B"]
     print "Creating word timing aligned corpus..."
     for dialogue_triple in sorted(dialogue_speakers, key=lambda x: x[0]):
@@ -833,7 +839,7 @@ if __name__ == '__main__':
         MSfilename = alignments_dir + "/" + dialogue_speakerID[0:1] + "/" +\
             "sw{}-ms98-a-penn.text".format(dialogue_speakerID)
         # can switch between A and B, use the original PTB role names
-        #(not the MS ones)
+        # (not the MS ones)
         speaker = getSWDAspeaker(MSfilename)
         # print speaker
         # NB do we need to sample the first n words to check which speaker

@@ -118,8 +118,10 @@ class DeepDisfluencyTagger(IncrementalTagger):
             config_number = 35
             print "No config file, using default", config_file, config_number
 
-        config_file = os.path.join(os.path.dirname(__file__), '..', config_file)
-        saved_model_dir = os.path.join(os.path.dirname(__file__), '..', saved_model_dir)
+        config_file = os.path.join(
+            os.path.dirname(__file__), '..', config_file)
+        saved_model_dir = os.path.join(
+            os.path.dirname(__file__), '..', saved_model_dir)
 
         super(DeepDisfluencyTagger, self).__init__(config_file,
                                                    config_number,
@@ -194,7 +196,8 @@ class DeepDisfluencyTagger(IncrementalTagger):
             intereg_ind = len(self.hmm_dict.keys())
             interreg_tag = \
                 "<i/><cc/>" if "uttseg" in self.args.tags else "<i/>"
-            self.hmm_dict[interreg_tag] = intereg_ind  # add the interregnum tag
+            # add the interregnum tag
+            self.hmm_dict[interreg_tag] = intereg_ind
 
         # decoder_file = os.path.dirname(os.path.realpath(__file__)) + \
         #     "/../decoder/model/{}_tags".format(self.args.tags)

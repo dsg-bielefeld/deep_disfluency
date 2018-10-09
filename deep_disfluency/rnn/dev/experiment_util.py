@@ -185,7 +185,8 @@ def save_predictions_and_quick_eval(predictions_filename=None,
                 rollback = 0
                 current_words, newsuffix, rollback = get_diff_and_new_prefix(
                     current_words, new_lex, verbose=False)
-                current_pos = current_pos[:len(current_pos) - rollback] + new_pos
+                current_pos = current_pos[:len(
+                    current_pos) - rollback] + new_pos
                 current_words_string = current_words_string[
                     :len(current_words_string) - rollback] + \
                     [idx_to_word_dict[x[0][-1]] for x in new_lex]

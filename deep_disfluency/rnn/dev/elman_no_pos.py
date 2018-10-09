@@ -40,16 +40,31 @@ class model_no_pos(object):
         self.L2_reg = 0.00001
 
         # bundle
-        self.params = [self.emb, self.Wx, self.Wh, self.W, self.bh, self.b, self.h0]
+        self.params = [
+            self.emb,
+            self.Wx,
+            self.Wh,
+            self.W,
+            self.bh,
+            self.b,
+            self.h0]
         self.names = ['embeddings', 'Wx', 'Wh', 'W', 'bh', 'b', 'h0']
 
-        self.idxs = T.imatrix()  # as many columns as context window size/lines as words in the sentence
+        # as many columns as context window size/lines as words in the sentence
+        self.idxs = T.imatrix()
 
         x = self.emb[self.idxs].reshape((self.idxs.shape[0], de * cs))
         self.y = T.iscalar('y')  # label
 
         def recurrence(x_t, h_tm1):
-            h_t = T.nnet.sigmoid(T.dot(x_t, self.Wx) + T.dot(h_tm1, self.Wh) + self.bh)
+            h_t = T.nnet.sigmoid(
+                T.dot(
+                    x_t,
+                    self.Wx) +
+                T.dot(
+                    h_tm1,
+                    self.Wh) +
+                self.bh)
             s_t = T.nnet.softmax(T.dot(h_t, self.W) + self.b)
             return [h_t, s_t]
 
@@ -106,7 +121,9 @@ class model_no_pos(object):
             if self.y.dtype.startswith('int'):
                 # the T.neq operator returns a vector of 0s and 1s, where 1
                 # represents a mistake in prediction
-                # return T.mean(T.neq(y_pred_word, self.y)) #NOTE, this shouldn't be mean if just one variable? or .. could be more..?
+                # return T.mean(T.neq(y_pred_word, self.y)) #NOTE, this
+                # shouldn't be mean if just one variable? or .. could be
+                # more..?
                 return T.mean(T.neq(y_pred_word, self.y))
             else:
                 raise NotImplementedError()
@@ -124,17 +141,20 @@ class model_no_pos(object):
             + self.L2_reg * self.L2_sqr
         gradients = T.grad(cost, self.params)
 
-        self.updates = OrderedDict((p, p - self.lr * g) for p, g in zip(self.params, gradients))
+        self.updates = OrderedDict((p, p - self.lr * g)
+                                   for p, g in zip(self.params, gradients))
 
         # theano functions
-        self.soft_max = theano.function(inputs=[self.idxs], outputs=p_y_given_x_sentence)  # simply outputs the soft_max distribution for each word in utterance
+        # simply outputs the soft_max distribution for each word in utterance
+        self.soft_max = theano.function(
+            inputs=[self.idxs], outputs=p_y_given_x_sentence)
 
-        #=======================================================================
+        # =======================================================================
         # #ORIGINAL CODE
         # self.train = theano.function( inputs  = [self.idxs, self.y, lr],
         #                               outputs = nll,
         #                               updates = self.updates )
-        #=======================================================================
+        # =======================================================================
 
         self.normalize = theano.function(inputs=[],
                                          updates={self.emb:
@@ -142,7 +162,8 @@ class model_no_pos(object):
 
     def fit(self, my_seq, my_indices, my_labels, lr, nw):
         tic = time.time()
-        corpus, labels = self.shared_dataset(my_seq, my_labels)  # loads data set as a shared variable
+        corpus, labels = self.shared_dataset(
+            my_seq, my_labels)  # loads data set as a shared variable
         # TODO new effort to index the shared vars
         batchstart = T.iscalar('batchstart')
         batchstop = T.iscalar('batchstop')
@@ -162,7 +183,7 @@ class model_no_pos(object):
                                               on_unused_input='warn')
 
         # trying Theano scan now
-        #=======================================================================
+        # =======================================================================
         # indices = T.imatrix('indices')
         # costs, newupdates = theano.scan(sequences=[indices],
         #                                non_sequences = [self.lr],
@@ -174,7 +195,7 @@ class model_no_pos(object):
         # power = theano.function(inputs=[indices,self.lr], outputs=cost, updates=newupdates)
         #
         # return f(my_indices)
-        #=======================================================================
+        # =======================================================================
 
         i = 0
         train_loss = 0.0
@@ -196,9 +217,11 @@ class model_no_pos(object):
         # batch sizes is a list the same length as losses
         # which has size of each batch in it (all of sizefrom 1 to bptt limit). Computes with myindices
         #batch_sizes = [(my_indices[i][1]-my_indices[i][0])+1 for i in range(0,len(my_indices))]
-        # print len(batch_sizes) #TODO don't actually need this for weighting the loss as this done anyway I believe by length of context sequence?
+        # print len(batch_sizes) #TODO don't actually need this for weighting
+        # the loss as this done anyway I believe by length of context sequence?
 
-        corpus, labels = self.shared_dataset(my_seq, my_labels)  # loads data set as a shared variable
+        corpus, labels = self.shared_dataset(
+            my_seq, my_labels)  # loads data set as a shared variable
         batchstart = T.iscalar('batchstart')
         batchstop = T.iscalar('batchstop')
         cost = self.nll
@@ -208,7 +231,8 @@ class model_no_pos(object):
                                               givens={self.idxs: corpus[batchstart:batchstop + 1],
                                                       self.y: labels[batchstop]},
                                               on_unused_input='warn')
-        losses = [self.error_by_index(start, stop) for start, stop in my_indices]
+        losses = [self.error_by_index(start, stop)
+                  for start, stop in my_indices]
 
         return numpy.average(losses)
 

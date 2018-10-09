@@ -182,34 +182,34 @@ def verify_disfluency_tags(tags, normalize_ID=False):
                 continue
             ID = tag[tag.find("=") + 2:-3]
             if "<rms" in tag:
-                assert repairs[ID][0] == None, \
+                assert repairs[ID][0] is None, \
                     "reparandum started parsed more than once " + ID
-                assert repairs[ID][1] == None, \
+                assert repairs[ID][1] is None, \
                     "reparandum start again during interregnum phase " + ID
-                assert repairs[ID][2] == None, \
+                assert repairs[ID][2] is None, \
                     "reparandum start again during repair phase " + ID
                 repairs[ID][0] = False  # set in progress
             elif "<rm " in tag:
-                assert repairs[ID][0] != None, \
+                assert repairs[ID][0] is not None, \
                     "mid reparandum tag before reparandum start " + ID
-                assert repairs[ID][2] == None, \
+                assert repairs[ID][2] is None, \
                     "mid reparandum tag in a interregnum phase or beyond " + ID
-                assert repairs[ID][2] == None, \
+                assert repairs[ID][2] is None, \
                     "mid reparandum tag in a repair phase or beyond " + ID
             elif "<i" in tag:
-                assert repairs[ID][0] != None, \
+                assert repairs[ID][0] is not None, \
                     "interregnum start before reparandum start " + ID
-                assert repairs[ID][2] == None, \
+                assert repairs[ID][2] is None, \
                     "interregnum in a repair phase " + ID
-                if repairs[ID][1] == None:  # interregnum not reached yet
+                if repairs[ID][1] is None:  # interregnum not reached yet
                     repairs[ID][0] = True  # reparandum completed
                 repairs[ID][1] = False  # interregnum in progress
             elif "<rps" in tag:
-                assert repairs[ID][0] != None, \
+                assert repairs[ID][0] is not None, \
                     "repair start before reparandum start " + ID
                 assert repairs[ID][1] != True, \
                     "interregnum over before repair start " + ID
-                assert repairs[ID][2] == None, \
+                assert repairs[ID][2] is None, \
                     "repair start parsed twice " + ID
                 repairs[ID][0] = True  # reparanudm complete
                 repairs[ID][1] = True  # interregnum complete
@@ -1104,6 +1104,6 @@ if __name__ == '__main__':
     #repair = [("You","NNP"),("really","RB"),("like","VP"),("him","NP")]
     #reparandum = [("Y-","NNP"),("like","VP"),("john","NN")]
     # repair = [("Y-","NNP"),("like","VP"),("and","cc"),("I","RB"),
-    #("like","VP"),("I","RB"),("like","VP"),("john","NN")]
+    # ("like","VP"),("I","RB"),("like","VP"),("john","NN")]
     graph_viz_repair(classify_repair(
         reparandum, repair, [("", "")]), reparandum, repair, continuation)

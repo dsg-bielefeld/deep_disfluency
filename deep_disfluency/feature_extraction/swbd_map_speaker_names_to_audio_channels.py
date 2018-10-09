@@ -3,7 +3,9 @@
 
 # In[1]:
 
-# After conversion and audio features have been extracted, rename the split channels according to the intensity values from OpenSmile or IBM ASR results (this is not consistently A: l, B: r in SWBD)
+# After conversion and audio features have been extracted, rename the
+# split channels according to the intensity values from OpenSmile or IBM
+# ASR results (this is not consistently A: l, B: r in SWBD)
 
 
 # In[6]:
@@ -85,12 +87,14 @@ for audio in sorted(audio_feature_files):
     #    continue
 
     csv = rootdir + "/audio_features/" + audio
-    # wavfile = rootdir + "/wav/"+ audio.replace(".csv",".wav") #can add wavs too
+    # wavfile = rootdir + "/wav/"+ audio.replace(".csv",".wav") #can add wavs
+    # too
     pair.append((csv, None))
     if len(pair) < 2:
         continue
     assert pair[0][0].replace("_l", "").replace("_r", "") == pair[1][0].replace("_l", "").replace("_r", ""),\
-        pair[0][0].replace("_l", "").replace("_r", "") + " " + pair[1][0].replace("_l", "").replace("_r", "")
+        pair[0][0].replace("_l", "").replace("_r", "") + \
+        " " + pair[1][0].replace("_l", "").replace("_r", "")
     # print "pair", pair
     # we have the pair
     # grab the mapping/timing files for A and B and check the first 3-4 words and get average intensity
@@ -104,7 +108,9 @@ for audio in sorted(audio_feature_files):
         missed.append(csv)
         pair = []
         continue
-    intensity_scores = defaultdict(list)  # dict of ((wav/opensmilcsv)) -> [intensity at A's words, intensity at B's words]
+    # dict of ((wav/opensmilcsv)) -> [intensity at A's words, intensity at B's
+    # words]
+    intensity_scores = defaultdict(list)
     for t in timing_files:
         timings = get_first_n_timings(wordtimingdir + t, n=150)
         speaker = t[4:5]
@@ -129,7 +135,9 @@ for audio in sorted(audio_feature_files):
         for filename in p:
             if not filename:
                 continue
-            c = "mv {} {}".format(filename, filename.replace(leftright, speaker))
+            c = "mv {} {}".format(
+                filename, filename.replace(
+                    leftright, speaker))
             print c
             os.system(c)
     pair = []  # reset

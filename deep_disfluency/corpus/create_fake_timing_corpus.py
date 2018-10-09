@@ -151,7 +151,9 @@ if __name__ == "__main__":
             if not ref == "":
                 spl = ref.split(":")
                 n_ref = ":".join([spl[0], spl[2], spl[1]])
-                target.write("\t".join([n_ref, map, word, postag, disftag]) + "\n")
+                target.write(
+                    "\t".join([n_ref, map, word, postag, disftag]) + "\n")
             else:
-                target.write("\t".join([ref, map, word, postag, disftag]) + "\n")
+                target.write(
+                    "\t".join([ref, map, word, postag, disftag]) + "\n")
         target.close()

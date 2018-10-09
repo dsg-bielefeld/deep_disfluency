@@ -27,7 +27,7 @@ def tabulate_cfd(cfd, *args, **kwargs):
     # conditions = sorted([c for c in cfd.conditions()
     #                     if "_t_" in c])   # only concerned with act-final
     conditions = sorted([c for c in cfd.conditions()])
-    if type(cfd) == nltk.ConditionalProbDist:
+    if isinstance(cfd, nltk.ConditionalProbDist):
         samples = sorted(set(v for c in conditions for v in cfd[c].samples()))
     else:
         samples = sorted(set(v for c in conditions for v in cfd[c]))
@@ -40,7 +40,7 @@ def tabulate_cfd(cfd, *args, **kwargs):
         if cumulative:
             freqs[c] = list(cfd[c]._cumulative_frequencies(samples))
         else:
-            if type(cfd) == nltk.ConditionalProbDist:
+            if isinstance(cfd, nltk.ConditionalProbDist):
                 freqs[c] = [cfd[c].prob(sample) for sample in samples]
             else:
                 freqs[c] = [cfd[c][sample] for sample in samples]
@@ -49,7 +49,7 @@ def tabulate_cfd(cfd, *args, **kwargs):
     # condition_size = max(len("%s" % c) for c in conditions)
     final_string = ""
     # final_string += ' ' * condition_size
-    if type(cfd) == nltk.ConditionalProbDist:
+    if isinstance(cfd, nltk.ConditionalProbDist):
         width += 1
     for s in samples:
         # final_string += "%*s" % (width, s)
@@ -60,7 +60,7 @@ def tabulate_cfd(cfd, *args, **kwargs):
         final_string += str(c) + "\t"
         for f in freqs[c]:
 
-            if type(cfd) == nltk.ConditionalProbDist:
+            if isinstance(cfd, nltk.ConditionalProbDist):
                 # final_string += "%*.2f" % (width, f)
                 if f == 0:
                     final_string += "\t"

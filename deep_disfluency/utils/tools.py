@@ -141,34 +141,34 @@ def verify_disfluency_tags(tags, normalize_ID=False):
                 continue
             ID = tag[tag.find("=") + 2:-3]
             if "<rms" in tag:
-                assert repairs[ID][0] == None,\
+                assert repairs[ID][0] is None,\
                     "reparandum started parsed more than once " + ID
-                assert repairs[ID][1] == None,\
+                assert repairs[ID][1] is None,\
                     "reparandum start again during interregnum phase " + ID
-                assert repairs[ID][2] == None,\
+                assert repairs[ID][2] is None,\
                     "reparandum start again during repair phase " + ID
                 repairs[ID][0] = False  # set in progress
             elif "<rm " in tag:
-                assert repairs[ID][0] != None,\
+                assert repairs[ID][0] is not None,\
                     "mid reparandum tag before reparandum start " + ID
-                assert repairs[ID][2] == None,\
+                assert repairs[ID][2] is None,\
                     "mid reparandum tag in a interregnum phase or beyond " + ID
-                assert repairs[ID][2] == None,\
+                assert repairs[ID][2] is None,\
                     "mid reparandum tag in a repair phase or beyond " + ID
             elif "<i" in tag:
-                assert repairs[ID][0] != None,\
+                assert repairs[ID][0] is not None,\
                     "interregnum start before reparandum start " + ID
-                assert repairs[ID][2] == None,\
+                assert repairs[ID][2] is None,\
                     "interregnum in a repair phase " + ID
-                if repairs[ID][1] == None:  # interregnum not reached yet
+                if repairs[ID][1] is None:  # interregnum not reached yet
                     repairs[ID][0] = True  # reparandum completed
                 repairs[ID][1] = False  # interregnum in progress
             elif "<rps" in tag:
-                assert repairs[ID][0] != None,\
+                assert repairs[ID][0] is not None,\
                     "repair start before reparandum start " + ID
                 assert repairs[ID][1] != True,\
                     "interregnum over before repair start " + ID
-                assert repairs[ID][2] == None,\
+                assert repairs[ID][2] is None,\
                     "repair start parsed twice " + ID
                 repairs[ID][0] = True  # reparanudm complete
                 repairs[ID][1] = True  # interregnum complete
@@ -286,7 +286,8 @@ def corpus_to_indexed_matrix(my_array_list, win, bs, sentence=False):
     totalSize = 0
     if sentence:
         for sent in my_array_list:
-            mysent = np.asarray([-1] * (bs - 1) + list(sent))  # padding with eos
+            # padding with eos
+            mysent = np.asarray([-1] * (bs - 1) + list(sent))
             # get list of context windows
             mywords = context_win_backwards(mysent, win)
             # just one per utterance for now..
@@ -362,7 +363,8 @@ def convert_from_eval_tags_to_inc_disfluency_tags(tags, words,
             rps = re.findall("<rps id\=\"[0-9]+\"\/>", tags[t], re.S)
             for r in rps:
                 repairID = r[r.find("=") + 2:-3]
-                assert repair_dict.get(repairID), str(repairID) + str(tags) + str(words)
+                assert repair_dict.get(repairID), str(
+                    repairID) + str(tags) + str(words)
                 repair_dict[repairID][1] = t
                 dist = min(t - repair_dict[repairID][0], limit)
                 # adjust in case the reparandum is shortened due to the limit

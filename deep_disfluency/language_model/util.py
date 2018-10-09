@@ -124,9 +124,9 @@ def process_args_for_consumer_producer(*args, **kwargs):
                         help='write output from OUTPUT (must be a file) instead of stdout')
     parser.add_argument('-l', '--logger', type=str, required=False)
     args = parser.parse_args()
-    if args.input == None:
+    if args.input is None:
         args.input = sys.stdin
-    if args.output == None:
+    if args.output is None:
         args.output = sys.stdout
     else:
         args.output = safe_open(args.output, 'w')
@@ -246,7 +246,7 @@ def add_seed_argument(parser):
     parser.add_argument('-s', '--seed', type=long, metavar='SEED',
                         help='the seed used to initialize the number generator. \
                 Define it for reproducibility of results \
-                (it defaults to 5489 in any case)', default=5489L)
+                (it defaults to 5489 in any case)', default=5489)
 
 # statistical stuff
 
@@ -271,7 +271,8 @@ def percentile(values, p):
     elif k == N:
         return sorted_values[-1]
     else:
-        return sorted_values[k - 1] + d * (sorted_values[k] - sorted_values[k - 1])
+        return sorted_values[k - 1] + d * \
+            (sorted_values[k] - sorted_values[k - 1])
 
 
 def read_property_file(f):

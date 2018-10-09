@@ -101,14 +101,14 @@ class DisfluencyCorpusCreator:
         try:
             self.__treemaplist__ = TreeMapCorpus(True, self.errorlog,
                                                  mapdir=mapdir_path)
-        except:
+        except BaseException:
             self.__treemaplist__ = None
             print "WARNING no treemap files"
         try:
 
             self.__POSmaplist__ = POSMapCorpus(True, self.errorlog,
                                                mapdir=mapdir_path)
-        except:
+        except BaseException:
             self.__POSmaplist__ = None
             print "WARNING no posmap files"
 
@@ -157,7 +157,7 @@ class DisfluencyCorpusCreator:
                                                [int(f), int(g)],
                                                [int(h), int(i)],
                                                repairID))
-                        except:
+                        except BaseException:
                             warning = "invalid repair" + \
                                 " ".join([a, b, c, d, e, f, g, h, i, j, k])
                             print warning
@@ -186,7 +186,7 @@ class DisfluencyCorpusCreator:
                                 repairID += 1
                                 self.dRelaxedRepairs[c + ":" + d]\
                                     .append(repairID)
-                        except:
+                        except BaseException:
                             warning = "invalid relaxed repair" + " "\
                                 .join([a, b, c, d, e, f, g, h, i])
                             print warning
@@ -362,7 +362,7 @@ class DisfluencyCorpusCreator:
                             continue
                         # i.e. it was never repairStackPopped, gets rid of one
                         # word partials and edit term repairs etc..
-                        elif (tag == "rp" or tag == "i" or tag == None) \
+                        elif (tag == "rp" or tag == "i" or tag is None) \
                                 and repair.reparandum == False:
                             # pops it off but doesn't annotate it
                             repair.complete = True
@@ -391,7 +391,7 @@ class DisfluencyCorpusCreator:
                                 tag += "s"  # indicates start of repair
                             # no tags for classification
                             repair.repairWords.append((word, pos))
-                        elif tag == None and repair.complete == False:
+                        elif tag is None and repair.complete == False:
                             if debug:
                                 print "incomplete tag"
                             # Have gone past last word of the repair but
@@ -415,7 +415,7 @@ class DisfluencyCorpusCreator:
                                     try:
                                         find_repair_end_in_previous_utts(
                                             repair, overallTagList, uttList)
-                                    except:
+                                    except BaseException:
                                         warning = "ANNOTATION ERROR: \
                                         Start of repair not found. \n" + \
                                             utt.swda_filename + " " +\
@@ -1230,7 +1230,7 @@ class DisfluencyCorpusCreator:
                                         # complex type
                                         mytype[2] += 1
 
-                    except:
+                    except BaseException:
                         print sys.exc_info()
                         print repair.reparandumWords
                         print repair.repairWords
@@ -1336,17 +1336,17 @@ class DisfluencyCorpusCreator:
 if __name__ == '__main__':
     # parse command line parameters
     # Optional arguments:
-    #-i string, path of source data (in swda style)
-    #-t string, target path of folder for the preprocessed data
-    #-f string, path of file with the division of files to be turned into
+    # -i string, path of source data (in swda style)
+    # -t string, target path of folder for the preprocessed data
+    # -f string, path of file with the division of files to be turned into
     # a corpus
-    #-a string, path to disfluency annotations
-    #-l string, Location of where to write a clean language\
+    # -a string, path to disfluency annotations
+    # -l string, Location of where to write a clean language\
     # model files out of this corpus
-    #-pos boolean, Whether to write a word2pos mapping folder
+    # -pos boolean, Whether to write a word2pos mapping folder
     # in the sister directory to the corpusLocation, else assume it is there
-    #-p boolean, whether to include partial words or not
-    #-d boolean, include dialogue act tags in the info
+    # -p boolean, whether to include partial words or not
+    # -d boolean, include dialogue act tags in the info
     parser = argparse.ArgumentParser(description='Feature extraction for\
     disfluency and other tagging tasks from raw data.')
     parser.add_argument('-i', action='store', dest='corpusLocation',
@@ -1414,14 +1414,14 @@ if __name__ == '__main__':
 
     corpusName = args.divisionFile[args.divisionFile.rfind("/") + 1:].\
         replace("_ranges.text", "")
-    #(1) Make disfluency detection annotated files
+    # (1) Make disfluency detection annotated files
     n.make_corpus(target_folder=args.targetDir,
                   corpus=corpusName,
                   range_files=[args.divisionFile],
                   mode="disfluency",
                   debug=False)
 
-    #(2) Make clean and edit term files
+    # (2) Make clean and edit term files
     if args.cleanModelDir:
         n.make_corpus(target_folder=args.cleanModelDir,
                       corpus=corpusName,

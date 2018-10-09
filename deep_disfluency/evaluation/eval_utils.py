@@ -39,7 +39,7 @@ def intervalframe_overlaps(frame1, frame2, concatdelimiter='/'):
         fr2 = fr2[fr2['start_time'] < en1]
         for intrv2 in fr2.index:
             overlap = {}
-            if type(concatdelimiter) == str and len(concatdelimiter) > 0:
+            if isinstance(concatdelimiter, str) and len(concatdelimiter) > 0:
                 overlap['text'] = fr2.ix[intrv2]['text'] + concatdelimiter + \
                     frame1.ix[intrv1]['text']
 
@@ -637,7 +637,7 @@ def final_output_accuracy_word_level(words, prediction_tags, gold_tags,
         "\n".join(prediction_tags) +
         "\n%%%%%%\ngold_tags:" + "\n".join(gold_tags)
     )
-    end_of_utt_align = {"ref":  len(gold_tags) * [""],
+    end_of_utt_align = {"ref": len(gold_tags) * [""],
                         "hyp": len(gold_tags) * [""]}
     count = 0
     for word, prediction, label in zip(words, prediction_tags, gold_tags):
@@ -832,8 +832,10 @@ def final_output_accuracy_word_level(words, prediction_tags, gold_tags,
                 (utt_eval and "t/>" in prediction):
             turnFinal = True
             tag_dict["<rps_relaxed"][0] += min(relaxedHypUtt, relaxedGoldUtt)
-            tag_dict["<rps_relaxed"][1] += max(0, relaxedHypUtt - relaxedGoldUtt)
-            tag_dict["<rps_relaxed"][2] += max(0, relaxedGoldUtt - relaxedHypUtt)
+            tag_dict["<rps_relaxed"][1] += max(0,
+                                               relaxedHypUtt - relaxedGoldUtt)
+            tag_dict["<rps_relaxed"][2] += max(0,
+                                               relaxedGoldUtt - relaxedHypUtt)
             repairs_gold += relaxedGoldUtt
             repairs_hyp += relaxedHypUtt
             number_of_utts_hyp += 1
@@ -945,10 +947,14 @@ def final_output_accuracy_interval_level(hyp, reference, tag_dict,
             tag_dict['DSER'][1] += total_gold_segments
             tag_dict['DSER'][0] += correctly_segmented_dser
             tag_dict['NIST_SU'][0] += correctly_segmented
-            tag_dict['NIST_SU'][1] += (total_hyp_segments - correctly_segmented)
-            tag_dict['NIST_SU'][2] += (total_gold_segments - correctly_segmented)
+            tag_dict['NIST_SU'][1] += (total_hyp_segments -
+                                       correctly_segmented)
+            tag_dict['NIST_SU'][2] += (total_gold_segments -
+                                       correctly_segmented)
             continue
-        gold_duration = sum(gold_intervals.end_time - gold_intervals.start_time)
+        gold_duration = sum(
+            gold_intervals.end_time -
+            gold_intervals.start_time)
         hyp_duration = sum(hyp_intervals.end_time - hyp_intervals.start_time)
         overlap_duration = sum(overlaps.end_time - overlaps.start_time)
         # do overall rate
@@ -1310,8 +1316,8 @@ def rename_repair_with_repair_onset_idx(orig_tags, rp_start_index, new_id,
 def test():
     print "testing repair extraction"
     # tags = '<f/>,<rms id="FP3"/>,<i id="FP3"/><e/>,<rps id="FP3"/>\
-    #<rpn id="FP3"/>,<rms id="6"/>,<i id="6"/><e/>,<rps id="6"/>\
-    #<rpn id="6"/>,<f/>'.split(',')
+    # <rpn id="FP3"/>,<rms id="6"/>,<i id="6"/><e/>,<rps id="6"/>\
+    # <rpn id="6"/>,<f/>'.split(',')
     tags = '<f/>,<f/>,<i id="FP3"/><e/>,<rps id="FP3"/>,<f/>,<i id="6"/><e/>,<rps id="6"/>\
     <f/>,<f/>'.split(',')
     print rename_repair_with_repair_onset_idx(tags, 3, "FP0",

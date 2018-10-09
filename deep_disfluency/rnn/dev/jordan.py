@@ -34,7 +34,14 @@ class model(object):
         self.s0 = theano.shared(numpy.zeros(nc, dtype=dtype))
 
         # bundle
-        self.params = [self.emb, self.Wx, self.Ws, self.W, self.bh, self.b, self.s0]
+        self.params = [
+            self.emb,
+            self.Wx,
+            self.Ws,
+            self.W,
+            self.bh,
+            self.b,
+            self.s0]
         self.names = ['embeddings', 'Wx', 'Wh', 'W', 'bh', 'b', 's0']
         idxs = T.imatrix()  # as many columns as context window size/lines as words in the sentence
         x = self.emb[idxs].reshape((idxs.shape[0], de * cs))
@@ -58,7 +65,8 @@ class model(object):
         lr = T.scalar('lr')
         nll = -T.mean(T.log(p_y_given_x_lastword)[y])
         gradients = T.grad(nll, self.params)
-        updates = OrderedDict((p, p - lr * g) for p, g in zip(self.params, gradients))
+        updates = OrderedDict((p, p - lr * g)
+                              for p, g in zip(self.params, gradients))
 
         # theano functions
         self.classify = theano.function(inputs=[idxs], outputs=y_pred)

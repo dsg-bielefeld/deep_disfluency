@@ -44,7 +44,8 @@ def wer(r, h, macro=False):
                 d[i][j] = min(substitution, insertion, deletion)
     if macro:
         return d[len(r)][len(h)]
-    wer = 1 if len(r) == 0 and 0 < len(h) else d[len(r)][len(h)] / float(len(r))
+    wer = 1 if len(r) == 0 and 0 < len(
+        h) else d[len(r)][len(h)] / float(len(r))
     return 100 * float(wer)
 
 
@@ -332,7 +333,8 @@ def load_data_from_disfluency_corpus_file(fp, representation="disf1", limit=8,
     targets = []
     timings = []
     currentTimings = []
-    current_fake_time = 0  # marks the current fake time for the dialogue (i.e. end of word)
+    # marks the current fake time for the dialogue (i.e. end of word)
+    current_fake_time = 0
     current_dialogue = ""
 
     reader = csv.reader(f, delimiter='\t')
@@ -658,7 +660,8 @@ def process_arguments(config=None,
     config -- the config file location, default None
     exp_id -- the experiment ID name, default None
     """
-    parser = argparse.ArgumentParser(description='This script trains a RNN for disfluency detection and saves the best models and results to disk.')
+    parser = argparse.ArgumentParser(
+        description='This script trains a RNN for disfluency detection and saves the best models and results to disk.')
     parser.add_argument('-c', '--config', type=str,
                         help='The location of the config file.',
                         default=config)
@@ -688,7 +691,8 @@ def process_arguments(config=None,
         'lr',  # learning rate
         'decay',  # decay on the learning rate if improvement stops
         'seed',  # random seed
-        'window',  # number of words in the context window (backwards only for disfluency)
+        'window',
+        # number of words in the context window (backwards only for disfluency)
         'bs',  # number of backprop through time steps
         'emb_dimension',  # dimension of word embedding
         'nhidden',  # number of hidden units

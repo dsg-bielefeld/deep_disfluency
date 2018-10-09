@@ -32,13 +32,16 @@ def save_to_disfeval_file(p, g, w, f, filename, incremental=False):
             sw.append('EOS')  # adding an extra word position
             sl.append('O')
             sp[-1].append('O')  # trivially not evaluated
-            for wl, pp, w in zip(sl, sp, sw):  # for each prefix in the utt pp = prefix prediciton, not just latest word
+            for wl, pp, w in zip(
+                    sl, sp, sw):  # for each prefix in the utt pp = prefix prediciton, not just latest word
                 prefix.append(w + ' ' + wl + ' ')
                 assert(len(prefix) == len(pp)), str(prefix) + str(pp)
                 out += 'BOS O O\n'
-                for my_prefix, my_prediction in zip(prefix, pp):  # for each prediction
+                for my_prefix, my_prediction in zip(
+                        prefix, pp):  # for each prediction
                     out += my_prefix + " " + my_prediction + "\n"
-                # last one is final for the prefix, the last one will have an EOS
+                # last one is final for the prefix, the last one will have an
+                # EOS
                 out += "\n"
 
     f = open(filename, 'w')

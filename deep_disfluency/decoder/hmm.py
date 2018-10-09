@@ -331,7 +331,8 @@ class FirstOrderHMM():
                 # print word_index
                 # print input_distribution.shape
                 # print self.tagToIndexDict[tag]
-                # print input_distribution[word_index][self.tagToIndexDict[tag]]
+                # print
+                # input_distribution[word_index][self.tagToIndexDict[tag]]
                 tag_prob = self.cpd_tags["s"].prob(self.convert_tag("s", tag))
                 if tag_prob >= 0.00001:  # allowing for margin of error
                     if self.constraint_only:
@@ -341,7 +342,8 @@ class FirstOrderHMM():
                     tag_prob = 0.0
 
                 prob = log(tag_prob) + \
-                    log(input_distribution[word_index][self.tagToIndexDict[tag]])
+                    log(input_distribution[word_index]
+                        [self.tagToIndexDict[tag]])
                 # no timing bias to start
                 if self.noisy_channel_source_model:
                     # noisy channel eliminate the missing tags
@@ -474,7 +476,8 @@ class FirstOrderHMM():
                     tag_prob = 0.0
                 # the principal joint log prob
                 prob = prev_viterbi[prevtag] + log(tag_prob) + \
-                    log(input_distribution[word_index][self.tagToIndexDict[tag]])
+                    log(input_distribution[word_index]
+                        [self.tagToIndexDict[tag]])
 
                 # gets updated by noisy channel if in this mode
                 if self.noisy_channel_source_model:

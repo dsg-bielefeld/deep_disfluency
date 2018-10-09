@@ -184,7 +184,8 @@ class SourceModel(object):
             # should be a fairly straightforward chain back
             last_node = (node_address, node_value)
             # print 'last node', last_node
-            for d in range(depth - 1, (len(self.word_tree) - len(suffix) - 1), -1):
+            for d in range(
+                    depth - 1, (len(self.word_tree) - len(suffix) - 1), -1):
                 # get the father
                 if debug:
                     print 'last node int', last_node
@@ -323,7 +324,8 @@ class SourceModel(object):
         else:
             path = self.find_or_generate_best_path_of_suffix(suffix)
         orig_log_prob = path[min([len(path) - 1, len(path) - (1 + n)])][1][1]
-        orig_unigram_log_prob = path[min([len(path) - 1, len(path) - (1 + n)])][1][2]
+        orig_unigram_log_prob = path[min(
+            [len(path) - 1, len(path) - (1 + n)])][1][2]
         final_log_prob = path[-1][1][1]
         diff = final_log_prob - orig_log_prob
         # TODO what if diff is 0?
@@ -333,7 +335,8 @@ class SourceModel(object):
         # print '...'
         final_unigram_log_prob = path[-1][1][2]
         unigram_diff = final_unigram_log_prob - orig_unigram_log_prob
-        wml_diff = 0.999 if unigram_diff == 0 else 1 - (((diff / - unigram_diff)) / -3.5)
+        wml_diff = 0.999 if unigram_diff == 0 else 1 - \
+            (((diff / - unigram_diff)) / -3.5)
         # print wml_diff
         #diff = log(wml_diff)
         diff = log(0.01) if diff == 0 else diff  # too much weight for 0s
