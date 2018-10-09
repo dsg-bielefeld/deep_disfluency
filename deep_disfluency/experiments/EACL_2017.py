@@ -199,14 +199,14 @@ if train_models:
         disf = DeepDisfluencyTagger(
             config_file=THIS_DIR + "/experiment_configs.csv",
             config_number=exp
-            )
+        )
         exp_str = '%03d' % exp
         e = disf.train_net(
-                    train_dialogues_filepath=feature_matrices_filepath,
-                    validation_dialogues_filepath=validation_filepath,
-                    model_dir=THIS_DIR + '/' + exp_str,
-                    tag_accuracy_file_path=THIS_DIR +
-                    '/results/tag_accuracies/{}.text'.format(exp_str))
+            train_dialogues_filepath=feature_matrices_filepath,
+            validation_dialogues_filepath=validation_filepath,
+            model_dir=THIS_DIR + '/' + exp_str,
+            tag_accuracy_file_path=THIS_DIR +
+            '/results/tag_accuracies/{}.text'.format(exp_str))
         systems_best_epoch[exp] = e
 else:
     # 33 RNN simple tags, disf + utt joint
@@ -235,19 +235,19 @@ if test_models:
         for timing_bool in [
             False,
             True
-                            ]:  # test with and without timing info
+        ]:  # test with and without timing info
             if exp in [37, 39] and timing_bool:
                 print "skipping timing condition for disfluency-only tagger"
                 continue
             exp_str = '%03d' % exp
             # load the model
             disf = DeepDisfluencyTagger(
-                            config_file=THIS_DIR + '/experiment_configs.csv',
-                            config_number=exp,
-                            saved_model_dir=THIS_DIR +
-                            '/{0}/epoch_{1}'.format(exp_str, best_epoch),
-                            use_timing_data=timing_bool
-                                        )
+                config_file=THIS_DIR + '/experiment_configs.csv',
+                config_number=exp,
+                saved_model_dir=THIS_DIR +
+                '/{0}/epoch_{1}'.format(exp_str, best_epoch),
+                use_timing_data=timing_bool
+            )
             # simulating (or using real) ASR results
             # for now just saving these in the same folder as the best epoch
             # also outputs the speed
@@ -256,17 +256,17 @@ if test_models:
             for div in [
                 'heldout',
                 'test'
-                        ]:
+            ]:
                 disf.incremental_output_from_file(
-                        THIS_DIR +
-                        '/../data/disfluency_detection/switchboard/' +
-                        'swbd_disf_{0}{1}_data_timings.csv'.format(
-                            div, partial_string),
-                        target_file_path=THIS_DIR + '/{0}/epoch_{1}/'.format(
-                            exp_str, best_epoch) +
-                        'swbd_disf_{0}{1}{2}_data_output_increco.text'
-                        .format(div, partial_string, timing_string)
-                        )
+                    THIS_DIR +
+                    '/../data/disfluency_detection/switchboard/' +
+                    'swbd_disf_{0}{1}_data_timings.csv'.format(
+                        div, partial_string),
+                    target_file_path=THIS_DIR + '/{0}/epoch_{1}/'.format(
+                        exp_str, best_epoch) +
+                    'swbd_disf_{0}{1}{2}_data_output_increco.text'
+                    .format(div, partial_string, timing_string)
+                )
 
 
 # 6. To get the numbers run the notebook:

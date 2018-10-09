@@ -16,7 +16,7 @@ def add_word_continuation_tags(tags):
             tags[i] = tags[i] + "<t"
         else:
             tags[i] = tags[i] + "<c"
-        if i == len(tags)-1:
+        if i == len(tags) - 1:
             tags[i] = tags[i] + "t/>"
         else:
             tags[i] = tags[i] + "c/>"
@@ -150,8 +150,8 @@ def verify_disfluency_tags(tags, normalize_ID=False):
     """Check that the repair tags sequence is valid.
 
     Keyword arguments:
-    normalize_ID -- boolean, whether to convert the 
-    repair ID numbers to be derivable from 
+    normalize_ID -- boolean, whether to convert the
+    repair ID numbers to be derivable from
     their unique RPS position in the utterance.
     """
     id_map = dict()  # map between old ID and new ID
@@ -171,7 +171,7 @@ def verify_disfluency_tags(tags, normalize_ID=False):
     for i in range(0, len(tags)):  # iterate over all tag strings
         new_tags = []
         if tags[i] == "":
-            all([repairs[ID][2] or repairs[ID] == [None, None, None] 
+            all([repairs[ID][2] or repairs[ID] == [None, None, None]
                  for ID in repairs.keys(
             )]), "Unresolved repairs at fluent tag\n\t" + str(repairs)
         # iterate over all tags in this tag string
@@ -182,34 +182,34 @@ def verify_disfluency_tags(tags, normalize_ID=False):
                 continue
             ID = tag[tag.find("=") + 2:-3]
             if "<rms" in tag:
-                assert repairs[ID][0] == None, \
+                assert repairs[ID][0] is None, \
                     "reparandum started parsed more than once " + ID
-                assert repairs[ID][1] == None, \
+                assert repairs[ID][1] is None, \
                     "reparandum start again during interregnum phase " + ID
-                assert repairs[ID][2] == None, \
+                assert repairs[ID][2] is None, \
                     "reparandum start again during repair phase " + ID
                 repairs[ID][0] = False  # set in progress
             elif "<rm " in tag:
-                assert repairs[ID][0] != None, \
+                assert repairs[ID][0] is not None, \
                     "mid reparandum tag before reparandum start " + ID
-                assert repairs[ID][2] == None, \
+                assert repairs[ID][2] is None, \
                     "mid reparandum tag in a interregnum phase or beyond " + ID
-                assert repairs[ID][2] == None, \
+                assert repairs[ID][2] is None, \
                     "mid reparandum tag in a repair phase or beyond " + ID
             elif "<i" in tag:
-                assert repairs[ID][0] != None, \
+                assert repairs[ID][0] is not None, \
                     "interregnum start before reparandum start " + ID
-                assert repairs[ID][2] == None, \
+                assert repairs[ID][2] is None, \
                     "interregnum in a repair phase " + ID
-                if repairs[ID][1] == None:  # interregnum not reached yet
+                if repairs[ID][1] is None:  # interregnum not reached yet
                     repairs[ID][0] = True  # reparandum completed
                 repairs[ID][1] = False  # interregnum in progress
             elif "<rps" in tag:
-                assert repairs[ID][0] != None, \
+                assert repairs[ID][0] is not None, \
                     "repair start before reparandum start " + ID
                 assert repairs[ID][1] != True, \
                     "interregnum over before repair start " + ID
-                assert repairs[ID][2] == None, \
+                assert repairs[ID][2] is None, \
                     "repair start parsed twice " + ID
                 repairs[ID][0] = True  # reparanudm complete
                 repairs[ID][1] = True  # interregnum complete
@@ -239,9 +239,9 @@ def verify_disfluency_tags(tags, normalize_ID=False):
 
 
 def orthography_normalization(word, pos, spelling_dict, lang='en'):
-    """Converts the spelling from the transcripts into 
+    """Converts the spelling from the transcripts into
     one that is consistent for disfluency detection.
-    Filled pauses are treated specially to make 
+    Filled pauses are treated specially to make
     sure the POS tags are correct.
     """
     if lang == 'en':
@@ -300,6 +300,7 @@ def parse_list(string):
             Number2 += char
     return [int(Number1), int(Number2)]
 
+
 def remove_repairs(tags, repairIDs):
     """Return a list of tags without the repairs with IDs in repairIDs."""
     for t in range(0, len(tags)):
@@ -322,7 +323,7 @@ def remove_repairs(tags, repairIDs):
 
 
 def find_repair_end(repair, disfluencyTagList):
-    """Given a repair object and a disfluency tag list, 
+    """Given a repair object and a disfluency tag list,
     find the repair word and tag it in place in the list.
     """
     # print "searching for repair in same utt", repair.repairID
@@ -347,11 +348,11 @@ def find_repair_end(repair, disfluencyTagList):
 
 def find_repair_ends_and_reclassify(problem_rpns, tag_list, word_list,
                                     search_start, partial_disallowed=False):
-    """Backwards search to find a possible repair end rpn tag and 
-    re-classify its type if needs be. 
+    """Backwards search to find a possible repair end rpn tag and
+    re-classify its type if needs be.
     Return the repair ends successfully found.
 
-    problem_rpns :: list of repair end tags (non-deletes) which are to 
+    problem_rpns :: list of repair end tags (non-deletes) which are to
     be moved back before an edit term.
     tag_list :: the disfluency tags for utterance
     word_list :: the words for the utterance
@@ -432,16 +433,16 @@ def find_repair_end_in_previous_utts(repair, overallTagList, uttlist):
 
 def find_delete_interregna_and_repair_onsets(tag_list, problem_rpns_del,
                                              interreg_start):
-    """problem_rpns_del ::  list of delete repairs (consisting of their 
+    """problem_rpns_del ::  list of delete repairs (consisting of their
     identifying <rpndel id="x"/>.
-    tag_list :: list of disfluency tags where reparanda of those repairs 
+    tag_list :: list of disfluency tags where reparanda of those repairs
     is marked.
-    interreg_start :: int, where the interregnum is known to start 
+    interreg_start :: int, where the interregnum is known to start
     for these tags
 
-    For each repair in problems_rpns_del mark the interregnum and 
+    For each repair in problems_rpns_del mark the interregnum and
     repair onset/repair end delete word for that repair if possible.
-    Return a list with those repairs with successfully resolved 
+    Return a list with those repairs with successfully resolved
     interregna and repair stats.
     """
     interreg_index_dict = defaultdict(
@@ -473,18 +474,18 @@ def find_delete_interregna_and_repair_onsets(tag_list, problem_rpns_del,
     return resolved
 
 
-def find_interregna_and_repair_onsets(tag_list, problem_rps, interreg_start, 
+def find_interregna_and_repair_onsets(tag_list, problem_rps, interreg_start,
                                       word_list):
-    """For each repair in problems_rps mark the interregnum and 
+    """For each repair in problems_rps mark the interregnum and
     repair onset/repair end delete word for that repair if possible.
-    Return a list with those repairs with successfully 
+    Return a list with those repairs with successfully
     resolved interregna and repair stats.
-    
-    problem_rps ::  list of repair ends (consisting of 
+
+    problem_rps ::  list of repair ends (consisting of
     their identifying <rps id="x"/>.
-    tag_list :: list of disfluency tags where reparanda of those 
+    tag_list :: list of disfluency tags where reparanda of those
     repairs is marked.
-    interreg_start :: int, where the interregnum is known to start 
+    interreg_start :: int, where the interregnum is known to start
     for these tags
     """
     # key repair onset tag, value a list of indices for the interregnum
@@ -522,14 +523,14 @@ def find_interregna_and_repair_onsets(tag_list, problem_rps, interreg_start,
                         repair.append(word_list[check])
                         if not reparandum == repair:
                             tag_list[i] = tag_list[i].replace(
-                                r.replace("rps", "rpnrep"), 
+                                r.replace("rps", "rpnrep"),
                                 r.replace("rps", "rpnsub"))
                         break
                     elif r.replace("rps", "rpnsub") in tag_list[check]:
                         repair.append(word_list[check])
                         if reparandum == repair:
                             tag_list[i] = tag_list[i].replace(
-                                r.replace("rps", "rpnsub"), 
+                                r.replace("rps", "rpnsub"),
                                 r.replace("rps", "rpnrep"))
                         break
 
@@ -546,7 +547,7 @@ def find_interregna_and_repair_onsets(tag_list, problem_rps, interreg_start,
 
 
 def remove_non_edit_interregna(tags, words, problem_interreg_IDs):
-    """Where an interregnum is marked but is not an edit term, 
+    """Where an interregnum is marked but is not an edit term,
     convert the interregnum to <rp(s) repair tags.
     """
     phase_dict = dict()  # repair mapped to the phase it is currently in
@@ -561,7 +562,7 @@ def remove_non_edit_interregna(tags, words, problem_interreg_IDs):
                 # repair phase already reached, replace start with rps
                 if phase_dict[repairID] == "rp":
                     tags[t] = tags[t].replace(
-                        '<rps id="{}"/>'.format(repairID), 
+                        '<rps id="{}"/>'.format(repairID),
                         '<rp id="{}"/>'.format(repairID))
                 else:
                     phase_dict[repairID] = "rp"
@@ -575,14 +576,14 @@ def remove_non_edit_interregna(tags, words, problem_interreg_IDs):
                     # repair phase not reached yet, repair onset
                     if phase_dict[repairID] == "rm":
                         tags[t] = tags[t].replace(
-                            '<i id="{}"/>'.format(repairID), 
+                            '<i id="{}"/>'.format(repairID),
                             '<rps id="{}"/>'.format(repairID))
                         phase_dict[repairID] = "rp"
                     # repair phase reached, just repair word
                     elif phase_dict[repairID] == "rp":
                         if not '<rps id="{}"/>'.format(repairID) in tags[t]:
                             tags[t] = tags[t].replace(
-                                '<i id="{}"/>'.format(repairID), 
+                                '<i id="{}"/>'.format(repairID),
                                 '<rp id="{}"/>'.format(repairID))
                         else:
                             # repair onset word from above, just get rid of
@@ -591,30 +592,30 @@ def remove_non_edit_interregna(tags, words, problem_interreg_IDs):
                                 '<i id="{}"/>'.format(repairID), "")
 
                 else:
-                    # while potentially a good interrengum, 
+                    # while potentially a good interrengum,
                     # not if repair phase has already been reached,
                     # so leave it as a plain edit term
                     if phase_dict[repairID] == "rp":
                         tags[t] = tags[t].replace(
                             '<i id="{}"/>'.format(repairID), "")
             if phase_dict[repairID] == "rm" and not '<i id="{}"/>'.format(
-                            repairID) in tags[t] and not "<e/>" in tags[t]:
+                    repairID) in tags[t] and not "<e/>" in tags[t]:
                 phase_words_dict[repairID][0].append(words[t])
             if phase_dict[repairID] == "rp" and not "<e/>" in tags[t] and \
-                not '<rpndel id="{}"/>'.format(repairID) in tags[t]:
+                    not '<rpndel id="{}"/>'.format(repairID) in tags[t]:
                 phase_words_dict[repairID][1].append(words[t])
             # reclassify if end of repair
             if '<rpndel id="{}"/>'.format(repairID) in tags[t]:
                 # either a rep or sub, replace delete with appropriate class
                 if len(phase_words_dict[repairID][1]) > 0:
                     if phase_words_dict[repairID][0] + [words[t]] == \
-                    phase_words_dict[repairID][1]:
+                            phase_words_dict[repairID][1]:
                         tags[t] = tags[t].replace(
-                            '<rpndel id="{}"/>'.format(repairID), 
+                            '<rpndel id="{}"/>'.format(repairID),
                             '<rpnrep id="{}"/>'.format(repairID))
                     else:
                         tags[t] = tags[t].replace(
-                            '<rpndel id="{}"/>'.format(repairID), 
+                            '<rpndel id="{}"/>'.format(repairID),
                             '<rpnsub id="{}"/>'.format(repairID))
                 # either way get rid of rp from above
                 tags[t] = tags[t].replace('<rp id="{}"/>'.format(repairID), "")
@@ -622,22 +623,22 @@ def remove_non_edit_interregna(tags, words, problem_interreg_IDs):
             elif '<rpnrep id="{}"/>'.format(repairID) in tags[t]:
                 # if not the same, change to sub, else leave
                 if phase_words_dict[repairID][0] != \
-                            phase_words_dict[repairID][1]:
+                        phase_words_dict[repairID][1]:
                     tags[t] = tags[t].replace('<rpnrep id="{}"/>'.format(
-                                    repairID), '<rpnsub id="{}"/>'.format(
-                                    repairID)).\
-                                    replace('<rp id="{}"/>'.\
-                                            format(repairID), "")
+                        repairID), '<rpnsub id="{}"/>'.format(
+                        repairID)).\
+                        replace('<rp id="{}"/>'.
+                                format(repairID), "")
                 # either way get rid of rp from above
-                tags[t] = tags[t].replace('<rp id="{}"/>'.\
+                tags[t] = tags[t].replace('<rp id="{}"/>'.
                                           format(repairID), "")
                 phase_dict[repairID] = "o"
             elif '<rpnsub id="{}"/>'.format(repairID) in tags[t]:
                 # if the same, change to rep, else leave
                 if phase_words_dict[repairID][0] == \
-                phase_words_dict[repairID][1]:
+                        phase_words_dict[repairID][1]:
                     tags[t] = tags[t].replace(
-                        '<rpnsub id="{}"/>'.format(repairID), 
+                        '<rpnsub id="{}"/>'.format(repairID),
                         '<rpnrep id="{}"/>'.format(repairID))
                 # either way get rid of rp from above
                 tags[t] = tags[t].replace('<rp id="{}"/>'.format(repairID), "")
@@ -646,7 +647,7 @@ def remove_non_edit_interregna(tags, words, problem_interreg_IDs):
 
 
 def remove_partial_words(tagList, wordsList, POSList, refList):
-    """Consistent with the standard switchboard disfluency detection task, 
+    """Consistent with the standard switchboard disfluency detection task,
     remove partial words,
     and any repairs whose reparanda consist solely of partial words.
     """
@@ -683,7 +684,7 @@ def remove_partial_words(tagList, wordsList, POSList, refList):
                         if "<rps" in tagList[n]:
                             break  # don't make it an embedded repair
                         if not wordsList[n][-1] == "-" and \
-                        not "<e/>" in tagList[n]:
+                                not "<e/>" in tagList[n]:
                             tagList[n] = test + r + tagList[n]
                             repairsToRemoveNoRepairStart.remove(test)
                             break
@@ -693,7 +694,7 @@ def remove_partial_words(tagList, wordsList, POSList, refList):
                 problem_rpns = [
                     rpn for rpn in get_tags(tagList[w]) if "<rpn" in rpn]
                 resolved = find_repair_ends_and_reclassify(
-                    problem_rpns, tagList, wordsList, w - 1, \
+                    problem_rpns, tagList, wordsList, w - 1,
                     partial_disallowed=True)
                 for r in problem_rpns:
                     test = r.replace("rpn", "rps")
@@ -702,8 +703,8 @@ def remove_partial_words(tagList, wordsList, POSList, refList):
             # all problems resolved here, apart from interregnum onsets, which
             # should not cause problems
             continue
-        # get here we have non-partial (complete) words, 
-        #see if problem repairs can be resolved
+        # get here we have non-partial (complete) words,
+        # see if problem repairs can be resolved
         # try to shift repairs missing reparandum start forward
         if '<rm ' in tagList[w]:
             # print "repairs to remove no rm", repairsToRemoveNoReparandumStart
@@ -736,7 +737,7 @@ def remove_partial_words(tagList, wordsList, POSList, refList):
         if '<rpnsub ' in tagList[w] or '<rpnrep ' in tagList[w]:
             # subsitution or repeat repair
             rpn = re.findall("<rpnrep id\=\"[0-9]+\"\/>", tagList[w], re.S) + \
-            re.findall(
+                re.findall(
                 "<rpnsub id\=\"[0-9]+\"\/>", tagList[w], re.S)
             for r in rpn:
                 test = r.replace("rpnrep", "rps").replace("rpnsub", "rps")
@@ -751,7 +752,7 @@ def remove_partial_words(tagList, wordsList, POSList, refList):
                     repairsToRemoveNoRepairStart.remove(test)
 
     repairsToRemove.extend(repairsToRemoveNoReparandumStart +
-                           repairsToRemoveNoRepairStart + \
+                           repairsToRemoveNoRepairStart +
                            repairsToRemoveNoRepairEnd)
     repairIDs = []
     for problem in repairsToRemove:
@@ -768,14 +769,15 @@ def remove_partial_words(tagList, wordsList, POSList, refList):
         i -= 1
     return tagList, wordsList, POSList, refList
 
+
 def classify_repair(reparandum, repair, continuation):
     """min edit distance string aligner for repair-> reparandum
-    Creates table of all possible edits, only considers the paths 
+    Creates table of all possible edits, only considers the paths
     from i,j=0 to i=m, j= n
-    returns mapping from i to j with the max alignment- problem, 
+    returns mapping from i to j with the max alignment- problem,
     there may be several paths. Weights:
         rep(string1,string2) 0
-        repPartial(string1,string2)  1         j- john 
+        repPartial(string1,string2)  1         j- john
         repReversePartial(string1,string2) 1    john j-
         samePOS(string1,string2) 2
         insertIntoReparandum(eps,string) 4
@@ -832,8 +834,8 @@ def classify_repair(reparandum, repair, continuation):
         D.append([0] * (n + 1))
         ptr.append([[]] * (n + 1))  # these are mutable, just dummies
 
-    # defaultdict(defaultdict(list)) 
-    #the pointer table with a list of (pointer,relation) pairs
+    # defaultdict(defaultdict(list))
+    # the pointer table with a list of (pointer,relation) pairs
     # populate each of the table axes
     D[0][0] = 0
     j = 0
@@ -886,8 +888,8 @@ def classify_repair(reparandum, repair, continuation):
                 ptr[i][j].append((a[-1], a[2]))
             D[i][j] = mincost
     # print the optimal alignment(s) backtrace-
-    # there should only be one given the weights as 
-    #we shouldn't allow an ins+del to beat an arbsub
+    # there should only be one given the weights as
+    # we shouldn't allow an ins+del to beat an arbsub
     # return a list of the alignemnts
     # gets them backwards then returns the reverse
     # print "cost = " + str(D[m][n])
@@ -975,7 +977,7 @@ def classify_repair(reparandum, repair, continuation):
 
 
 def graph_viz_repair(maps, reparandum, repair, continuation):
-    """Returns a graph viz .dot input file for a 
+    """Returns a graph viz .dot input file for a
     digraph that can be rendered by graphviz
     """
     assert isinstance(reparandum, list)
@@ -1060,7 +1062,7 @@ def graph_viz_repair(maps, reparandum, repair, continuation):
     edge[weight=15];
     0 -> 1 -> 2;
     }
-    
+
     subgraph cluster_repair{
     label = "repair";
     style=invisible;
@@ -1075,7 +1077,7 @@ def graph_viz_repair(maps, reparandum, repair, continuation):
     edge[weight=15];
     r0 -> r1 -> r2 -> r3 -> r4 -> r5;
     }
-    
+
     edge[constrained=false]
     0 -> r0[label="rep",color=red,dir=back];
     0 -> r1[label="insert",color=red,dir=back];
@@ -1084,14 +1086,15 @@ def graph_viz_repair(maps, reparandum, repair, continuation):
     1 -> r4[label="sublexical",color=red,dir=back];
     2 -> r5[label="rep",color=red,dir=back];
 
-    }  
+    }
     """
     finalResult = digraphInit + ranks + reparandumClusterInit + \
-    reparandumNodes + "edge[weight=15];\n" + reparandumSequence + "\n}\n\n"\
+        reparandumNodes + "edge[weight=15];\n" + reparandumSequence + "\n}\n\n"\
         + repairClusterInit + repairNodes + \
         "edge[weight=15];\n" + repairSequence + "\n}\n\n" + \
         "edge[constrained=false]" + alignments + "\n}\n"
     return finalResult
+
 
 if __name__ == '__main__':
     #s = SelfRepair()
@@ -1100,7 +1103,7 @@ if __name__ == '__main__':
     continuation = [("a", "DT")]
     #repair = [("You","NNP"),("really","RB"),("like","VP"),("him","NP")]
     #reparandum = [("Y-","NNP"),("like","VP"),("john","NN")]
-    #repair = [("Y-","NNP"),("like","VP"),("and","cc"),("I","RB"),
-    #("like","VP"),("I","RB"),("like","VP"),("john","NN")]
+    # repair = [("Y-","NNP"),("like","VP"),("and","cc"),("I","RB"),
+    # ("like","VP"),("I","RB"),("like","VP"),("john","NN")]
     graph_viz_repair(classify_repair(
         reparandum, repair, [("", "")]), reparandum, repair, continuation)

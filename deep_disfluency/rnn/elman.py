@@ -79,18 +79,18 @@ class Elman(object):
             # POS version, not just the embeddings
             # but with the POS window concatenated
             x = T.concatenate((self.emb[self.idxs].reshape((self.idxs.shape[0],
-                                                            de*cs)),
+                                                            de * cs)),
                                self.pos[self.pos_idxs].reshape(
-                                                    (self.pos_idxs.shape[0],
-                                                     npos*cs))), 1)
+                (self.pos_idxs.shape[0],
+                 npos * cs))), 1)
         else:
             # TODO new version with extra features
             x = T.concatenate((self.emb[self.idxs].reshape((self.idxs.shape[0],
-                                                            de*cs)),
+                                                            de * cs)),
                                self.pos[self.pos_idxs].reshape(
-                                                    (self.pos_idxs.shape[0],
-                                                     npos*cs)),
-                               self.extra_features), 1)
+                (self.pos_idxs.shape[0],
+                 npos * cs)),
+                self.extra_features), 1)
         self.y = T.iscalar('y')  # label
         # TODO for sentences
         # self.y = T.ivector('y') #labels for whole sentence
@@ -150,7 +150,7 @@ class Elman(object):
             + self.L2_reg * self.L2_sqr
         gradients = T.grad(self.cost, self.params)
 
-        self.updates = OrderedDict((p, p-self.lr*g)
+        self.updates = OrderedDict((p, p - self.lr * g)
                                    for p, g in zip(self.params, gradients))
 
         # costs for multiple labels (one for each in the input)
@@ -159,7 +159,7 @@ class Elman(object):
             + self.L2_reg * self.L2_sqr
         sentence_gradients = T.grad(self.sentence_cost, self.params)
 
-        self.sentence_updates = OrderedDict((p, p - self.lr*g)
+        self.sentence_updates = OrderedDict((p, p - self.lr * g)
                                             for p, g in
                                             zip(self.params,
                                                 sentence_gradients))
@@ -168,16 +168,16 @@ class Elman(object):
             self.soft_max = theano.function(inputs=[self.idxs, self.pos_idxs],
                                             outputs=p_y_given_x_sentence)
             self.soft_max_return_hidden_layer = theano.function(
-                                    inputs=[self.idxs, self.pos_idxs],
-                                    outputs=p_y_given_x_sentence_hidden)
+                inputs=[self.idxs, self.pos_idxs],
+                outputs=p_y_given_x_sentence_hidden)
         else:
             self.soft_max = theano.function(inputs=[self.idxs, self.pos_idxs,
                                                     self.extra_features],
                                             outputs=p_y_given_x_sentence)
             self.soft_max_return_hidden_layer = theano.function(
-                                        inputs=[self.idxs, self.pos_idxs,
-                                                self.extra_features],
-                                        outputs=p_y_given_x_sentence_hidden)
+                inputs=[self.idxs, self.pos_idxs,
+                        self.extra_features],
+                outputs=p_y_given_x_sentence_hidden)
 
         if na == 0:
             self.train = theano.function(inputs=[self.idxs, self.pos_idxs,
@@ -194,12 +194,12 @@ class Elman(object):
                                          updates=self.updates)
 
         self.normalize = theano.function(
-                        inputs=[],
-                        updates={self.emb:
-                                 self.emb /
-                                 T.sqrt((self.emb**2).sum(axis=1))
-                                 .dimshuffle(0, 'x')}
-                                         )
+            inputs=[],
+            updates={self.emb:
+                     self.emb /
+                     T.sqrt((self.emb**2).sum(axis=1))
+                     .dimshuffle(0, 'x')}
+        )
 
     def classify_by_index(self, word_idx, indices, pos_idx=None,
                           extra_features=None):
@@ -217,16 +217,16 @@ class Elman(object):
 
             if extra_features:
 
-                output.extend(self.classify(word_idx[start:stop+1, :],
-                                            pos_idx[start:stop+1, :],
+                output.extend(self.classify(word_idx[start:stop + 1, :],
+                                            pos_idx[start:stop + 1, :],
                                             np.asarray(
-                                            extra_features[start:stop+1, :],
+                                            extra_features[start:stop + 1, :],
                                             dtype='float32')
                                             )
                               )
             else:
-                output.extend(self.classify(word_idx[start:stop+1, :],
-                                            pos_idx[start:stop+1, :]
+                output.extend(self.classify(word_idx[start:stop + 1, :],
+                                            pos_idx[start:stop + 1, :]
                                             )
                               )
         return output
@@ -253,15 +253,15 @@ class Elman(object):
                     break
             if extra_features:
 
-                x = self.train(word_idx[start:stop+1, :],
-                               pos_idx[start:stop+1, :],
-                               np.asarray(extra_features[start:stop+1, :],
+                x = self.train(word_idx[start:stop + 1, :],
+                               pos_idx[start:stop + 1, :],
+                               np.asarray(extra_features[start:stop + 1, :],
                                           dtype='float32'),
                                labels[stop],
                                lr)
             else:
-                x = self.train(word_idx[start:stop+1, :],
-                               pos_idx[start:stop+1, :],
+                x = self.train(word_idx[start:stop + 1, :],
+                               pos_idx[start:stop + 1, :],
                                labels[stop],
                                lr)
             loss += x

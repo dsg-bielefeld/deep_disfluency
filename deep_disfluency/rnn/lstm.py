@@ -28,6 +28,7 @@ def init_weight(shape, name, sample='uni', seed=None):
 
     return shared(values, name=name, borrow=True)
 
+
 dtype = T.config.floatX  # @UndefinedVariable
 
 
@@ -47,8 +48,9 @@ class LSTM(object):
         npos :: number of pos tags
         '''
 
-        self.emb = init_weight((ne+1, de), 'emb')  # add one to ne for PADDING
-        self.n_in = (de * cs)+(npos * cs)
+        # add one to ne for PADDING
+        self.emb = init_weight((ne + 1, de), 'emb')
+        self.n_in = (de * cs) + (npos * cs)
         self.n_lstm = n_lstm
         self.n_out = n_out
         self.W_xi = init_weight((self.n_in, self.n_lstm), 'W_xi')
@@ -122,10 +124,10 @@ class LSTM(object):
         # x = self.emb[self.idxs].reshape((self.idxs.shape[0], de*cs))
         # POS version
         x = T.concatenate((self.emb[self.idxs].reshape((self.idxs.shape[0],
-                                                        de*cs)),
+                                                        de * cs)),
                            self.pos[self.pos_idxs].reshape(
-                                            (self.pos_idxs.shape[0],
-                                             npos*cs))), 1)
+            (self.pos_idxs.shape[0],
+             npos * cs))), 1)
 
         self.y = T.iscalar('y')
         # initial hidden state
@@ -133,10 +135,10 @@ class LSTM(object):
         self.c0 = shared(np.zeros(shape=self.n_lstm, dtype=dtype))
         self.lr = T.scalar('lr')
         [h_vals, c_vals, y_vals], _ = theano.scan(
-                                        fn=step_lstm,
-                                        sequences=x,
-                                        outputs_info=[self.h0, self.c0, None],
-                                        n_steps=x.shape[0])
+            fn=step_lstm,
+            sequences=x,
+            outputs_info=[self.h0, self.c0, None],
+            n_steps=x.shape[0])
         self.output = y_vals
         p_y_given_x_lastword = self.output[-1, 0, :]
         p_y_given_x_sentence = self.output[:, 0, :]
@@ -161,7 +163,7 @@ class LSTM(object):
                                      outputs=[x.shape, self.y.shape,
                                               y_vals.shape, self.cost.shape])
         gradients = T.grad(self.cost, self.params)
-        self.updates = OrderedDict((p, p-self.lr*g)
+        self.updates = OrderedDict((p, p - self.lr * g)
                                    for p, g in zip(self.params, gradients))
         self.loss = theano.function(inputs=[x, self.y], outputs=self.cost)
         # if na == 0: #assume no acoustic features for now
@@ -169,15 +171,15 @@ class LSTM(object):
         self.soft_max = theano.function(inputs=[self.idxs, self.pos_idxs],
                                         outputs=p_y_given_x_sentence)
         self.soft_max_return_hidden_layer = theano.function(
-                                        inputs=[self.idxs, self.pos_idxs],
-                                        outputs=p_y_given_x_sentence_hidden)
+            inputs=[self.idxs, self.pos_idxs],
+            outputs=p_y_given_x_sentence_hidden)
         if na == 0:
             self.train = theano.function(inputs=[self.idxs, self.pos_idxs,
                                                  self.y, self.lr],
                                          outputs=self.cost,
                                          updates=self.updates)
             self.classify = theano.function(inputs=[self.idxs, self.pos_idxs],
-                                        outputs=y_pred)
+                                            outputs=y_pred)
         else:
             self.train = theano.function(inputs=[self.idxs, self.pos_idxs,
                                                  self.acoustic,
@@ -186,14 +188,14 @@ class LSTM(object):
                                          updates=self.updates)
             self.classify = theano.function(inputs=[self.idxs, self.pos_idxs,
                                                     self.acoustic],
-                                        outputs=y_pred)
+                                            outputs=y_pred)
         self.normalize = theano.function(
-                                         inputs=[],
-                                         updates={self.emb:
-                                                  self.emb/T.sqrt(
-                                                                (self.emb**2).
-                                                                sum(axis=1))
-                                                  .dimshuffle(0, 'x')})
+            inputs=[],
+            updates={self.emb:
+                     self.emb / T.sqrt(
+                         (self.emb**2).
+                         sum(axis=1))
+                     .dimshuffle(0, 'x')})
 
     def classify_by_index(self, word_idx, indices, pos_idx=None,
                           extra_features=None):
@@ -211,16 +213,16 @@ class LSTM(object):
 
             if extra_features:
 
-                output.extend(self.classify(word_idx[start:stop+1, :],
-                                            pos_idx[start:stop+1, :],
+                output.extend(self.classify(word_idx[start:stop + 1, :],
+                                            pos_idx[start:stop + 1, :],
                                             np.asarray(
-                                            extra_features[start:stop+1, :],
+                                            extra_features[start:stop + 1, :],
                                             dtype='float32')
                                             )
                               )
             else:
-                output.extend(self.classify(word_idx[start:stop+1, :],
-                                            pos_idx[start:stop+1, :]
+                output.extend(self.classify(word_idx[start:stop + 1, :],
+                                            pos_idx[start:stop + 1, :]
                                             )
                               )
         return output
@@ -247,15 +249,15 @@ class LSTM(object):
 
             if extra_features:
 
-                x = self.train(word_idx[start:stop+1, :],
-                               pos_idx[start:stop+1, :],
-                               np.asarray(extra_features[start:stop+1, :],
+                x = self.train(word_idx[start:stop + 1, :],
+                               pos_idx[start:stop + 1, :],
+                               np.asarray(extra_features[start:stop + 1, :],
                                           dtype='float32'),
                                labels[stop],
                                lr)
             else:
-                x = self.train(word_idx[start:stop+1, :],
-                               pos_idx[start:stop+1, :],
+                x = self.train(word_idx[start:stop + 1, :],
+                               pos_idx[start:stop + 1, :],
                                labels[stop],
                                lr)
             loss += x
@@ -348,10 +350,10 @@ class LstmMiniBatch:
         self.lr = shared(np.cast[dtype](lr))
 
         [_, _, y_vals], _ = theano.scan(
-                                            fn=step_lstm,
-                                            sequences=X.dimshuffle(1, 0, 2),
-                                            outputs_info=[h0, c0, None]
-                                                  )
+            fn=step_lstm,
+            sequences=X.dimshuffle(1, 0, 2),
+            outputs_info=[h0, c0, None]
+        )
 
         if single_output:
             self.output = y_vals[-1]

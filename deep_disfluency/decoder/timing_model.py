@@ -65,7 +65,7 @@ def load_timing_data(dialogues, labels2idx, simple=False):
             if t < 0:
                 print "below zero"
                 t = np.average([x[0] for x in timing_dict[tag]])
-                timings[i-1] = timings[i] - t
+                timings[i - 1] = timings[i] - t
             # turn to milliseconds
             timing_dict[tag].append((prev_prev_t, prev_t,
                                      t))
@@ -149,6 +149,7 @@ def test(model, scaler, X, y):
     predicted = model.predict(X1)
     print metrics.classification_report(np.asarray(test1), predicted)
     print metrics.confusion_matrix(np.asarray(test1), predicted)
+
 
 if __name__ == '__main__':
     disf_dir = "../data/disfluency_detection/switchboard"

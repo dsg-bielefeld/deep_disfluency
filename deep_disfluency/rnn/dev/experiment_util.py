@@ -12,7 +12,7 @@ from sklearn.metrics import classification_report
 from nltk.tag import CRFTagger
 
 import sys
-sys.path.append('../') #path to the src files
+sys.path.append('../')  # path to the src files
 
 from language_model.ngram_language_model import KneserNeySmoothingModel
 from utils.tools import convertFromIncDisfluencyTagsToEvalTags
@@ -32,18 +32,18 @@ def get_diff_and_new_prefix(current, newprefix, verbose=False):
     rollback = 0
     original_length = len(current)
     original_current = deepcopy(current)
-    for i in range(len(current)-1, -2, -1):
+    for i in range(len(current) - 1, -2, -1):
         if verbose:
             print "oooo", newprefix[0]
             if not current == []:
                 print current[i]
         if i == -1 or (float(newprefix[0][1]) >= float(current[i][2])):
-            if i == len(current)-1:
+            if i == len(current) - 1:
                 current = current + newprefix
                 break
             k = 0
-            marker = i+1
-            for j in range(i+1, len(current)):
+            marker = i + 1
+            for j in range(i + 1, len(current)):
                 if k == len(newprefix):
                     break
                 if verbose:
@@ -54,7 +54,7 @@ def get_diff_and_new_prefix(current, newprefix, verbose=False):
                     if verbose:
                         print "repeat"
                     k += 1
-                    marker = j+1
+                    marker = j + 1
             rollback = original_length - marker
             current = current[:marker] + newprefix[k:]
             newprefix = newprefix[k:]
@@ -72,7 +72,7 @@ def get_diff_and_new_prefix(current, newprefix, verbose=False):
 def div(enum, denom):
     if denom == 0.0 or enum == 0.0:
         return 0.0
-    return enum/denom
+    return enum / denom
 
 
 def get_last_n_features(feature, current_words, idx, n=3):
@@ -83,9 +83,9 @@ def get_last_n_features(feature, current_words, idx, n=3):
         last = 0
         timings = []
         if idx > n:
-            last = current_words[idx-n][2]
+            last = current_words[idx - n][2]
         for _, _, e in current_words[max(0, (idx - n) + 1): idx + 1]:
-            timings.append((e-last)*100)
+            timings.append((e - last) * 100)
             last = e
         while len(timings) < n:
             timings = [0] + timings
@@ -109,7 +109,7 @@ def simulate_increco_data(frame, acoustic_data, lexical_data, pos_data):
     current_time = 0
     for my_frame, acoust, word, pos in zip(frame, acoustic_data,
                                            lexical_data, pos_data):
-        new_lexical_data.append([(word, current_time/100, my_frame/100)])
+        new_lexical_data.append([(word, current_time / 100, my_frame / 100)])
         current_time = my_frame
         new_pos_data.append([pos])
         new_acoustic_data.append([acoust])
@@ -135,9 +135,9 @@ def save_predictions_and_quick_eval(predictions_filename=None,
     classes = [idx_to_label_dict[idx]
                for idx in sorted(idx_to_label_dict.keys())]
     raw_predictions_file = open(predictions_filename, "w")
-    raw_predictions_header = "file_name,time_step,"+",".\
-        join(classes)+",arg_max,y"
-    raw_predictions_file.write(raw_predictions_header+"\n")
+    raw_predictions_header = "file_name,time_step," + ",".\
+        join(classes) + ",arg_max,y"
+    raw_predictions_file.write(raw_predictions_header + "\n")
     if incremental_eval:
         inc_predictions_file = open(predictions_filename.replace(
             ".csv", ".increco"), "w")
@@ -185,16 +185,17 @@ def save_predictions_and_quick_eval(predictions_filename=None,
                 rollback = 0
                 current_words, newsuffix, rollback = get_diff_and_new_prefix(
                     current_words, new_lex, verbose=False)
-                current_pos = current_pos[:len(current_pos)-rollback] + new_pos
+                current_pos = current_pos[:len(
+                    current_pos) - rollback] + new_pos
                 current_words_string = current_words_string[
-                    :len(current_words_string)-rollback] + \
+                    :len(current_words_string) - rollback] + \
                     [idx_to_word_dict[x[0][-1]] for x in new_lex]
                 assert(len(current_words) == len(current_words_string) ==
                        len(current_pos))
                 # history = history[:len(history)-rollback]
                 # TODO was the history being reset incorrectly?
-                history = history[:len(history)-rollback]
-                softmaxlist = softmaxlist[:len(softmaxlist)-rollback]
+                history = history[:len(history) - rollback]
+                softmaxlist = softmaxlist[:len(softmaxlist) - rollback]
                 for i in range(max([len(softmaxlist), 0]), len(current_words)):
                     if not history == []:
                         if s["model"] == "lstm":
@@ -244,7 +245,7 @@ def save_predictions_and_quick_eval(predictions_filename=None,
                         # get the actual label
                         label = idx_to_label_dict[label_idx]
                         labels.append(label)
-                    new_words = current_words_string[:i+1]
+                    new_words = current_words_string[:i + 1]
                     if hmm:
                         # if hmm get the proper viterbi prefix (or
                         # at least the changed indices for effiency
@@ -264,15 +265,15 @@ def save_predictions_and_quick_eval(predictions_filename=None,
                             timing_data=last_n_timings)
                         predictions = predictions[:len(predictions) -
                                                   (len(newpredictions) -
-                                                  1)] + newpredictions
+                                                   1)] + newpredictions
                         if "simple" not in s['tags']:
                             predictions = \
-                                    convertFromIncDisfluencyTagsToEvalTags(
-                                        predictions,
-                                        new_words,
-                                        start=len(predictions) -
-                                        (len(newpredictions)),
-                                        representation=s["tags"])
+                                convertFromIncDisfluencyTagsToEvalTags(
+                                    predictions,
+                                    new_words,
+                                    start=len(predictions) -
+                                    (len(newpredictions)),
+                                    representation=s["tags"])
                         else:
                             for p in range(
                                     len(predictions) -
@@ -305,13 +306,13 @@ def save_predictions_and_quick_eval(predictions_filename=None,
                                 new_prefix = predictions[j:]
                                 break
                         for t, w, l in zip(current_words[
-                            (i-(len(new_prefix)-1)):i+1],
-                                        new_words[(i-(len(new_prefix)-1)):i+1],
-                                        new_prefix):
+                                (i - (len(new_prefix) - 1)):i + 1],
+                                new_words[(i - (len(new_prefix) - 1)):i + 1],
+                                new_prefix):
                             _, start_time, end_time = t
                             inc_predictions_file.write("\t".join([
                                 str(start_time), str(end_time), w,
-                                str(l)])+"\n")
+                                str(l)]) + "\n")
                         prev_predictions = deepcopy(predictions)
         else:  # not incremental eval, do something much easier to get the loss
             softmax = model.soft_max(lexical_data, pos_data)  # no acoustic
@@ -329,7 +330,7 @@ def save_predictions_and_quick_eval(predictions_filename=None,
     raw_predictions_file.close()
     if incremental_eval:
         inc_predictions_file.close()
-    print "overall loss/cross entropy", loss/total
+    print "overall loss/cross entropy", loss / total
     av_loss = []
     for key, val in sorted(class_loss.items(), key=lambda x: x[0]):
         print key, val
@@ -350,9 +351,9 @@ def save_predictions_and_quick_eval(predictions_filename=None,
                "f1_tto1": p_r_f_tags[2], "f1_tto2": p_r_f_tags[2]}
 
     results.update({
-                'class_loss': class_loss,
-                'loss': div(loss, total),
-                'f1_tags': p_r_f_tags[2],
-                'tag_summary': tag_summary
+        'class_loss': class_loss,
+        'loss': div(loss, total),
+        'f1_tags': p_r_f_tags[2],
+        'tag_summary': tag_summary
     })
     return results

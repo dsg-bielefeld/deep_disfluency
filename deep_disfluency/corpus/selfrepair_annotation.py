@@ -22,11 +22,11 @@ class SelfRepair:
         self.extras = []  # unannotated bits
 
         self.forward_acts = ["sv", "qw^d", "qh", "sd", "qy", "qw",
-                             "qy^d", "qrr", "qo", "ad", "oo_co_cc", 
+                             "qy^d", "qrr", "qo", "ad", "oo_co_cc",
                              "fc", "fa", "fp"]
-        self.backward_acts = ["+", "h", "aap_aam", "arp_nd", "no", "bf", 
+        self.backward_acts = ["+", "h", "aap_aam", "arp_nd", "no", "bf",
                               "na", "ng", "^q",
-                              "ar", "^2", "ba", "br", "aa", "bd", "b^m", 
+                              "ar", "^2", "ba", "br", "aa", "bd", "b^m",
                               "ft", "nn", "bh", "bk", "ny", "b"]
         # others will be other! NB have on one occasion, file 97 added a "a/oo" marker with forward backslash to show change of dialogue act
         # self.test()
@@ -59,7 +59,7 @@ class SelfRepair:
         markerfile = open("AnnotationMarker.text")
         for line in markerfile:
             #gives the reparandumStart of the last unannotated pair
-            marker = line.split(",") 
+            marker = line.split(",")
         self.unannotated_marker = []
         for number in marker:
             self.unannotated_marker.append(int(number))
@@ -131,7 +131,8 @@ class SelfRepair:
             translength = len(trans.utterances)
             totalUtterances += len(trans.utterances)
 
-            if int(trans.conversation_no) >= 2000 and int(trans.conversation_no) < 4000:
+            if int(trans.conversation_no) >= 2000 and int(
+                    trans.conversation_no) < 4000:
                 if trans.has_trees():  # jc train, fine for both training files
                     trainingNumber += 1
                     trainingUtterances += len(trans.utterances)
@@ -494,7 +495,7 @@ class SelfRepair:
         #    interleavedStrings += utt.text_words(filter_disfluency=True)
         #    interleavedDAs.append(utt.damsl_act_tag())
         # now leave out 14, add those two instead
-        #..15 and 16 and 17 as per above
+        # ..15 and 16 and 17 as per above
         file.write(str(repair[0]) + "\t" + str(repair[1][0]) + "\t" + str(repair[1][1]) + "\t" + str(repair[2][0]) + "\t" + str(repair[2][1]) +
                    "\t" + str(repair[3][0]) + "\t" + str(repair[3][1]) + "\t" + str(repair[4][0]) + "\t" + str(repair[4][1]) + "\t" + str(repair[5]) + "\n")
         #file.write(str(repair[0]) + "\t" + str(repair[1][0]) + "\t" + str(repair[1][1]) + "\t" + str(repair[2][0]) + "\t" + str(repair[2][1]) + "\t" + str(repair[3][0]) + "\t" + str(repair[3][1]) + "\t" + str(repair[4][0]) + "\t" + str(repair[4][1]) + "\t" + str(repair[5]) + "\t" + str(repair[6]) + "\t" + str(repair[7]) + "\t" + str(repair[8]) + "\t" + str(repair[9]) + "\t" + str(interruptionPos) + "\t" + str(reparandumLength) + "\t" + str(repair[10]) + "\t" + str(repair[11]) + "\t" + str(repair[12]) + "\t" + str(repair[13]) + str(interleavedDAs)+ "\t" + str(interleavedStrings) + "\t" + str(len(interleavedStrings)) + "\t" + str(repair[15]) + "\t" + str(repair[16]) + "\t" + str(repair[17]) + "\n")
@@ -569,7 +570,7 @@ class SelfRepair:
 
                 # i.e. orig, reparandum, interreg, repair, end
                 for i in range(len(repair[12])):
-                    #(only concerned with first two for now)
+                    # (only concerned with first two for now)
                     # key thing we're interested in is the path length of the reparandum onset and of the last consistuent before interruption point versus the others?
                     # i.e. what it is and whether it's higher than the others so far.. would be v interesting.
                     # find out its relative length compared to the rest <S> is
@@ -628,7 +629,8 @@ class SelfRepair:
                     for i in range(len(pathlengths) - 1):
                         length1 = pathlengths[i][2]
                         length2 = pathlengths[i + 1][2]
-                        if ((length2 == "<S>" and not length1 == "<S>") or (length1 != "<S>" and int(length2) > int(length1))):
+                        if ((length2 == "<S>" and not length1 == "<S>") or (
+                                length1 != "<S>" and int(length2) > int(length1))):
                             pathlengths[i], pathlengths[
                                 i + 1] = pathlengths[i + 1], pathlengths[i]
                             swapHappened = True
@@ -660,7 +662,8 @@ class SelfRepair:
                         myRelativePL = float(
                             pathlengths[i][2]) / float(normaliser)
 
-                        if (pathlengths[i][0] == reparandumOnsetAddress and found == False):
+                        if (pathlengths[i][0] ==
+                                reparandumOnsetAddress and found == False):
                             relativePathLength = float(myRelativePL)
 
                             # raw_input(relativePathLength)
@@ -697,7 +700,8 @@ class SelfRepair:
                 for pair in origLengthBucketsRaw:
                     if pair[0] == origLength:
                         for bucket in pair[1]:
-                            if str(bucket[0]) == str(reparandumOnsetPathlength):
+                            if str(bucket[0]) == str(
+                                    reparandumOnsetPathlength):
                                 bucket[1] += 1
                                 thisbucketfound = True
                                 break
@@ -729,21 +733,25 @@ class SelfRepair:
         corpus = open(
             "SelfRepairResults\REPAIRCORPUSSTATS22May13.csv.text", "w")
         corpus.write("POS frequency \n")
-        for key1, val1 in sorted(onsetPOSdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(onsetPOSdict.items(),
+                                 key=itemgetter(0), reverse=True):
             relativefreq = float(val1) / float(3861)
             corpus.write(
                 str(key1) + "\t" + str(val1) + "\t" + str(relativefreq) + "\n")
         corpus.write("Interreg occurence \n")
-        for key1, val1 in sorted(interregnumDict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(
+                interregnumDict.items(), key=itemgetter(0), reverse=True):
             corpus.write(str(key1) + "\t" + str(val1) + "\n")
         corpus.write("\n OVERALL lengths \n")
-        for key1, val1 in sorted(lengthdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(
+                lengthdict.items(), key=itemgetter(0), reverse=True):
             corpus.write(str(key1) + "\t" + str(val1) + "\n")
         corpus.write("\n OVERALL buckets \n")
         for pair in NUMBERBUCKETS:
             corpus.write(str(pair[0]) + "\t" + str(pair[1]) + "\n")
         corpus.write("\n 1p lengths \n")
-        for key1, val1 in sorted(firstPlengthdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(
+                firstPlengthdict.items(), key=itemgetter(0), reverse=True):
             corpus.write(str(key1) + "\t" + str(val1) + "\n")
         corpus.write("\n 1p buckets \n")
         for pair in firstPNUMBERBUCKETS:
@@ -960,7 +968,7 @@ class SelfRepair:
                 # string position
                 # i.e. interregnum and repair never reached, only reparandum
                 # terminated.. deletion type
-                if interregnumBool == None:
+                if interregnumBool is None:
                     interregUtt = utt
                     interregUttTreeMap = self.__treeMapList__.get_treemap(
                         trans, utt)
@@ -972,7 +980,7 @@ class SelfRepair:
                 # i.e. repair not reached yet, interregnum could be over/in
                 # progress, still deletion type, look ahead for possible
                 # interregnum
-                if repairBool == None:
+                if repairBool is None:
                     repairUtt = utt
                     # repairNum = [utt.transcript_index, pos] # might still have interregna left to add
                     # extend the repair by one word past the repair point to
@@ -1010,7 +1018,7 @@ class SelfRepair:
                     # still haven't got a post repair point word, look for next
                     # utterance.. shouldn't have to go beyond that!!
                     if nextWordFound == False:
-                        if trans.next_utt_same_speaker(utt) != None:
+                        if trans.next_utt_same_speaker(utt) is not None:
                             pos = 0
                             utt = trans.next_utt_same_speaker(utt)
                             words = utt.text_words()
@@ -1123,7 +1131,7 @@ class SelfRepair:
                         treeNumber += 1
                     if interregNum[0] > startNum[0]:
                         # might get a different tree..
-                        if interregUttTreeMap is None or interregUttTreeMap.get_first_TreeNumber() == None:
+                        if interregUttTreeMap is None or interregUttTreeMap.get_first_TreeNumber() is None:
                             self.errorlog.write("NO TREE FOUND FOR repair in interregUtt  " + interregUtt.swda_filename + " utt no." + str(
                                 interregUtt.transcript_index) + str(interregUtt.text_words()))
                             # print(str(interregUttTreeMap))
@@ -1141,7 +1149,7 @@ class SelfRepair:
                             #print("adding interreg " + str(interregNum))
                             # print(myTreeMaps)
                     if repairNum[0] > interregNum[0]:
-                        if repairUttTreeMap.get_first_TreeNumber() == None:
+                        if repairUttTreeMap.get_first_TreeNumber() is None:
                             self.errorlog.write("NO TREE FOUND FOR repair in repairUtt " + repairUtt.swda_filename + " utt no." + str(
                                 repairUtt.transcript_index) + str(repairUtt.text_words()))
                             # print(str(repairUttTreeMap))
@@ -1160,7 +1168,7 @@ class SelfRepair:
                         # print(myTreeMaps)
 
                     if endNum[0] > repairNum[0]:
-                        if endUttTreeMap.get_first_TreeNumber() == None:
+                        if endUttTreeMap.get_first_TreeNumber() is None:
                             self.errorlog.write("NO TREE FOUND FOR repair in endUtt " + endUtt.swda_filename + " utt no." + str(
                                 endUtt.transcript_index) + str(endUtt.text_words()))
                             # print(str(endUttTreeMap))
@@ -1217,7 +1225,7 @@ class SelfRepair:
                     for i in range(len(myTreeMaps)):
                         pair = myTreeMaps[i]  #treemaps now a pair- oh balls this screws everything up- maybe not
                         #print pair
-                        if len(pair[1]) > 0: # only take words with tree mapping?? wise?  yes, gets rid of punct etc..        
+                        if len(pair[1]) > 0: # only take words with tree mapping?? wise?  yes, gets rid of punct etc..
                             if [startUtt.transcript_index, pair[1]] < startNum:
                                 origWords.append(pair[0])
                             elif [interregUtt.transcript_index, pair[0]] < interregNum:
@@ -1339,7 +1347,7 @@ class SelfRepair:
                                     startUttTreeMap[d][1][0][0]]
                                 mytreenumber = startUttTreeMap[d][1][0][0]
                                 break
-                    if mytree == None:
+                    if mytree is None:
                         print("NO TREE FOUND FOR 1p repair in  " + startUtt.swda_filename + " utt no." + str(
                             startUtt.transcript_index) + "from startNum" + str(startNum) + str(startUtt.text_words()))
                         # print(str(startUttTreeMap))
@@ -1435,7 +1443,8 @@ class SelfRepair:
             elif (string == '}' and interregnumBool == True):
                 # could be at end of an utt..in which case close of interreg-
                 # maybe not for 3ps??
-                if ((pos < len(words) - 1 and words[pos + 1] != "{") or pos == len(words) - 1):
+                if ((pos < len(words) -
+                     1 and words[pos + 1] != "{") or pos == len(words) - 1):
                     interregnumBool = False
                 else:
                     pass
@@ -1462,7 +1471,8 @@ class SelfRepair:
             if pos >= len(words):
                 # we might have a second position type annotation, where it's really a first pos
                 # for now ignore these- no- don't!
-                if (trans.next_utt(utt) != None and trans.next_utt(utt).caller == startUtt.caller):
+                if (trans.next_utt(utt) is not None and trans.next_utt(
+                        utt).caller == startUtt.caller):
                     errormessage = "POSSIBLE SECOND POS REPAIR: START= " + str(startUtt.text_words()) + "NEXT= " + str(
                         trans.next_utt(utt).text_words()) + " " + startUtt.swda_filename + str(startUtt.transcript_index)
                     # self.errorlog.write(errormessage+"\n")
@@ -1480,7 +1490,7 @@ class SelfRepair:
                         pos = 0
                         # i.e. we haven't got to repair point (still in
                         # reparandum or just finished it with the last string)
-                        if interregnumBool == None:
+                        if interregnumBool is None:
                             interregUtt = utt
                             #interregNum = [pos, utt.transcript_index]
                             interregUttTreeMap = uttTreeMap
@@ -1512,14 +1522,15 @@ class SelfRepair:
                 # keep going until we get all the interleaved utts and the
                 # repair one..
                 while True:
-                    if (trans.next_utt(utt) != None and trans.next_utt(utt).caller != startUtt.caller):
+                    if (trans.next_utt(utt) is not None and trans.next_utt(
+                            utt).caller != startUtt.caller):
                         utt = trans.next_utt(utt)
                         uttTreeMap = self.__treeMapList__.get_treemap(
                             trans, utt)
                         #print("interleaved utt= " + str(utt.text_words()))
                         # raw_input()
                         interleavedUtts.append(utt)
-                    elif (trans.next_utt(utt) != None and trans.next_utt(utt).caller == startUtt.caller and trans.next_utt(utt).damsl_act_tag() == "+"):
+                    elif (trans.next_utt(utt) is not None and trans.next_utt(utt).caller == startUtt.caller and trans.next_utt(utt).damsl_act_tag() == "+"):
                         # get the next utt after the interleaved turns same
                         # speaker
                         utt = trans.next_utt(utt)
@@ -1530,7 +1541,7 @@ class SelfRepair:
 
                         # i.e. we haven't got to repair point (still in
                         # reparandum or just finished it with the last string)
-                        if interregnumBool == None:
+                        if interregnumBool is None:
                             interregUtt = utt
                             #interregNum = [pos, utt.transcript_index]
                             interregUttTreeMap = uttTreeMap
@@ -1591,7 +1602,8 @@ class SelfRepair:
         return [utt.transcript_index, len(words)]
 
     # if check is true we're checking..
-    def new_1p_3p_NoTreeStuff(self, trans, utt, mystart, embeddedIn, hasembedded, check=False):
+    def new_1p_3p_NoTreeStuff(
+            self, trans, utt, mystart, embeddedIn, hasembedded, check=False):
         """Just return the positions at the moment, for Ngram model. Could also get the lengths across the board too.."""
         # method to return repair and any embedded ones of 1p or some 3p types (i.e. the 3p ones could be split across their partner's turn../this won't cover same-person Compound Conts which aren't disfluency marked)
         # adds a new repair to the appropriate list
@@ -1642,7 +1654,7 @@ class SelfRepair:
         editterm = False  # whether we're in an edit term phase or not
 
         while pos < len(words):
-            if uttpos == None:  # skip forward over <laughter> turns
+            if uttpos is None:  # skip forward over <laughter> turns
                 utt = trans.next_utt_same_speaker(utt)
                 words = utt.text_words()
                 uttTreeMap, uttpos = self.getTreeMapAndPos(trans, utt)
@@ -1768,12 +1780,12 @@ class SelfRepair:
                         "not observed" + str(transcriptFile) + str(utt.transcript_index))
                 # i.e. interregnum and repair never reached, only reparandum
                 # terminated.. deletion type
-                if interregnumBool == None:
+                if interregnumBool is None:
                     # yes, effectively replacing the ] with +, now need to find
                     # next op to use a +
                     interregNum = [utt.transcript_index, pos]
                     #thirdPos = True
-                if repairBool == None:
+                if repairBool is None:
                     # repair not reached yet, interregnum could be over/in progress, should be a delete,
                     # should only have delete types
                     print "delete type!!"
@@ -1853,7 +1865,7 @@ class SelfRepair:
                 print utt.swda_filename
                 print utt.transcript_index
                 nextutt = trans.next_utt(utt)
-                if (nextutt != None and nextutt.caller == startUtt.caller):
+                if (nextutt is not None and nextutt.caller == startUtt.caller):
                     errormessage = "POSSIBLE SECOND POS REPAIR: START= " +\
                         str(startUtt.text_words()) + "NEXT= " + \
                         str(trans.next_utt(utt).text_words()) + " " \
@@ -1868,7 +1880,7 @@ class SelfRepair:
                     print "3p!"
                     thirdPos = True
                     utt = trans.next_utt_same_speaker(utt)
-                if utt != None:
+                if utt is not None:
                     words = utt.text_words()
                     uttTreeMap, uttpos = self.getTreeMapAndPos(trans, utt)
                 else:
@@ -1887,11 +1899,11 @@ class SelfRepair:
         mypos = None
         if trans.has_trees():
             mytreemap = self.__treeMapList__.get_treemap(trans, utt)
-            if not mytreemap == None:
+            if not mytreemap is None:
                 mypos = mytreemap.get_POS(trans, utt)
         else:  # for POS files
             uttPOSmap = self.__posMapList__.get_POSmap(trans, utt)
-            if not uttPOSmap == None:
+            if not uttPOSmap is None:
                 mypos = uttPOSmap.get_POS(utt)
         return mytreemap, mypos
 
@@ -2009,7 +2021,7 @@ class SelfRepair:
             # FP partial word, still grammatical continuation of last constit, but incomplete
             # RP(-1) repeats part of a previous word sorry [s-]
             # MP(-1) completion of a partial word N words back
-            #% end of utt/halt..
+            # % end of utt/halt..
             # EDIT SIGNAL..# here or on different level? maybe on different level?
             # S(N)denotes either fresh tree from here or if N>0 fresh start making all words from N words relative to this position (i.e. 3 back if -3) downgraded in terms of discourse status (sort of abandoned)
             # R(N) shows replacement type repair, intended replacement of constituent at pos N detectable via pos matching/syntactic constit
@@ -2033,7 +2045,7 @@ class SelfRepair:
 
             # think this works for both, needs slight alteration
             if mytype == "1p" or mytype == "3p":
-                """  
+                """
                 for i in range(number-1,-1,-1): #backwards iter through repairs needs to go back through BOTH lists...
                     yourRepair = self.__lists__[i]
                     print(yourRepair)
@@ -2130,7 +2142,8 @@ class SelfRepair:
                     myOrig[i] = ["f", 0]
             # if len(origWords) == 0 and myReparandum
             for i in range(len(myReparandum)):
-                if (i == 0 and len(origWords) == 0 and myReparandum[i][0] in alphabetUpper):
+                if (i == 0 and len(origWords) ==
+                        0 and myReparandum[i][0] in alphabetUpper):
                     myReparandum[i] = ["s,", 0]
                 elif myReparandum[i] == "":
                     myReparandum[i] = ["f", 0]
@@ -2159,11 +2172,13 @@ class SelfRepair:
             # look for matching words and matching onsets first:
             for i in range(len(reparandum)):
                 for j in range(len(repair)):
-                    if (reparandum[i].replace(",", "").replace(".", "") == repair[j].replace(",", "").replace(".", "") or (reparandum[i].replace(",", "").replace(".", "")[-1] == "-" and reparandum[i].replace(",", "").replace(".", "")[0:len(reparandum[i].replace(",", "").replace(".", "")) - 1] == repair[j].replace(",", "").replace(".", "")[0:len(reparandum[i].replace(",", "").replace(".", "")) - 1])):
+                    if (reparandum[i].replace(",", "").replace(".", "") == repair[j].replace(",", "").replace(".", "") or (reparandum[i].replace(",", "").replace(".", "")[-1] == "-" and reparandum[i].replace(
+                            ",", "").replace(".", "")[0:len(reparandum[i].replace(",", "").replace(".", "")) - 1] == repair[j].replace(",", "").replace(".", "")[0:len(reparandum[i].replace(",", "").replace(".", "")) - 1])):
                         reparandumconstit = "f"
                         repairconstit = "m"  # i.e. copy
                         # i.e. this is a partial repeat
-                        if not reparandum[i].replace(",", "").replace(".", "") == repair[j].replace(",", "").replace(".", ""):
+                        if not reparandum[i].replace(",", "").replace(
+                                ".", "") == repair[j].replace(",", "").replace(".", ""):
                             repairconstit += "p"
                         # instead have a -
                         myReparandum[i] = [reparandumconstit, -1]
@@ -2191,7 +2206,7 @@ class SelfRepair:
                 # FP partial word, still grammatical continuation of last constit, but incomplete
                 # RP(-1) repeats part of a previous word sorry [s-]
                 # MP(-1) completion of a partial word N words back
-                #% end of utt/halt..
+                # % end of utt/halt..
                 # EDIT SIGNAL..# E(0) E(-1) continuation of edit signal here or on different level? maybe on different level?
                 # S(N)denotes either fresh tree from here or if N>0 fresh start making all words from N words relative to this position (i.e. 3 back if -3) downgraded in terms of discourse status (sort of abandoned)
                 # R(N) shows replacement type repair, intended replacement of constituent at pos N detectable via pos matching/syntactic constit
@@ -2446,10 +2461,11 @@ class SelfRepair:
                         # pass
 
                         # only checking mapped words
-                        if (not uttTreeMap == None and len(uttTreeMap[pos][1]) > 0):
+                        if (not uttTreeMap is None and len(
+                                uttTreeMap[pos][1]) > 0):
                             treeIndex = uttTreeMap[pos][1][0][0]
                             leafIndex = uttTreeMap[pos][1][0][1]
-                            missed = (not treeIndex == None
+                            missed = (not treeIndex is None
                                       and "EDITED" in uttTreeMap.get_ancestor_nodes(uttTreeMap.get_trees(trans)[treeIndex], leafIndex))
                         else:
                             missed = False
@@ -2475,7 +2491,8 @@ class SelfRepair:
                                     if l == pos:
                                         edited = "!!E!!"
                                     print str(l) + ": " + str(uttTreeMap[l]) + " " + edited
-                                if (transnumber, startNum[0], startNum[1]) <= self.unannotated_marker:
+                                if (transnumber, startNum[0], startNum[1]
+                                    ) <= self.unannotated_marker:
                                     print "seen this!!"
                                     break
 
@@ -2502,7 +2519,7 @@ class SelfRepair:
                                 endNum = [
                                     utt.transcript_index, int(raw_input("end(exc)?"))]
                                 nextUtt = trans.next_utt_same_speaker(utt)
-                                if nextUtt != None:
+                                if nextUtt is not None:
                                     print "\n" + str(nextUtt.text_words())
                                     thirdPos = raw_input("3RD?")
                                 else:
@@ -2624,9 +2641,11 @@ class SelfRepair:
         # how about automatic stats for graphs here?
         # link all categories to those in repair lists then print them side by side?
         # can also get local models here
-        for key1, val1 in sorted(lengthdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(
+                lengthdict.items(), key=itemgetter(0), reverse=True):
             corpusStatsFile.write(str(key1) + "\t" + str(val1) + "\n")
-        for key1, val1 in sorted(POSdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(
+                POSdict.items(), key=itemgetter(0), reverse=True):
             corpusStatsFile.write(
                 str(key1) + "\t" + str(val1) + "\t" + str(float(val1) / float(totalWords)) + "\n")
         corpusStatsFile.close()
@@ -2841,9 +2860,11 @@ class SelfRepair:
         # how about automatic stats for graphs here?
         # link all categories to those in repair lists then print them side by side?
         # can also get local models here
-        for key1, val1 in sorted(lengthdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(
+                lengthdict.items(), key=itemgetter(0), reverse=True):
             corpusStatsFile.write(str(key1) + "\t" + str(val1) + "\n")
-        for key1, val1 in sorted(POSdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(
+                POSdict.items(), key=itemgetter(0), reverse=True):
             corpusStatsFile.write(
                 str(key1) + "\t" + str(val1) + "\t" + str(float(val1) / float(totalWords)) + "\n")
         corpusStatsFile.close()
@@ -2873,7 +2894,8 @@ class SelfRepair:
             # normalising by dividing by number of words per act tag
             # indent th next three lines!
             if percentage:
-                for key, val in sorted(d.items(), key=itemgetter(1), reverse=True):
+                for key, val in sorted(
+                        d.items(), key=itemgetter(1), reverse=True):
                     # Getting raw acts over entire corpus
                     file1.write(key + "," + str(val))
                     if key == key1:
@@ -2912,7 +2934,8 @@ class SelfRepair:
 
                 if (utt.damsl_act_tag() == string):
                     if (double):
-                        if (count >= (translength - 1) or utt.caller != trans.utterances[count + 1].caller or trans.utterances[count + 1].damsl_act_tag() != string):
+                        if (count >= (translength - 1) or utt.caller !=
+                                trans.utterances[count + 1].caller or trans.utterances[count + 1].damsl_act_tag() != string):
                             # i.e. skip this one if we're looking for doubles
                             # and the following utterance doesn't have the same
                             # tag
@@ -2957,6 +2980,7 @@ class SelfRepair:
             if string == DA:
                 return "b"
         return "o"
+
 
 if __name__ == '__main__':
     s = SelfRepair()

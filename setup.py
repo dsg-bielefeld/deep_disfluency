@@ -36,6 +36,7 @@ def recurse(package_name, directory):
 # Arguments marked as "Required" below must be included for upload to PyPI.
 # Fields marked as "Optional" may be commented out.
 
+
 setup(
     # This is the name of your project. The first time you publish this
     # package, this name will be registered for you. It will determine how
@@ -140,7 +141,7 @@ setup(
     #
     #   py_modules=["my_module"],
     #
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']), # Required
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']),  # Required
 
     # This field lists other packages that your project depends on to run.
     # Any package you put here will be installed by pip when your project is
@@ -186,8 +187,7 @@ setup(
             recurse('deep_disfluency', os.path.join('data', 'tag_representations')) +
             recurse('deep_disfluency', os.path.join('decoder', 'models')) +
             recurse('deep_disfluency', os.path.join('decoder', 'timing_models')) +
-            [os.path.join('feature_extraction', 'crfpostagger')]
-        ,
+            [os.path.join('feature_extraction', 'crfpostagger')],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may

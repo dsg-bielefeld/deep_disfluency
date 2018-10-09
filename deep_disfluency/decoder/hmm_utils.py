@@ -27,7 +27,7 @@ def tabulate_cfd(cfd, *args, **kwargs):
     # conditions = sorted([c for c in cfd.conditions()
     #                     if "_t_" in c])   # only concerned with act-final
     conditions = sorted([c for c in cfd.conditions()])
-    if type(cfd) == nltk.ConditionalProbDist:
+    if isinstance(cfd, nltk.ConditionalProbDist):
         samples = sorted(set(v for c in conditions for v in cfd[c].samples()))
     else:
         samples = sorted(set(v for c in conditions for v in cfd[c]))
@@ -40,7 +40,7 @@ def tabulate_cfd(cfd, *args, **kwargs):
         if cumulative:
             freqs[c] = list(cfd[c]._cumulative_frequencies(samples))
         else:
-            if type(cfd) == nltk.ConditionalProbDist:
+            if isinstance(cfd, nltk.ConditionalProbDist):
                 freqs[c] = [cfd[c].prob(sample) for sample in samples]
             else:
                 freqs[c] = [cfd[c][sample] for sample in samples]
@@ -49,7 +49,7 @@ def tabulate_cfd(cfd, *args, **kwargs):
     # condition_size = max(len("%s" % c) for c in conditions)
     final_string = ""
     # final_string += ' ' * condition_size
-    if type(cfd) == nltk.ConditionalProbDist:
+    if isinstance(cfd, nltk.ConditionalProbDist):
         width += 1
     for s in samples:
         # final_string += "%*s" % (width, s)
@@ -60,7 +60,7 @@ def tabulate_cfd(cfd, *args, **kwargs):
         final_string += str(c) + "\t"
         for f in freqs[c]:
 
-            if type(cfd) == nltk.ConditionalProbDist:
+            if isinstance(cfd, nltk.ConditionalProbDist):
                 # final_string += "%*.2f" % (width, f)
                 if f == 0:
                     final_string += "\t"
@@ -90,7 +90,7 @@ def convert_to_dot(filename):
         for i in range(1, len(feats)):
             if feats[i].strip() == "1":
                 graph_string += domain + " -> " + \
-                    header[i-1].strip().strip("\n") + ";\n"
+                    header[i - 1].strip().strip("\n") + ";\n"
     file.close()
     return graph_string
 
@@ -115,8 +115,8 @@ def fill_in_time_approximations(word_timing_tuples, idx):
         # this end time is the same as the latest one
         # need backward search for time
         # print "backward search"
-        idx = len(word_timing_tuples)-1
-        for i in range(len(word_timing_tuples)-1, -1, -1):
+        idx = len(word_timing_tuples) - 1
+        for i in range(len(word_timing_tuples) - 1, -1, -1):
             affected_indices.append(i)
             idx = i
             if not word_timing_tuples[i][1] == start_time:
@@ -131,7 +131,7 @@ def fill_in_time_approximations(word_timing_tuples, idx):
     total_time = end_time - start_time
     assert total_time > 0.0, str(word_timing_tuples[affected_indices[0]:]) +\
         str(idx)
-    mean_len = total_time/len(affected_indices)
+    mean_len = total_time / len(affected_indices)
     for i in range(idx, idx + len(affected_indices)):
         end_time = start_time + mean_len
         word_timing_tuples[i] = (word_timing_tuples[i][0], start_time,
@@ -176,8 +176,8 @@ def load_data_from_corpus_file(filename):
                             break
                     if shift > -1:
                         latest_increco = fill_in_time_approximations(
-                                                        latest_increco,
-                                                        shift)
+                            latest_increco,
+                            shift)
                     lex_data.extend(deepcopy(latest_increco))
                     pos_data.extend(deepcopy(latest_pos))
                     # convert to the disfluency tags for this

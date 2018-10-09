@@ -32,12 +32,14 @@ from nltk.stem import WordNetLemmatizer
 
 ######################################################################
 
+
 class Metadata:
     """
     Basically an internal method for organizing the tables of metadata
     from the original Switchboard transcripts and linking them with
     the dialog acts.
-    """    
+    """
+
     def __init__(self, metadata_filename):
         """
         Turns the CSV file into a dictionary mapping Switchboard
@@ -49,27 +51,27 @@ class Metadata:
 
         metadata_filename (str) -- the CSV file swda-metadata.csv
         (should be in the main folder of the swda directory)
-        """        
+        """
         self.metadata_filename = metadata_filename
         self.metadata = {}
         self.get_metadata()
-        
+
     def get_metadata(self):
         """
         Build the dictionary self.metadata mapping conversation_no to
         dictionaries of values (str, int, or datatime, as
         appropriate).
-        """        
+        """
         csvreader = csv.reader(open(self.metadata_filename))
         header = csvreader.next()
         for row in csvreader:
             d = dict(zip(header, row))
-            for key in ('length', 'from_caller_education', 
+            for key in ('length', 'from_caller_education',
                         'to_caller_education'):
-                d[key] = int(d[key]) #nb have removed conversation_no
-            for key in ('talk_day', 'from_caller_birth_year', 
+                d[key] = int(d[key])  # nb have removed conversation_no
+            for key in ('talk_day', 'from_caller_birth_year',
                         'to_caller_birth_year'):
-                #original:
+                # original:
                 #d[key] = dateutil.parser.parse(d[key])
                 d[key] = int(d[key])
             self.metadata[d['conversation_no']] = d
@@ -83,9 +85,10 @@ class Metadata:
 
 ######################################################################
 
+
 class CorpusReader:
     """Class for reading in the corpus and iterating through its values."""
-    
+
     def __init__(self, src_dirname, metadata_path="swda-metadata.csv"):
         """
         Reads in the data from src_dirname (should be the root of the
@@ -94,7 +97,7 @@ class CorpusReader:
         the Metadata object used throughout.
         """
         self.src_dirname = src_dirname
-        if not metadata_path == None:
+        if not metadata_path is None:
             metadata_filename = os.path.join(src_dirname, metadata_path)
             self.metadata = Metadata(metadata_filename)
         else:
@@ -104,36 +107,39 @@ class CorpusReader:
         """
         Iterate through the transcripts.
 
-        Argument: 
-        display_progress (boolean) -- display an overwriting progress bar if 
+        Argument:
+        display_progress (boolean) -- display an overwriting progress bar if
         True (default: True)
         """
         i = 1
-        #Always src_dirname/*/...utt.csv
+        # Always src_dirname/*/...utt.csv
         for filename in sorted(iglob(os.path.join(self.src_dirname, "sw*",
-                                                   "*utt.csv"))):
+                                                  "*utt.csv"))):
             print filename
-            if "metadata" in filename: continue
-            #print "scanning file:",filename
+            if "metadata" in filename:
+                continue
+            # print "scanning file:",filename
             # Optional progress bar:
             if display_progress:
                 sys.stderr.write("\r")
                 sys.stderr.write("transcript %s" % i)
-                sys.stderr.flush(); i += 1
+                sys.stderr.flush()
+                i += 1
             # Yield the Transcript instance:
             yield Transcript(filename, self.metadata)
         # Closing blank line for the progress bar:
-        if display_progress: sys.stderr.write("\n") 
-    
+        if display_progress:
+            sys.stderr.write("\n")
+
     def get_transcript(self, filename):
         return Transcript(filename, self.metadata)
-                    
+
     def iter_utterances(self, display_progress=True):
         """
         Iterate through the utterances.
 
-        Argument: 
-        display_progress (boolean) -- display an overwriting progress 
+        Argument:
+        display_progress (boolean) -- display an overwriting progress
         bar if True (default: True)
         """
         i = 1
@@ -143,13 +149,16 @@ class CorpusReader:
                 if display_progress:
                     sys.stderr.write("\r")
                     sys.stderr.write("utterance %s" % i)
-                    sys.stderr.flush(); i += 1
+                    sys.stderr.flush()
+                    i += 1
                 # Yield the Utterance instance:
                 yield utt
         # Closing blank line for the progress bar:
-        if display_progress: sys.stderr.write("\n") 
+        if display_progress:
+            sys.stderr.write("\n")
 
 ######################################################################
+
 
 class Transcript:
     """
@@ -157,156 +166,156 @@ class Transcript:
     utterances and transcript-level metadata, accessible via
     attributes.
     """
+
     def __init__(self, swda_filename, metadata):
         """
         Sets up all the attribute values:
-	
+
         Arguments:
-        
+
         swda_filename -- the filename for this transcript
         metadata -- if a string, then assumed to be the metadata
         fileame, and the metadata is created from that filename if a
-        Metadata object, then used as the needed metadata directly.        
+        Metadata object, then used as the needed metadata directly.
         """
         self.swda_filename = swda_filename
         # If the supplied value is a filename:
         if isinstance(metadata, str) or isinstance(metadata, unicode):
-            self.metadata = Metadata(metadata)        
-        else: # Where the supplied value is already a Metadata object or None.
+            self.metadata = Metadata(metadata)
+        else:  # Where the supplied value is already a Metadata object or None.
             self.metadata = metadata
         # Get the file rows:
         rows = list(csv.reader(file(self.swda_filename)))
-        #print rows
+        # print rows
         # Ge the header and remove it from the rows:
         self.header = rows[0]
         rows.pop(0)
         # Extract the conversation_no to get the meta-data. Use the
         # header for this in case the column ordering is ever changed:
         row0dict = dict(zip(self.header, rows[1]))
-        #changing from int to string
+        # changing from int to string
         #self.conversation_no = int(row0dict['conversation_no'])
         self.conversation_no = row0dict['conversation_no']
         # The ptd filename in the right format for the current OS:
-        self.ptd_basename =  os.sep.join(row0dict['ptb_basename'].split("/"))
+        self.ptd_basename = os.sep.join(row0dict['ptb_basename'].split("/"))
         # The dictionary of metadata for this transcript:
-        if not self.metadata == None:
+        if not self.metadata is None:
             transcript_metadata = self.metadata[self.conversation_no]
             for key, _ in transcript_metadata.iteritems():
                 setattr(self, key, transcript_metadata[key])
         else:
             transcript_metadata = None
         # Create the utterance list:
-        self.utterances = map((lambda x : Utterance(x, transcript_metadata)), 
+        self.utterances = map((lambda x: Utterance(x, transcript_metadata)),
                               rows)
-        # Coder's Manual: ``We also removed any line with a "@" 
-        #(since @ marked slash-units with bad segmentation).''
-        self.utterances = filter((lambda x : not re.search(r"[@]", x.act_tag)),
-                                  self.utterances)
-    
+        # Coder's Manual: ``We also removed any line with a "@"
+        # (since @ marked slash-units with bad segmentation).''
+        self.utterances = filter((lambda x: not re.search(r"[@]", x.act_tag)),
+                                 self.utterances)
+
     def next_utt(self, myUtt):
         for utt in self.utterances:
             if utt.transcript_index > myUtt.transcript_index:
-                return utt                
-        #print("WARNING: No next utterance for FILE " + \
-        #str(myUtt.swda_filename) + ", UTT number: " +\
+                return utt
+        # print("WARNING: No next utterance for FILE " + \
+        # str(myUtt.swda_filename) + ", UTT number: " +\
         # str(myUtt.transcript_index))
         return None
-    
+
     def next_utt_same_speaker(self, myUtt):
         for utt in self.utterances:
-            if (utt.transcript_index > myUtt.transcript_index 
-                and utt.caller == myUtt.caller):
-                return utt                
-        #print("WARNING: No next utterance same speaker for FILE " 
-        #+ str(myUtt.swda_filename) + ", UTT number: " + \
-        #str(myUtt.transcript_index))
+            if (utt.transcript_index > myUtt.transcript_index
+                    and utt.caller == myUtt.caller):
+                return utt
+        # print("WARNING: No next utterance same speaker for FILE "
+        # + str(myUtt.swda_filename) + ", UTT number: " + \
+        # str(myUtt.transcript_index))
         return None
-    
+
     def previous_utt_same_speaker(self, myUtt):
         for utt in self.utterances:
             if (self.next_utt_same_speaker(utt) is myUtt):
                 return utt
-        #print("WARNING: No previous utterance same speaker for FILE " +
+        # print("WARNING: No previous utterance same speaker for FILE " +
         # str(myUtt.swda_filename) + ", UTT number: " +
         # str(myUtt.transcript_index))
         return None
-    
+
     def has_trees(self):
         for utt in self.utterances:
-            if hasattr(utt,"trees") and utt.trees != []:
-                return True
-        return False
-    
-    def has_pos(self):
-        for utt in self.utterances:
-            if hasattr(utt,"pos") and utt.pos.strip() != "":
+            if hasattr(utt, "trees") and utt.trees != []:
                 return True
         return False
 
-            
-                
+    def has_pos(self):
+        for utt in self.utterances:
+            if hasattr(utt, "pos") and utt.pos.strip() != "":
+                return True
+        return False
+
+
 ######################################################################
-            
+
 class Utterance:
     """
     The central object of interest. The attributes correspond to the
     values of the class variable header:
 
     'swda_filename':       (str) The filename: directory/basename
-    'ptb_basename':        (str) The Treebank filename: add ".pos" for POS and 
+    'ptb_basename':        (str) The Treebank filename: add ".pos" for POS and
                                     ".mrg" for trees
-    'conversation_no':     (int) The conversation Id, to key into the 
+    'conversation_no':     (int) The conversation Id, to key into the
                                     metadata database.
-    'transcript_index':    (int) The line number of this item in the transcript 
+    'transcript_index':    (int) The line number of this item in the transcript
                                     (counting only utt lines).
-    'act_tag':             (list of str) The Dialog Act Tags (separated 
+    'act_tag':             (list of str) The Dialog Act Tags (separated
                                     by ||| in the file).
     'caller':              (str) A, B, @A, @B, @@A, @@B
-    'utterance_index':     (int) The encoded index of the utterance 
+    'utterance_index':     (int) The encoded index of the utterance
                                     (the number in A.49, B.27, etc.)
-    'subutterance_index':  (int) Utterances can be broken across line. 
+    'subutterance_index':  (int) Utterances can be broken across line.
                                     This gives the internal position.
     'text':                (str) The text of the utterance
-    'pos':                 (str) The POS tagged version of the utterance, 
+    'pos':                 (str) The POS tagged version of the utterance,
                                     from PtbBasename+.pos
-    'trees':               (list of nltk.tree.Tree) The tree(s) containing 
-                                    this utterance (separated by ||| 
+    'trees':               (list of nltk.tree.Tree) The tree(s) containing
+                                    this utterance (separated by |||
                                     in the file).
-    'ptb_treenumbers':     (list of int) The tree numbers in the 
+    'ptb_treenumbers':     (list of int) The tree numbers in the
                                     PtbBasename+.mrg
     """
 
     header = [
         'swda_filename',      # (str) The filename: directory/basename
-        'ptb_basename',       # (str) The Treebank filename: add ".pos" for 
+        'ptb_basename',       # (str) The Treebank filename: add ".pos" for
                               #  POS and ".mrg" for trees
-        'conversation_no',    # (int) The conversation Id, to key into the 
+        'conversation_no',    # (int) The conversation Id, to key into the
                               #  metadata database.
-        'transcript_index',   # (int) The line number of this item in the 
+        'transcript_index',   # (int) The line number of this item in the
                               #  transcript (counting only utt lines).
-        'act_tag',            # (list of str) The Dialog Act Tags (separated 
+        'act_tag',            # (list of str) The Dialog Act Tags (separated
                               #  by ||| in the file).
         'caller',             # (str) A, B, @A, @B, @@A, @@B
-        'utterance_index',    # (int) The encoded index of the utterance 
+        'utterance_index',    # (int) The encoded index of the utterance
                               # (the number in A.49, B.27, etc.)
-        'subutterance_index', # (int) Utterances can be broken across line. 
+        'subutterance_index',  # (int) Utterances can be broken across line.
                               # This gives the internal position.
         'text',               # (str) The text of the utterance
-        'pos',                # (str) The POS tagged version of the utterance, 
-                              #from PtbBasename+.pos
-        'trees',              # (list of nltk.tree.Tree) The tree(s) containing 
-                              #this utterance (separated by ||| in the file).
-        'ptb_treenumbers'     # (list of int) The tree numbers in the 
+        'pos',                # (str) The POS tagged version of the utterance,
+                              # from PtbBasename+.pos
+        'trees',              # (list of nltk.tree.Tree) The tree(s) containing
+                              # this utterance (separated by ||| in the file).
+        'ptb_treenumbers'     # (list of int) The tree numbers in the
                               # PtbBasename+.mrg
-       ]
-    
+    ]
+
     def __init__(self, row, transcript_metadata):
         """
         Arguments:
         row (list) -- a row from one of the corpus CSV files
-        transcript_metadata (dict) -- a Metadata value based 
+        transcript_metadata (dict) -- a Metadata value based
         on the current conversation_no
-        """        
+        """
         ##################################################
         # Utterance data:
         for i in xrange(len(Utterance.header)):
@@ -316,69 +325,81 @@ class Utterance:
                 row_value = row[i].strip()
             # Special handling of non-string values.
             if att_name == "trees":
-                #NB CHANGING from below:
+                # NB CHANGING from below:
                 # if row_value: row_value = map(Tree, row_value.split("|||"))
-                #print row_value
-                if row_value: 
+                # print row_value
+                if row_value:
                     trees = []
                     for r in row_value.split("|||"):
                         trees.append(Tree.fromstring(r))
                     #row_value = map(Tree, row_value.split('|||'))
                     row_value = trees
-                else: row_value = []
+                else:
+                    row_value = []
             elif att_name == "ptb_treenumbers":
-                if row_value: row_value = map(int, row_value.split("|||"))
-                else: row_value = []
+                if row_value:
+                    row_value = map(int, row_value.split("|||"))
+                else:
+                    row_value = []
             elif att_name == 'act_tag':
                 # I thought these conjoined tags were meant to be split.
                 # The docs suggest that they are single tags, thought,
                 # so skip this conditional and let it be treated as a str.
                 # row_value = re.split(r"\s*[,;]\s*", row_value)
-                # `` Transcription errors (typos, obvious mistranscriptions) 
-                #are marked with a "*" after the discourse tag.''
+                # `` Transcription errors (typos, obvious mistranscriptions)
+                # are marked with a "*" after the discourse tag.''
                 # These are removed for this version.
                 row_value = row_value.replace("*", "")
-            elif att_name in ('transcript_index', 'utterance_index', 
+            elif att_name in ('transcript_index', 'utterance_index',
                               'subutterance_index'):
-                row_value = int(row_value) #NB have removed conversation_no
+                row_value = int(row_value)  # NB have removed conversation_no
             # Add the attribute.
             setattr(self, att_name, row_value)
         ##################################################
         # Caller data:
-        if not transcript_metadata == None:
+        if not transcript_metadata is None:
             for key in ('caller_sex', 'caller_education', 'caller_birth_year',
-                         'caller_dialect_area'):
+                        'caller_dialect_area'):
                 full_key = 'from_' + key
                 if self.caller.endswith("B"):
                     full_key = 'to_' + key
                 setattr(self, key, transcript_metadata[full_key])
         else:
-            pass #TODO default values or will this throw a key error?
-
+            pass  # TODO default values or will this throw a key error?
 
     def damsl_act_tag(self):
         """
         Seeks to duplicate the tag simplification described at the
-        Coders' Manual: 
+        Coders' Manual:
         http://www.stanford.edu/~jurafsky/ws97/manual.august1.html
         """
         d_tags = []
         tags = re.split(r"\s*[,;]\s*", self.act_tag)
         for tag in tags:
-            if tag in ('qy^d', 'qw^d', 'b^m'): pass
-            elif tag == 'nn^e': tag = 'ng'
-            elif tag == 'ny^e': tag = 'na'
-            else: 
+            if tag in ('qy^d', 'qw^d', 'b^m'):
+                pass
+            elif tag == 'nn^e':
+                tag = 'ng'
+            elif tag == 'ny^e':
+                tag = 'na'
+            else:
                 tag = re.sub(r'(.)\^.*', r'\1', tag)
-                tag = re.sub(r'[\(\)@*]', '', tag)            
-                if tag in ('qr', 'qy'):             tag = 'qy'
-                elif tag in ('fe', 'ba'):           tag = 'ba'
-                elif tag in ('oo', 'co', 'cc'):     tag = 'oo_co_cc'
-                elif tag in ('fx', 'sv'):           tag = 'sv'
-                elif tag in ('aap', 'am'):          tag = 'aap_am'
-                elif tag in ('arp', 'nd'):          tag = 'arp_nd'
-                elif tag in ('fo','o', 'fw', 
-                         '"', 'by', 'bc'):          tag = 'fo_o_fw_"_by_bc'            
+                tag = re.sub(r'[\(\)@*]', '', tag)
+                if tag in ('qr', 'qy'):
+                    tag = 'qy'
+                elif tag in ('fe', 'ba'):
+                    tag = 'ba'
+                elif tag in ('oo', 'co', 'cc'):
+                    tag = 'oo_co_cc'
+                elif tag in ('fx', 'sv'):
+                    tag = 'sv'
+                elif tag in ('aap', 'am'):
+                    tag = 'aap_am'
+                elif tag in ('arp', 'nd'):
+                    tag = 'arp_nd'
+                elif tag in ('fo', 'o', 'fw',
+                             '"', 'by', 'bc'):
+                    tag = 'fo_o_fw_"_by_bc'
             d_tags.append(tag)
         # Dan J says (p.c.) that it makes sense to take the first;
         # there are only a handful of examples with 2 tags here.
@@ -398,17 +419,17 @@ class Utterance:
             return True
         else:
             return False
-                                       
+
     def regularize_tree_lemmas(self):
         """
         Simplify the (word, pos) tags asssociated with the lemmas for
         this utterances trees, so that they can be compared with those
         of self.pos. The output is a list of (string, pos) pairs.
-        """        
+        """
         tree_lems = self.tree_lemmas()
-        tree_lems = filter((lambda x : x[1] not in ('-NONE-', '-DFL-')), 
+        tree_lems = filter((lambda x: x[1] not in ('-NONE-', '-DFL-')),
                            tree_lems)
-        tree_lems = map((lambda x : (re.sub(r"-$", "", x[0]), x[1])), 
+        tree_lems = map((lambda x: (re.sub(r"-$", "", x[0]), x[1])),
                         tree_lems)
         return tree_lems
 
@@ -417,20 +438,20 @@ class Utterance:
         Simplify the (word, pos) tags asssociated with self.pos, so
         that they can be compared with those of the trees. The output
         is a list of (string, pos) pairs.
-        """ 
+        """
         pos_lems = self.pos_lemmas()
-        pos_lems = filter((lambda x : len(x) == 2), pos_lems)
-        pos_lems = filter((lambda x : x), pos_lems)
+        pos_lems = filter((lambda x: len(x) == 2), pos_lems)
+        pos_lems = filter((lambda x: x), pos_lems)
         nontree_nodes = ('^PRP^BES', '^FW', '^MD', '^MD^RB', '^PRP^VBZ',
-                          '^WP$', '^NN^HVS',
+                         '^WP$', '^NN^HVS',
                          'NN|VBG', '^DT^BES', '^MD^VB', '^DT^JJ', '^PRP^HVS',
-                          '^NN^POS',
-                         '^WP^BES', '^NN^BES', 'NN|CD', '^WDT', '^VB^PRP')        
-        pos_lems = filter((lambda x : x[1] not in nontree_nodes), pos_lems)
-        pos_lems = filter((lambda x : x[0] != "--"), pos_lems)
-        pos_lems = map((lambda x : (re.sub(r"-$", "", x[0]), x[1])), pos_lems)
+                         '^NN^POS',
+                         '^WP^BES', '^NN^BES', 'NN|CD', '^WDT', '^VB^PRP')
+        pos_lems = filter((lambda x: x[1] not in nontree_nodes), pos_lems)
+        pos_lems = filter((lambda x: x[0] != "--"), pos_lems)
+        pos_lems = map((lambda x: (re.sub(r"-$", "", x[0]), x[1])), pos_lems)
         return pos_lems
-        
+
     def text_words(self, filter_disfluency=False):
         """
         Tokenized version of the utterance; filter_disfluency=True
@@ -471,12 +492,12 @@ class Utterance:
         """
         pos = self.pos
         pos = pos.strip()
-        word_tag = map((lambda x : tuple(x.split("/"))), re.split(r"\s+", pos))
-        word_tag = filter((lambda x : len(x) == 2), word_tag)
+        word_tag = map((lambda x: tuple(x.split("/"))), re.split(r"\s+", pos))
+        word_tag = filter((lambda x: len(x) == 2), word_tag)
         word_tag = self.wn_lemmatizer(word_tag, wn_format=wn_format,
-                                       wn_lemmatize=wn_lemmatize)
-        return word_tag        
-                
+                                      wn_lemmatize=wn_lemmatize)
+        return word_tag
+
     def tree_lemmas(self, wn_format=False, wn_lemmatize=False):
         """
         Return the (string, pos) pairs associated with self.trees
@@ -487,9 +508,9 @@ class Utterance:
         word_tag = []
         for tree in self.trees:
             word_tag += tree.pos()
-        return self.wn_lemmatizer(word_tag, wn_format=wn_format, 
+        return self.wn_lemmatizer(word_tag, wn_format=wn_format,
                                   wn_lemmatize=wn_lemmatize)
-    
+
     def wn_lemmatizer(self, word_tag, wn_format=False, wn_lemmatize=False):
         # Lemmatizing implies converting to WordNet tags.
         if wn_lemmatize:
@@ -497,9 +518,9 @@ class Utterance:
             word_tag = map(self.__wn_lemmatize, word_tag)
         # This is tag conversion without lemmatizing.
         elif wn_format:
-            word_tag = map(self.__treebank2wn_pos, word_tag)            
+            word_tag = map(self.__treebank2wn_pos, word_tag)
         return word_tag
-    
+
     def __treebank2wn_pos(self, lemma):
         """
         Internal method for turning a lemma's pos value into one that
@@ -533,6 +554,7 @@ class Utterance:
         return (string, tag)
 
 ######################################################################
+
 
 if __name__ == '__main__':
     pass

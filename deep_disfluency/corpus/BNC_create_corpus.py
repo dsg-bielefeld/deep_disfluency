@@ -8,14 +8,14 @@ word_count = 0
 
 def safe_open(filename, mode='r'):
     """To avoid forgetting to first expand system
-    variables in file names and to chop off a trailing newline 
+    variables in file names and to chop off a trailing newline
     it's better to use this function.
     """
     return open(os.path.expandvars(filename.strip()), mode)
 
 
 def safe_open_with_encoding(filename, mode, encoding='utf-8'):
-    return codecs.open(os.path.expandvars(filename.strip()), mode, 
+    return codecs.open(os.path.expandvars(filename.strip()), mode,
                        encoding=encoding, errors='backslashreplace')
 
 
@@ -36,7 +36,7 @@ def readXML_writeCorpus(orig_xml, new_file):
         for w in s.iter('w'):
             # print w.text, w.attrib['c5'] #POS tag
             tokens.append(
-                "_@".join([w.attrib['c5'].strip(), 
+                "_@".join([w.attrib['c5'].strip(),
                            w.text.encode('utf8').strip()]))
         new_file.write(" ".join(tokens) + "\n")
         word_count += len(tokens)
@@ -66,6 +66,7 @@ def main():
         if word_count > 20000000:
             break
     new_file.close()
+
 
 if __name__ == '__main__':
     main()

@@ -5,8 +5,8 @@ from util import add_word_continuation_tags
 def get_tag_data_from_corpus_file(f):
     """Loads from file into four lists of lists of strings of equal length:
     one for utterance iDs (IDs))
-    one for words (seq), 
-    one for pos (pos_seq) 
+    one for words (seq),
+    one for pos (pos_seq)
     one for tags (targets)."""
 
     f = open(f)
@@ -127,7 +127,7 @@ def write_corpus_file_add_fake_timings_and_utt_tags(f, target_path,
                 quit()
         target_file.write("Speaker: " + speaker_name + "\n")
         starts = range(0, len(label))
-        ends = range(1, len(label)+1)
+        ends = range(1, len(label) + 1)
         for m, s, e, w, p, l in zip(mapping, starts, ends, utt, pos, label):
             l = "\t".join([m, str(float(s)), str(float(e)), w, p, l])
             target_file.write(l + "\n")
@@ -137,7 +137,7 @@ def write_corpus_file_add_fake_timings_and_utt_tags(f, target_path,
 
 if __name__ == "__main__":
     #f = "../../../stir/python/data/bnc_spoken/BNC-CH_partial_data.csv"
-    #write_corpus_file_add_fake_timings_and_utt_tags(
+    # write_corpus_file_add_fake_timings_and_utt_tags(
     #    f, f.replace("_data", "_data_timings"))
     f = "../../../stir/python/data/pcc/PCC_test_partial_data.csv"
     write_corpus_file_add_fake_timings_and_utt_tags(
@@ -151,8 +151,9 @@ if __name__ == "__main__":
             if not ref == "":
                 spl = ref.split(":")
                 n_ref = ":".join([spl[0], spl[2], spl[1]])
-                target.write("\t".join([n_ref, map, word, postag, disftag]) + "\n")
+                target.write(
+                    "\t".join([n_ref, map, word, postag, disftag]) + "\n")
             else:
-                target.write("\t".join([ref, map, word, postag, disftag]) + "\n")
+                target.write(
+                    "\t".join([ref, map, word, postag, disftag]) + "\n")
         target.close()
-        

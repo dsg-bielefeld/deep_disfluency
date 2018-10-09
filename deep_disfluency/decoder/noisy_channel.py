@@ -30,7 +30,7 @@ class SourceModel(object):
     def reset(self):
         self.word_graph = [_S_] * (self.lm.order - 1)  # the words
         self.pos_graph = [_S_] * (self.pos_lm.order - 1) if self.pos_lm \
-                                                            else None
+            else None
         self.word_tree = []  # a list of dicts with pointers with the
         # tag, the probability of the sequence, and the mother node
         # (i.e. prevous word
@@ -41,7 +41,7 @@ class SourceModel(object):
         Warning that this is in fact pruning backwards"""
         if method == "wml":
             def score(x):
-                return log(0) if x[1][1] == 0 else x[1][1]/-x[1][2]
+                return log(0) if x[1][1] == 0 else x[1][1] / -x[1][2]
         elif method == "log":
             def score(x):
                 return log(0) if x[1][1] == 0 else x[1][1]
@@ -49,8 +49,8 @@ class SourceModel(object):
             n = int(len(self.word_tree[-1].keys()) / 3)
             n = 100
             top_n = sorted(self.word_tree[-1].items(),
-                    key=lambda x: score(x),
-                    reverse=True)[:n]
+                           key=lambda x: score(x),
+                           reverse=True)[:n]
             # for k,v in top_n:
             #    print k,v
             self.word_tree[-1] = dict((k, v) for k, v in top_n)
@@ -123,28 +123,28 @@ class SourceModel(object):
         self.word_tree.append(deepcopy(new_word_dict))
         if self.pos_lm and pos:
             self.pos_tree.append(deepcopy(new_pos_dict))
-        
+
         # self.prune()
 
     def get_successor_node_value(self, parent_node_address,
                                  parent_node_value,
                                  fluency_tag, depth):
-        """Compute what the nodes values should be from the 
+        """Compute what the nodes values should be from the
         parent node
         """
         context = parent_node_value[4]
         prob = parent_node_value[1]  # the original log prob
         unigram_prob = parent_node_value[2]
         # the 0-indexed position of word
-        parent_word_index = parent_node_value[3] - 1 + (self.lm.order-1)
+        parent_word_index = parent_node_value[3] - 1 + (self.lm.order - 1)
         word = self.word_graph[parent_word_index + 1]
         if fluency_tag == "<e/>":
             # no addition to the probability value keep trigram
             # the same
             trigram = [None] + context
             # don't update probs or unigrams/contexts or..
-            prob +=log(0.01)
-            unigram_prob+=log(0.5)
+            prob += log(0.01)
+            unigram_prob += log(0.5)
         else:
             if fluency_tag == "<s/>":
                 # calculate the prob of the last word ending
@@ -178,13 +178,14 @@ class SourceModel(object):
         depth, node_address = node_ID
         node_value = self.word_tree[depth].get(node_address)
         assert(node_value)
-        if depth > (len(self.word_tree)-len(suffix)-1):
+        if depth > (len(self.word_tree) - len(suffix) - 1):
             if debug:
                 print "start node in front of suffix start, chain back", depth, len(suffix)
             # should be a fairly straightforward chain back
             last_node = (node_address, node_value)
             # print 'last node', last_node
-            for d in range(depth-1, (len(self.word_tree)-len(suffix)-1), -1):
+            for d in range(
+                    depth - 1, (len(self.word_tree) - len(suffix) - 1), -1):
                 # get the father
                 if debug:
                     print 'last node int', last_node
@@ -199,7 +200,7 @@ class SourceModel(object):
         # now chain through the successor depths to find a path
         # through consistent with the suffix tags, else
         # create the path
-        for d, tag in zip(range(depth+1, len(self.word_tree)), suffix):
+        for d, tag in zip(range(depth + 1, len(self.word_tree)), suffix):
             if not new:
                 # 1. see if successor node exists with right tag
                 nodes = filter(lambda x: x[1][0] == tag,
@@ -219,10 +220,10 @@ class SourceModel(object):
             # do the new node value calculations from the current node value
             node_value = self.get_successor_node_value(node_address,
                                                        node_value, tag, d)
-            
+
             node_address = 0 if len(self.word_tree[d].items()) == 0 \
-                                else max(self.word_tree[d].items(),
-                                         key=lambda x: x[0])[0] + 1
+                else max(self.word_tree[d].items(),
+                         key=lambda x: x[0])[0] + 1
             self.word_tree[d][node_address] = node_value
             node_path.append((node_address, node_value))
         return node_path
@@ -235,24 +236,24 @@ class SourceModel(object):
         node_path = []
         for s, d in zip(
                 range(0, len(suffix)),
-                range(len(self.word_tree)-len(suffix),
+                range(len(self.word_tree) - len(suffix),
                       len(self.word_tree))):
             # print "s,d", s,d
-            # if we're in the loop we're still assuming there is 
+            # if we're in the loop we're still assuming there is
             # an existing path
             tag = suffix[s]
             if s == 0:
                 # first one, just get the ones with the right tags
                 nodes = filter(lambda x: x[1][0] == tag,
-                           self.word_tree[d].items())
+                               self.word_tree[d].items())
             else:
                 # otherwise, get the ones with the right tags which
                 # are the children of the existing nodes
                 successors = filter(lambda x: x[1][0] == tag,
-                           self.word_tree[d].items())
+                                    self.word_tree[d].items())
                 nodes = filter(lambda x: any([x[1][-1] ==
                                               n[0] for n in nodes]),
-                                 successors)
+                               successors)
             if nodes:
                 node_path.append(deepcopy(nodes))
             else:
@@ -261,9 +262,9 @@ class SourceModel(object):
                     # first flatten this to the most likely
                     # and chain back
                     last_node = max(node_path[-1],
-                                     key=lambda x: x[1][1])
+                                    key=lambda x: x[1][1])
                     new_node_path = [last_node]
-                    for b in range(len(node_path)-2, -1, -1):
+                    for b in range(len(node_path) - 2, -1, -1):
                         # get the father
                         last_node = filter(lambda x: x[0] == last_node[1][-1],
                                            node_path[b])[0]
@@ -274,20 +275,20 @@ class SourceModel(object):
                 else:
                     # empty node path so far
                     # just get most likely node at d-1
-                    node = max(self.word_tree[d-1].items(),
-                                key=lambda x: x[1][1])
-                node_ID = (d-1, node[0])
+                    node = max(self.word_tree[d - 1].items(),
+                               key=lambda x: x[1][1])
+                node_ID = (d - 1, node[0])
                 path_tail = self.find_or_generate_path_of_suffix_from_node(
-                                                suffix[s:],
-                                                node_ID,
-                                                new=True)
+                    suffix[s:],
+                    node_ID,
+                    new=True)
                 return node_path + path_tail
         # got this far we have found a path through of existing nodes
         # print "got to end"
         last_node = max(node_path[-1], key=lambda x: x[1][1])
         new_node_path = [last_node]
         # print 'last node', last_node
-        for b in range(len(node_path)-2, -1, -1):
+        for b in range(len(node_path) - 2, -1, -1):
             # get the father
             # print 'last node int', last_node
             # print "node path[b]", node_path[b]
@@ -322,21 +323,23 @@ class SourceModel(object):
             #orig_unigram_log_prob = start_node[2]
         else:
             path = self.find_or_generate_best_path_of_suffix(suffix)
-        orig_log_prob = path[min([len(path)-1,len(path)-(1+n)])][1][1]
-        orig_unigram_log_prob = path[min([len(path)-1,len(path)-(1+n)])][1][2]
+        orig_log_prob = path[min([len(path) - 1, len(path) - (1 + n)])][1][1]
+        orig_unigram_log_prob = path[min(
+            [len(path) - 1, len(path) - (1 + n)])][1][2]
         final_log_prob = path[-1][1][1]
         diff = final_log_prob - orig_log_prob
         # TODO what if diff is 0?
         # print 'path'
-        #for n in path:
+        # for n in path:
         #    print n
-        #print '...'
+        # print '...'
         final_unigram_log_prob = path[-1][1][2]
         unigram_diff = final_unigram_log_prob - orig_unigram_log_prob
-        wml_diff = 0.999 if unigram_diff == 0 else 1-(((diff / - unigram_diff))/-3.5)
-        #print wml_diff
+        wml_diff = 0.999 if unigram_diff == 0 else 1 - \
+            (((diff / - unigram_diff)) / -3.5)
+        # print wml_diff
         #diff = log(wml_diff)
-        diff = log(0.01) if diff == 0 else diff  #too much weight for 0s
+        diff = log(0.01) if diff == 0 else diff  # too much weight for 0s
         return diff, (path[-1][1][3], path[-1][0])
 
     def get_top_n_sequences(self, n):
@@ -345,15 +348,15 @@ class SourceModel(object):
         top_n = []
         lm_tree_dict = self.word_tree[-1]
         final_nodes = sorted(lm_tree_dict.items(),
-                        key=lambda x: log(0) if x[1][2] == 0 
-                        else x[1][1]/-x[1][2],
-                        reverse=True)[:n]
+                             key=lambda x: log(0) if x[1][2] == 0
+                             else x[1][1] / -x[1][2],
+                             reverse=True)[:n]
         for f in final_nodes:
             # each of the top ones get the sequences
             father_node = f[1][-1]
             tag = f[1][0]
             sequence = [tag]
-            for i in range(len(self.word_tree)-2, -1, -1):
+            for i in range(len(self.word_tree) - 2, -1, -1):
                 lm_tree_dict = self.word_tree[i]
                 node_val = lm_tree_dict[father_node]
                 tag = node_val[0]
@@ -361,7 +364,7 @@ class SourceModel(object):
                 father_node = node_val[-1]
             top_n.append(deepcopy(sequence))
         for seq, x in zip(top_n, final_nodes):
-            wml = log(0) if x[1][2] == 0 else x[1][1]/-x[1][2]
+            wml = log(0) if x[1][2] == 0 else x[1][1] / -x[1][2]
             print seq, wml
         return top_n
 
@@ -391,12 +394,12 @@ class LMTester(object):
             heldout_lm_corpus = "\n".join(lines[split:])
             lm_corpus_file.close()
             self.lm = KneserNeySmoothingModel(
-                                        order=3,
-                                        discount=0.7,
-                                        partial_words=True,
-                                        train_corpus=lm_corpus,
-                                        heldout_corpus=heldout_lm_corpus,
-                                        second_corpus=None)
+                order=3,
+                discount=0.7,
+                partial_words=True,
+                train_corpus=lm_corpus,
+                heldout_corpus=heldout_lm_corpus,
+                second_corpus=None)
         if pos_language_model:
             self.pos_lm = pos_language_model
         elif pos:
@@ -411,12 +414,13 @@ class LMTester(object):
             heldout_lm_corpus = "\n".join(lines[split:])
             lm_corpus_file.close()
             self.pos_lm = KneserNeySmoothingModel(
-                                        order=3,
-                                        discount=0.7,
-                                        partial_words=True,
-                                        train_corpus=lm_corpus,
-                                        heldout_corpus=heldout_lm_corpus,
-                                        second_corpus=None)
+                order=3,
+                discount=0.7,
+                partial_words=True,
+                train_corpus=lm_corpus,
+                heldout_corpus=heldout_lm_corpus,
+                second_corpus=None)
+
 
 if __name__ == '__main__':
     lmtest = LMTester()
@@ -432,10 +436,9 @@ if __name__ == '__main__':
         # top_n = s.get_top_n_sequences(5)
         # print top_n
         # print top_n[:10]
-        #raw_input()
-    # check all 
+        # raw_input()
+    # check all
         print s.get_log_diff_of_tag_suffix(tags[:i], n=1)
-    
+
     print s.get_log_diff_of_tag_suffix([
-        "<s/>", "<s/>", "<s/>"], n=1, start_node_ID=(10,0))
-    
+        "<s/>", "<s/>", "<s/>"], n=1, start_node_ID=(10, 0))

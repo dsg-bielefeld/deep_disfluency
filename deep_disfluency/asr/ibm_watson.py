@@ -36,6 +36,7 @@ class IBMWatsonAdapter(fluteline.Consumer):
     :class:`watson_streaming.Transcriber` and prepare them to work
     with the deep_disfluency tagger.
     '''
+
     def enter(self):
         self.running_id = itertools.count()
         # Messages that went down the pipeline, indexed by start_time.
@@ -73,7 +74,6 @@ class IBMWatsonAdapter(fluteline.Consumer):
             self.memory[start_time] = msg
             self.output.put(msg)
 
-
     def clean_word(self, word):
         if word in ['mmhm', 'aha', 'uhhuh']:
             return 'uh-huh'
@@ -109,8 +109,9 @@ class IBMWatsonAdapter(fluteline.Consumer):
             update_id = self.memory[old_id]['id']
         for start_time in update_start_times_to_revoke:
             self.memory.pop(start_time, None)
-        self.running_id = itertools.count(update_id+1)  # set the counter
+        self.running_id = itertools.count(update_id + 1)  # set the counter
         return update_id
+
 
 if __name__ == '__main__':
     fake_updates_raw_1 = [
@@ -131,34 +132,34 @@ if __name__ == '__main__':
     ]
 
     fake_updates_raw_2 = [
-            # First new
-            [
-                ('hello', 0, 1),
-            ],
-            # Old and add new
-            [
-                ('hello', 0, 1),
-                ('my', 1, 2),
-            ],
-            # Updating old timestamp and add new
-            [
-                ('hello', 0.5, 1),
-                ('my', 1, 2),
-                ('name', 3, 4),
-            ],
-            # Updating old word
-            [
-                ('hello', 0.5, 1),
-                ('your', 1, 2),
-                ('name', 3, 4),
-            ],
-            # Multiple old and new ones with timestamp overlap
-            [
-                ('once', 3.4, 4),
-                ('upon', 4.2, 4.6),
-                ('on', 4.3, 4.8),
-            ]
+        # First new
+        [
+            ('hello', 0, 1),
+        ],
+        # Old and add new
+        [
+            ('hello', 0, 1),
+            ('my', 1, 2),
+        ],
+        # Updating old timestamp and add new
+        [
+            ('hello', 0.5, 1),
+            ('my', 1, 2),
+            ('name', 3, 4),
+        ],
+        # Updating old word
+        [
+            ('hello', 0.5, 1),
+            ('your', 1, 2),
+            ('name', 3, 4),
+        ],
+        # Multiple old and new ones with timestamp overlap
+        [
+            ('once', 3.4, 4),
+            ('upon', 4.2, 4.6),
+            ('on', 4.3, 4.8),
         ]
+    ]
     # create a fake list of incoming transcription result dicts from watson
     fake_updates_data = []
     result_index = 0
@@ -170,9 +171,9 @@ if __name__ == '__main__':
         fake_updates_data.append(data)
 
     nodes = [
-       FakeIBMWatsonStreamer(fake_updates_data),
-       IBMWatsonAdapter(),
-       Printer()
+        FakeIBMWatsonStreamer(fake_updates_data),
+        IBMWatsonAdapter(),
+        Printer()
     ]
 
     tic = time.clock()

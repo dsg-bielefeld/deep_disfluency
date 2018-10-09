@@ -198,14 +198,14 @@ if train_models:
         disf = DeepDisfluencyTagger(
             config_file=THIS_DIR + "/experiment_configs.csv",
             config_number=exp
-            )
+        )
         exp_str = '%03d' % exp
         e = disf.train_net(
-                    train_dialogues_filepath=feature_matrices_filepath,
-                    validation_dialogues_filepath=validation_filepath,
-                    model_dir=THIS_DIR + '/' + exp_str,
-                    tag_accuracy_file_path=THIS_DIR +
-                    '/results/tag_accuracies/{}.text'.format(exp_str))
+            train_dialogues_filepath=feature_matrices_filepath,
+            validation_dialogues_filepath=validation_filepath,
+            model_dir=THIS_DIR + '/' + exp_str,
+            tag_accuracy_file_path=THIS_DIR +
+            '/results/tag_accuracies/{}.text'.format(exp_str))
         systems_best_epoch[exp] = e
 else:
     # Take our word for it that the saved models are the best ones:
@@ -223,24 +223,24 @@ if test_models:
         exp_str = '%03d' % exp
         # load the model
         disf = DeepDisfluencyTagger(
-                        config_file=THIS_DIR + '/experiment_configs.csv',
-                        config_number=exp,
-                        saved_model_dir=THIS_DIR +
-                        '/{0}/epoch_{1}'.format(exp_str, best_epoch)
-                                    )
+            config_file=THIS_DIR + '/experiment_configs.csv',
+            config_number=exp,
+            saved_model_dir=THIS_DIR +
+            '/{0}/epoch_{1}'.format(exp_str, best_epoch)
+        )
         # simulating (or using real) ASR results
         # for now just saving these in the same folder as the best epoch
         # also outputs the speed
         partial_string = '_partial' if partial else ''
         for div in ["heldout", "test"]:
             disf.incremental_output_from_file(
-                    THIS_DIR + '/../data/disfluency_detection/switchboard/' +
-                    'swbd_disf_{0}{1}_data_timings.csv'
-                    .format(div, partial_string),
-                    target_file_path=THIS_DIR + '/{0}/epoch_{1}/'.format(
-                        exp_str, best_epoch) +
-                    'swbd_disf_{0}{1}_data_output_increco.text'
-                    .format(div, partial_string))
+                THIS_DIR + '/../data/disfluency_detection/switchboard/' +
+                'swbd_disf_{0}{1}_data_timings.csv'
+                .format(div, partial_string),
+                target_file_path=THIS_DIR + '/{0}/epoch_{1}/'.format(
+                    exp_str, best_epoch) +
+                'swbd_disf_{0}{1}_data_output_increco.text'
+                .format(div, partial_string))
 
 # 5. To get the numbers run the notebook:
 # experiments/analysis/Interspeech_2015_EMNLP_2015/Interspeech_2015_eval.ipynb
