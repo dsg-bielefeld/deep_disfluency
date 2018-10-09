@@ -41,7 +41,7 @@ def intervalframe_overlaps(frame1, frame2, concatdelimiter='/'):
             overlap = {}
             if type(concatdelimiter) == str and len(concatdelimiter) > 0:
                 overlap['text'] = fr2.ix[intrv2]['text'] + concatdelimiter + \
-                                  frame1.ix[intrv1]['text']
+                    frame1.ix[intrv1]['text']
 
             else:
                 overlap['text'] = 'overlap'
@@ -83,8 +83,8 @@ def fill_in_time_approximations_timings(word_timing_tuples, idx):
         # this end time is the same as the latest one
         # need backward search for time
         # print "backward search"
-        idx = len(word_timing_tuples)-1
-        for i in range(len(word_timing_tuples)-1, -1, -1):
+        idx = len(word_timing_tuples) - 1
+        for i in range(len(word_timing_tuples) - 1, -1, -1):
             affected_indices.append(i)
             idx = i
             if not word_timing_tuples[i][1] == start_time:
@@ -99,7 +99,7 @@ def fill_in_time_approximations_timings(word_timing_tuples, idx):
     total_time = end_time - start_time
     assert total_time > 0.0, str(word_timing_tuples[affected_indices[0]:]) +\
         str(idx)
-    mean_len = total_time/len(affected_indices)
+    mean_len = total_time / len(affected_indices)
     for i in range(idx, idx + len(affected_indices)):
         end_time = start_time + mean_len
         word_timing_tuples[i] = (start_time,
@@ -129,7 +129,7 @@ def fill_in_time_approximations(word_timing_tuples, idx):
     assert len(word_timing_tuples) > 1
     timings = [(x[1], x[2]) for x in word_timing_tuples]
     timings = fill_in_time_approximations_timings(timings, idx)
-    for i, timing in zip(range(len(word_timing_tuples)-len(timings)-1,
+    for i, timing in zip(range(len(word_timing_tuples) - len(timings) - 1,
                                len(word_timing_tuples)),
                          timings):
         word_timing_tuples[i] = (word_timing_tuples[i][0],
@@ -220,20 +220,20 @@ def load_final_output_from_file(filename):
         assert(len(increco_speakers[speaker][0]) ==
                len(increco_speakers[speaker][1]) ==
                len(increco_speakers[speaker][2])), "lengths not the same!"\
-               "\n" + str(len(increco_speakers[speaker][0])) +\
-               " " + str(len(increco_speakers[speaker][1])) +\
-               " " + str(len(increco_speakers[speaker][2])) + "\n" +\
-               "\n".join(
-                    ['\t'.join([str(x), str(y), str(z)]) for x, y, z in zip(
-                     increco_speakers[speaker][0],
-                     increco_speakers[speaker][1],
-                     increco_speakers[speaker][2])]
-                          )
+            "\n" + str(len(increco_speakers[speaker][0])) +\
+            " " + str(len(increco_speakers[speaker][1])) +\
+            " " + str(len(increco_speakers[speaker][2])) + "\n" +\
+            "\n".join(
+            ['\t'.join([str(x), str(y), str(z)]) for x, y, z in zip(
+                increco_speakers[speaker][0],
+                increco_speakers[speaker][1],
+                increco_speakers[speaker][2])]
+        )
         final_timings = [(x[1], x[2]) for x in increco_speakers[speaker][1][0]]
         final_dict[speaker] = [[x[0] for x in final_timings],
                                [x[0] for x in increco_speakers[speaker][1][0]],
                                [(y, x[0], x[1]) for x, y in zip(final_timings,
-                                increco_speakers[speaker][2][0])]]
+                                                                increco_speakers[speaker][2][0])]]
     return final_dict
 
 
@@ -250,7 +250,7 @@ def add_word_continuation_tags(tags):
             tags[i] = tags[i] + "<t"
         else:
             tags[i] = tags[i] + "<c"
-        if i == len(tags)-1:
+        if i == len(tags) - 1:
             tags[i] = tags[i] + "t/>"
         else:
             tags[i] = tags[i] + "c/>"
@@ -267,18 +267,18 @@ def get_diff_and_new_prefix(current, newprefix, verbose=False):
     rollback = 0
     original_length = len(current)
     original_current = deepcopy(current)
-    for i in range(len(current)-1, -2, -1):
+    for i in range(len(current) - 1, -2, -1):
         if verbose:
             print "oooo", newprefix[0]
             if not current == []:
                 print current[i]
         if i == -1 or (float(newprefix[0][1]) >= float(current[i][2])):
-            if i == len(current)-1:
+            if i == len(current) - 1:
                 current = current + newprefix
                 break
             k = 0
-            marker = i+1
-            for j in range(i+1, len(current)):
+            marker = i + 1
+            for j in range(i + 1, len(current)):
                 if k == len(newprefix):
                     break
                 if verbose:
@@ -289,7 +289,7 @@ def get_diff_and_new_prefix(current, newprefix, verbose=False):
                     if verbose:
                         print "repeat", current[j], newprefix[k]
                     k += 1
-                    marker = j+1
+                    marker = j + 1
             rollback = original_length - marker
             current = current[:marker] + newprefix[k:]
             newprefix = newprefix[k:]
@@ -337,13 +337,13 @@ def final_hyp_from_increco_and_incremental_metrics(increco,
                                     verbose=False)
         if len(new_prefix) < len(n_words):
             print "correcting length of words"
-            n_words = n_words[(len(n_words)-len(new_prefix)):]
+            n_words = n_words[(len(n_words) - len(new_prefix)):]
         assert len(n_words) == len(new_prefix)
         no_edits += len(new_prefix)
-        final_words = final_words[:len(final_words)-rollback] \
+        final_words = final_words[:len(final_words) - rollback] \
             + deepcopy(n_words)
         # calculating incremental metrics
-        for n in range(orig_length-rollback, len(final_hypothesis)):
+        for n in range(orig_length - rollback, len(final_hypothesis)):
             if not len(final_hypothesis[n]) == 3:
                 print "uneven at number n!", n
                 print final_hypothesis
@@ -498,7 +498,7 @@ def get_tag_data_from_corpus_file(f, representation="1", limit=8):
         currentPOS.append(postag)
         currentTags.append(disftag)
         approx_word_length = 0.3  # TODO approximation until end times gotten
-        start = max([float(start_time), float(end_time)-approx_word_length])
+        start = max([float(start_time), float(end_time) - approx_word_length])
         currentTimings.append((start, float(end_time)))
         if (len(currentTimings) > 1 and currentTimings[-2][1] > start) or \
                 start >= float(end_time):
@@ -508,14 +508,14 @@ def get_tag_data_from_corpus_file(f, representation="1", limit=8):
                 currentTimings[-2] = (currentTimings[-2][0],
                                       currentTimings[-2][0])
                 currentTimings = fill_in_time_approximations_timings(
-                                                currentTimings,
-                                                len(currentTimings) - 2)
+                    currentTimings,
+                    len(currentTimings) - 2)
             if currentTimings[-1][0] >= currentTimings[-1][1]:
                 currentTimings[-1] = (currentTimings[-1][0],
                                       currentTimings[-1][0])
                 currentTimings = fill_in_time_approximations_timings(
-                                                currentTimings,
-                                                len(currentTimings) - 1)
+                    currentTimings,
+                    len(currentTimings) - 1)
     if not currentWords == []:
         seq.append(tuple(currentWords))
         pos_seq.append(tuple(currentPOS))
@@ -523,11 +523,11 @@ def get_tag_data_from_corpus_file(f, representation="1", limit=8):
         IDs.append(utt_reference)
         timings.append(tuple(currentTimings))
     assert len(seq) == len(targets) == len(pos_seq), ("{0} {1} {2}".format(
-                                                            len(seq),
-                                                            len(targets),
-                                                            len(pos_seq)
-                                                                    )
-                                                      )
+        len(seq),
+        len(targets),
+        len(pos_seq)
+    )
+    )
     print "loaded " + str(len(seq)) + " sequences"
     f.close()
     return (IDs, timings, seq, pos_seq, targets)
@@ -537,9 +537,9 @@ def get_tag_data_from_corpus_file(f, representation="1", limit=8):
 def p_r_f(tps, fps, fns):
     if tps == 0:
         return (0, 0, 0)
-    p = tps/(tps+fps)
-    r = tps/(tps+fns)
-    f = (2*(p*r))/(p+r)
+    p = tps / (tps + fps)
+    r = tps / (tps + fns)
+    f = (2 * (p * r)) / (p + r)
     return (p, r, f)
 
 
@@ -555,7 +555,7 @@ def NIST_SU(results):
     FNs = results[2]
     if (FNs + FPs) == 0:
         return 0.0
-    return ((FNs + FPs)/(TPs + FNs)) * 100
+    return ((FNs + FPs) / (TPs + FNs)) * 100
 
 
 def DSER(results):
@@ -566,7 +566,7 @@ def DSER(results):
     assert len(results) == 2
     CorrectSegs = results[0]
     TotalSegs = results[1]
-    return ((TotalSegs-CorrectSegs)/TotalSegs) * 100
+    return ((TotalSegs - CorrectSegs) / TotalSegs) * 100
 
 
 def SegER(results):
@@ -576,7 +576,7 @@ def SegER(results):
     assert len(results) == 2
     Edits = results[0]
     TotalSegs = results[1]
-    return (Edits/TotalSegs) * 100
+    return (Edits / TotalSegs) * 100
 
 
 def alignment_cost(r, h, subcost=1):
@@ -592,25 +592,25 @@ def alignment_cost(r, h, subcost=1):
     3
     """
     # initialisation
-    d = numpy.zeros((len(r)+1)*(len(h)+1), dtype=numpy.uint8)
-    d = d.reshape((len(r)+1, len(h)+1))
+    d = numpy.zeros((len(r) + 1) * (len(h) + 1), dtype=numpy.uint8)
+    d = d.reshape((len(r) + 1, len(h) + 1))
 
-    for i in range(len(r)+1):
-        for j in range(len(h)+1):
+    for i in range(len(r) + 1):
+        for j in range(len(h) + 1):
             if i == 0:
                 d[0][j] = j
             elif j == 0:
                 d[i][0] = i
 
     # computation
-    for i in range(1, len(r)+1):
-        for j in range(1, len(h)+1):
-            if r[i-1] == h[j-1]:
-                d[i][j] = d[i-1][j-1]
+    for i in range(1, len(r) + 1):
+        for j in range(1, len(h) + 1):
+            if r[i - 1] == h[j - 1]:
+                d[i][j] = d[i - 1][j - 1]
             else:
-                substitution = d[i-1][j-1] + subcost
-                insertion = d[i][j-1] + 1
-                deletion = d[i-1][j] + 1
+                substitution = d[i - 1][j - 1] + subcost
+                insertion = d[i][j - 1] + 1
+                deletion = d[i - 1][j] + 1
                 d[i][j] = min(substitution, insertion, deletion)
 
     return d[len(r)][len(h)]
@@ -628,15 +628,15 @@ def final_output_accuracy_word_level(words, prediction_tags, gold_tags,
     in_correct_segment = True
     assert len(words) == len(prediction_tags) == len(gold_tags), (
         "{0} {1} {2}".format(
-                            len(words),
-                            len(prediction_tags),
-                            len(gold_tags)
-                            ) +
+            len(words),
+            len(prediction_tags),
+            len(gold_tags)
+        ) +
         "\n%%%%%%words:" +
         "\n".join(words) + "\n%%%%%%prediction_tags:" +
         "\n".join(prediction_tags) +
         "\n%%%%%%\ngold_tags:" + "\n".join(gold_tags)
-                                                                )
+    )
     end_of_utt_align = {"ref":  len(gold_tags) * [""],
                         "hyp": len(gold_tags) * [""]}
     count = 0
@@ -655,7 +655,7 @@ def final_output_accuracy_word_level(words, prediction_tags, gold_tags,
                 gold_IDs = []
                 for t in gold_internal_tags:
                     if "<rms" in t:
-                        gold_ID = t[t.find("=")+2:-3]
+                        gold_ID = t[t.find("=") + 2:-3]
                         gold_IDs.append(gold_ID)
                 # print "goldID", gold_ID
                 # print "in", gold_tags
@@ -683,7 +683,7 @@ def final_output_accuracy_word_level(words, prediction_tags, gold_tags,
                     pred_IDs = []
                     for t in pred_internal_tags:
                         if "<rms" in t:
-                            pred_ID = t[t.find("=")+2:-3]
+                            pred_ID = t[t.find("=") + 2:-3]
                             pred_IDs.append(pred_ID)
                     # print "predID", pred_ID
                     # print "in", prediction_tags
@@ -750,19 +750,19 @@ def final_output_accuracy_word_level(words, prediction_tags, gold_tags,
                                         list(gold_tags), list(words),
                                         count, gold_tags=list(gold_tags),
                                         save_context=True)[0]
-                                                                 )
+                                )
                             elif tag == "<rms":
                                 tag_dict[tag][0] += \
-                                    (len(correct_rms_repairs)-1)
+                                    (len(correct_rms_repairs) - 1)
                                 error_analysis[tag]["TP"].extend(
                                     correct_rms_repairs
-                                                                 )
+                                )
                             else:
                                 error_analysis[tag]["TP"].extend(
                                     get_contexts_with_start_word_index(
                                         list(prediction_tags), list(words),
                                         count, gold_tags=list(gold_tags))
-                                                                 )
+                                )
                         else:
                             pass
                             print "No error analysis at interval level"
@@ -787,7 +787,7 @@ def final_output_accuracy_word_level(words, prediction_tags, gold_tags,
                             elif tag == "<rms":
                                 # either predicted incorrectly
                                 # or no matching rps found
-                                tag_dict[tag][1] += (len(pred_repairs)-1)
+                                tag_dict[tag][1] += (len(pred_repairs) - 1)
                                 error_analysis[tag]["FP"].extend(pred_repairs)
                             else:
                                 error_analysis[tag]["FP"].extend(
@@ -812,7 +812,7 @@ def final_output_accuracy_word_level(words, prediction_tags, gold_tags,
                                     gold_tags=list(gold_tags),
                                     save_context=True)[0])
                         elif tag == "<rms":
-                            tag_dict[tag][2] += (len(gold_repairs)-1)
+                            tag_dict[tag][2] += (len(gold_repairs) - 1)
                             error_analysis[tag]["FN"].extend(gold_repairs)
                         else:
                             error_analysis[tag]["FN"].extend(
@@ -832,8 +832,8 @@ def final_output_accuracy_word_level(words, prediction_tags, gold_tags,
                 (utt_eval and "t/>" in prediction):
             turnFinal = True
             tag_dict["<rps_relaxed"][0] += min(relaxedHypUtt, relaxedGoldUtt)
-            tag_dict["<rps_relaxed"][1] += max(0, relaxedHypUtt-relaxedGoldUtt)
-            tag_dict["<rps_relaxed"][2] += max(0, relaxedGoldUtt-relaxedHypUtt)
+            tag_dict["<rps_relaxed"][1] += max(0, relaxedHypUtt - relaxedGoldUtt)
+            tag_dict["<rps_relaxed"][2] += max(0, relaxedGoldUtt - relaxedHypUtt)
             repairs_gold += relaxedGoldUtt
             repairs_hyp += relaxedHypUtt
             number_of_utts_hyp += 1
@@ -845,8 +845,8 @@ def final_output_accuracy_word_level(words, prediction_tags, gold_tags,
         tag_dict["SegER"][1] += cost  # number of edits
     if not turnFinal:  # flush
         tag_dict["<rps_relaxed"][0] += min(relaxedHypUtt, relaxedGoldUtt)
-        tag_dict["<rps_relaxed"][1] += max(0, relaxedHypUtt-relaxedGoldUtt)
-        tag_dict["<rps_relaxed"][2] += max(0, relaxedGoldUtt-relaxedHypUtt)
+        tag_dict["<rps_relaxed"][1] += max(0, relaxedHypUtt - relaxedGoldUtt)
+        tag_dict["<rps_relaxed"][2] += max(0, relaxedGoldUtt - relaxedHypUtt)
 
     return repairs_hyp, repairs_gold, number_of_utts_hyp, number_of_utts_gold
 
@@ -895,9 +895,9 @@ def final_output_accuracy_interval_level(hyp, reference, tag_dict,
                 tag_dict["{}_relaxed".format(tag)][0]\
                     += min(relaxedHyp, relaxedGold)
                 tag_dict["{}_relaxed".format(tag)][1]\
-                    += max(0, relaxedHyp-relaxedGold)
+                    += max(0, relaxedHyp - relaxedGold)
                 tag_dict["{}_relaxed".format(tag)][2]\
-                    += max(0, relaxedGold-relaxedHyp)
+                    += max(0, relaxedGold - relaxedHyp)
         # now an overlap based eval
         gold_intervals = deepcopy(reference[reference.text.str.contains(tag)])
         hyp_intervals = deepcopy(hyp[hyp.text.str.contains(tag)])
@@ -945,12 +945,12 @@ def final_output_accuracy_interval_level(hyp, reference, tag_dict,
             tag_dict['DSER'][1] += total_gold_segments
             tag_dict['DSER'][0] += correctly_segmented_dser
             tag_dict['NIST_SU'][0] += correctly_segmented
-            tag_dict['NIST_SU'][1] += (total_hyp_segments-correctly_segmented)
-            tag_dict['NIST_SU'][2] += (total_gold_segments-correctly_segmented)
+            tag_dict['NIST_SU'][1] += (total_hyp_segments - correctly_segmented)
+            tag_dict['NIST_SU'][2] += (total_gold_segments - correctly_segmented)
             continue
-        gold_duration = sum(gold_intervals.end_time-gold_intervals.start_time)
-        hyp_duration = sum(hyp_intervals.end_time-hyp_intervals.start_time)
-        overlap_duration = sum(overlaps.end_time-overlaps.start_time)
+        gold_duration = sum(gold_intervals.end_time - gold_intervals.start_time)
+        hyp_duration = sum(hyp_intervals.end_time - hyp_intervals.start_time)
+        overlap_duration = sum(overlaps.end_time - overlaps.start_time)
         # do overall rate
         if tag == "<rps":
             repairs_hyp += len(hyp_intervals)
@@ -968,9 +968,9 @@ def final_output_accuracy_interval_level(hyp, reference, tag_dict,
         # TPs
         tag_dict[tag][0] += overlap_duration
         # FPs
-        tag_dict[tag][1] += (hyp_duration-overlap_duration)
+        tag_dict[tag][1] += (hyp_duration - overlap_duration)
         # FNs
-        tag_dict[tag][2] += (gold_duration-overlap_duration)
+        tag_dict[tag][2] += (gold_duration - overlap_duration)
     return repairs_hyp, repairs_gold, number_of_utts_hyp, number_of_utts_gold
 
 
@@ -978,6 +978,7 @@ def final_output_accuracy_interval_level(hyp, reference, tag_dict,
 class Context:
     """ A simple class which gives the words either side of a boundary word.
     """
+
     def __init__(self):
         self.words_left_context = []
         self.words_right_context = []
@@ -999,25 +1000,25 @@ class Context:
 
     def __str__(self):
         string = ""
-        string += "left context="+" ".join(["{0}|{1}".format(x, y)
-                                           for x, y in zip(
-                                               self.words_left_context,
-                                               self.tags_left_context)]) + "\n"
-        string += "right context="+" ".join(["{0}|{1}".format(x, y)
-                                            for x, y in zip(
-                                                self.words_right_context,
-                                                self.tags_right_context)]) \
+        string += "left context=" + " ".join(["{0}|{1}".format(x, y)
+                                              for x, y in zip(
+            self.words_left_context,
+            self.tags_left_context)]) + "\n"
+        string += "right context=" + " ".join(["{0}|{1}".format(x, y)
+                                               for x, y in zip(
+            self.words_right_context,
+            self.tags_right_context)]) \
             + "\n"
-        string += "gold left context="+" ".join(["{0}|{1}".format(x, y)
-                                                for x, y in
-                                                zip(
-                                                self.words_left_context,
-                                                self.gold_tags_left_context)])\
+        string += "gold left context=" + " ".join(["{0}|{1}".format(x, y)
+                                                   for x, y in
+                                                   zip(
+            self.words_left_context,
+            self.gold_tags_left_context)])\
             + "\n"
-        string += "gold right context="+" ".join(["{0}|{1}".format(x, y)
-                                                 for x, y in zip(
-                                            self.words_right_context,
-                                            self.gold_tags_right_context)])\
+        string += "gold right context=" + " ".join(["{0}|{1}".format(x, y)
+                                                    for x, y in zip(
+            self.words_right_context,
+            self.gold_tags_right_context)])\
             + "\n"
         string += "type = " + str(self.type)
         return string
@@ -1081,7 +1082,7 @@ def get_tags(s, open_delim='<', close_delim='/>'):
             # Spit out the tag
             yield open_delim + s[start:end].strip() + close_delim
             # Truncate string to start from last match
-            s = s[end+len(close_delim):]
+            s = s[end + len(close_delim):]
         else:
             return
 
@@ -1092,15 +1093,15 @@ def get_contexts_with_start_word_index(tags, words, rp_start_index,
     Only repairs with onset at index rp_start.
     """
     c = Context()
-    c.words_left_context = words[rp_start_index-window: rp_start_index]
-    c.words_right_context = words[rp_start_index: rp_start_index+window]
-    c.tags_left_context = tags[rp_start_index-window: rp_start_index]
-    c.tags_right_context = tags[rp_start_index: rp_start_index+window]
+    c.words_left_context = words[rp_start_index - window: rp_start_index]
+    c.words_right_context = words[rp_start_index: rp_start_index + window]
+    c.tags_left_context = tags[rp_start_index - window: rp_start_index]
+    c.tags_right_context = tags[rp_start_index: rp_start_index + window]
     if gold_tags:
-        c.gold_tags_left_context = gold_tags[rp_start_index-window:
+        c.gold_tags_left_context = gold_tags[rp_start_index - window:
                                              rp_start_index]
         c.gold_tags_right_context = gold_tags[rp_start_index:
-                                              rp_start_index+window]
+                                              rp_start_index + window]
     return [c]
 
 
@@ -1113,31 +1114,31 @@ def get_repairs_with_start_word_index(a_tags, a_words, rp_start_index,
     """
     repairOnsets = re.findall('<rps id="[FP]*-?[0-9]*"/>',
                               a_tags[rp_start_index])
-    repairDict = {rps[rps.find("=")+2:-3]: None
+    repairDict = {rps[rps.find("=") + 2:-3]: None
                   for rps in repairOnsets}
     # first, backwards search for the "rms" tag
     allComplete = True
     if save_context:
         for repair_id in repairDict.keys():
             r = Repair()
-            word_context = a_words[rp_start_index-context_length:
+            word_context = a_words[rp_start_index - context_length:
                                    rp_start_index] +\
-                ["+"] + a_words[rp_start_index: rp_start_index+context_length]
-            tag_context = a_tags[rp_start_index-context_length:
+                ["+"] + a_words[rp_start_index: rp_start_index + context_length]
+            tag_context = a_tags[rp_start_index - context_length:
                                  rp_start_index] + ["+"] + \
-                a_tags[rp_start_index: rp_start_index+context_length]
+                a_tags[rp_start_index: rp_start_index + context_length]
             r.context = ["{0}|{1}".format(x, y) for x, y in
                          zip(word_context, tag_context)]
             if gold_tags:
-                tag_context = gold_tags[rp_start_index-context_length:
+                tag_context = gold_tags[rp_start_index - context_length:
                                         rp_start_index] +\
-                 ["+"] + gold_tags[rp_start_index:
-                                   rp_start_index+context_length]
+                    ["+"] + gold_tags[rp_start_index:
+                                      rp_start_index + context_length]
                 r.gold_context = ["{0}|{1}".format(x, y) for x, y in
                                   zip(word_context, tag_context)]
             repairDict[repair_id] = deepcopy(r)
             # TODO assuming this is for false pos's only
-    for c in range(rp_start_index-1, -1, -1):
+    for c in range(rp_start_index - 1, -1, -1):
         allComplete = True
         for tag in get_tags(a_tags[c]):
             for repair_id in repairDict.keys():
@@ -1176,8 +1177,8 @@ def get_repairs_with_start_word_index(a_tags, a_words, rp_start_index,
                         repairDict[repair_id].repairWords.append(a_words[c])
                     wordAdded = True
                     # sometimes there is a rpn and rpndel, take the del
-                    if ("<rpn " in tag) and (not \
-                        repairDict[repair_id].repairComplete) and \
+                    if ("<rpn " in tag) and (not
+                                             repairDict[repair_id].repairComplete) and \
                             '<rpndel id="{}"/>'.format(repair_id) in a_tags[c]:
                         continue
                     repairDict[repair_id].repairComplete = True
@@ -1212,7 +1213,7 @@ def rename_all_repairs_in_line_with_index(tags, simple=False):
                     "\n".join(["\t".join([str(x), str(y)]) for
                                x, y in zip(range(0, len(tags)), tags)])
                 rps = repairOnsets[0]
-                old_id = rps[rps.find("=")+2:-3]
+                old_id = rps[rps.find("=") + 2:-3]
                 if old_id != str(i):
                     tags = rename_repair_with_repair_onset_idx(tags,
                                                                i,
@@ -1229,15 +1230,15 @@ def rename_repair_with_repair_onset_idx(orig_tags, rp_start_index, new_id,
     tags = deepcopy(orig_tags)
     repairOnsets = re.findall('<rps id="[FP]*-?[0-9]*"/>',
                               tags[rp_start_index])
-    repairDict = {rps[rps.find("=")+2:-3]: None
+    repairDict = {rps[rps.find("=") + 2:-3]: None
                   for rps in repairOnsets}
     assert len(repairOnsets) == 1, "too many/few repairs at" + \
         tags[rp_start_index]
     # from the repair onset go back and replace the relevant tag
     rps = repairOnsets[0]
-    old_id = rps[rps.find("=")+2:-3]
+    old_id = rps[rps.find("=") + 2:-3]
     repair_start_found = False
-    for i in range(rp_start_index-1, -1, -1):
+    for i in range(rp_start_index - 1, -1, -1):
         new_tag = ""
         for tag in get_tags(tags[i]):
             if tag == '<i id="{}"/>'.format(old_id):
@@ -1308,7 +1309,7 @@ def rename_repair_with_repair_onset_idx(orig_tags, rp_start_index, new_id,
 # Methods for error analysis on incremental results
 def test():
     print "testing repair extraction"
-    #tags = '<f/>,<rms id="FP3"/>,<i id="FP3"/><e/>,<rps id="FP3"/>\
+    # tags = '<f/>,<rms id="FP3"/>,<i id="FP3"/><e/>,<rps id="FP3"/>\
     #<rpn id="FP3"/>,<rms id="6"/>,<i id="6"/><e/>,<rps id="6"/>\
     #<rpn id="6"/>,<f/>'.split(',')
     tags = '<f/>,<f/>,<i id="FP3"/><e/>,<rps id="FP3"/>,<f/>,<i id="6"/><e/>,<rps id="6"/>\
@@ -1317,7 +1318,7 @@ def test():
                                               simple=True)
 
     print re.findall('<rps id="[FP]*-?[0-9]*"/>', '<rps id="-1"/>')
-    
+
     words = "i,like,uh,love,like,uh,love,alot".split(",")
     repairs = get_repairs_with_start_word_index(tags, words, 3)
     for r in repairs:
@@ -1326,8 +1327,6 @@ def test():
     for r in repairs2:
         print r
     print repairs2[0] == repairs[0]
-    
-    
 
 
 if __name__ == '__main__':

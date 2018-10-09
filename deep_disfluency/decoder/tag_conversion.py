@@ -174,7 +174,7 @@ def convert_to_source_model_tags(seq, uttseg=True):
             if m:
                 back = min([int(m.group(1)), len(source_tags)])
                 # print back, i, source_tags
-                for b in range(i-back, i):
+                for b in range(i - back, i):
                     source_tags[b] = "<e/>"
                 source_tags.append("<f/>")
             else:

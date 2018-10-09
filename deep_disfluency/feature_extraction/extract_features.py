@@ -36,10 +36,10 @@ def extract_features(args):
             os.path.dirname(os.path.realpath(__file__)) +
             '/swbd_map_word_alignments_to_SWDA_words.py',
             '-i', args.corpusLocation + "/" + corpus_filename.
-                                                    replace("_timings", ""),
+            replace("_timings", ""),
             '-d', args.divisionFile,
             '-a', args.wordAlignmentFolder
-            ]
+        ]
         if args.laughter:
             c.append('-l')
         subprocess.call(c)
@@ -53,7 +53,7 @@ def extract_features(args):
             '/create_tag_files.py',
             '-i', args.corpusLocation + "/" + corpus_filename,
             '-tag', args.tagFolder,
-            ]
+        ]
         if args.laughter:
             c.append('-l')
         if args.uttSeg:
@@ -83,7 +83,7 @@ def extract_features(args):
             '-order', str(3),
             '-xlm',
             # '-tag', args.tagFolder,
-            ]
+        ]
         if args.partial_words:
             c.append("-p")
         c.append('-e')
@@ -109,7 +109,7 @@ def extract_features(args):
         '-w', args.tagFolder + "/swbd_word_rep.csv",
         '-p', args.tagFolder + "/swbd_pos_rep.csv",
         '-tag', args.tagFolder + "/swbd_disf1_tags.csv"
-        ]
+    ]
     if args.languageModelFolder:
         c.append('-lm')
         c.append(args.matrixFolder + "/lm_matrices")
@@ -135,7 +135,7 @@ if __name__ == '__main__':
         dest='matrixFolder',
         default='../data/disfluency_detection/feature_matrices',
         help='location of the disfluency annotation csv files'
-                        )
+    )
     parser.add_argument('-f', action='store', dest='divisionFile',
                         default='../data/disfluency_detection/\
                         swda_divisions_disfluency_detection/\

@@ -23,7 +23,7 @@ def get_tags(s, open_delim='<', close_delim='/>'):
             # Spit out the tag
             yield open_delim + s[start:end].strip() + close_delim
             # Truncate string to start from last match
-            s = s[end+len(close_delim):]
+            s = s[end + len(close_delim):]
         else:
             return
 
@@ -99,7 +99,7 @@ def add_word_continuation_tags(tags):
             tags[i] = tags[i] + "<t"
         else:
             tags[i] = tags[i] + "<c"
-        if i == len(tags)-1:
+        if i == len(tags) - 1:
             tags[i] = tags[i] + "t/>"
         else:
             tags[i] = tags[i] + "c/>"
@@ -118,7 +118,7 @@ def verify_disfluency_tags(tags, normalize_ID=False):
     for i in range(0, len(tags)):
         rps = re.findall("<rps id\=\"[0-9]+\"\/>", tags[i])
         if rps:
-            id_map[rps[0][rps[0].find("=")+2:-3]] = str(i)
+            id_map[rps[0][rps[0].find("=") + 2:-3]] = str(i)
     # key: old repair ID, value, list [reparandum,interregnum,repair]
     # all True when repair is all there
     repairs = defaultdict(list)
@@ -133,13 +133,13 @@ def verify_disfluency_tags(tags, normalize_ID=False):
             assert(all([repairs[ID][2] or
                         repairs[ID] == [None, None, None]
                         for ID in repairs.keys()])),\
-                        "Unresolved repairs at fluent tag\n\t" + str(repairs)
+                "Unresolved repairs at fluent tag\n\t" + str(repairs)
         for tag in get_tags(tags[i]):  # iterate over all tags
             print i, tag
             if tag == "<e/>":
                 new_tags.append(tag)
                 continue
-            ID = tag[tag.find("=")+2:-3]
+            ID = tag[tag.find("=") + 2:-3]
             if "<rms" in tag:
                 assert repairs[ID][0] == None,\
                     "reparandum started parsed more than once " + ID
@@ -218,8 +218,8 @@ def minibatch(l, bs):
 
     l :: list of word idxs
     """
-    out = [l[:i] for i in xrange(1, min(bs, len(l)+1))]
-    out += [l[i-bs:i] for i in xrange(bs, len(l)+1)]
+    out = [l[:i] for i in xrange(1, min(bs, len(l) + 1))]
+    out += [l[i - bs:i] for i in xrange(bs, len(l) + 1)]
     assert len(l) == len(out)
     return out
 
@@ -232,12 +232,12 @@ def indices_from_length(sentence_length, bs, start_index=0):
     will output:
     [[0,0],[0,1],[0,2],[1,3]]
     """
-    l = map(lambda x: start_index+x, xrange(sentence_length))
+    l = map(lambda x: start_index + x, xrange(sentence_length))
     out = []
     for i in xrange(0, min(bs, len(l))):
         out.append([l[0], l[i]])
-    for i in xrange(bs+1, len(l)+1):
-        out.append([l[i-bs], l[i-1]])
+    for i in xrange(bs + 1, len(l) + 1):
+        out.append([l[i - bs], l[i - 1]])
     assert len(l) == sentence_length
     return out
 
@@ -253,8 +253,8 @@ def context_win(l, win):
     assert win >= 1
     l = list(l)
 
-    lpadded = win/2 * [-1] + l + win/2 * [-1]
-    out = [lpadded[i:i+win] for i in range(len(l))]
+    lpadded = win / 2 * [-1] + l + win / 2 * [-1]
+    out = [lpadded[i:i + win] for i in range(len(l))]
 
     assert len(out) == len(l)
     return out
@@ -266,8 +266,8 @@ def context_win_backwards(l, win):
     '''
     assert win >= 1
     l = list(l)
-    lpadded = (win-1) * [-1] + l
-    out = [lpadded[i: i+win] for i in range(len(l))]
+    lpadded = (win - 1) * [-1] + l
+    out = [lpadded[i: i + win] for i in range(len(l))]
     assert len(out) == len(l)
     return out
 
@@ -286,14 +286,14 @@ def corpus_to_indexed_matrix(my_array_list, win, bs, sentence=False):
     totalSize = 0
     if sentence:
         for sent in my_array_list:
-            mysent = np.asarray([-1] * (bs-1) + list(sent))  # padding with eos
+            mysent = np.asarray([-1] * (bs - 1) + list(sent))  # padding with eos
             # get list of context windows
             mywords = context_win_backwards(mysent, win)
             # just one per utterance for now..
-            cindices = [[totalSize, totalSize+len(mywords)-1]]
+            cindices = [[totalSize, totalSize + len(mywords) - 1]]
             cwords = []
-            for i in range(bs, len(mywords)+1):
-                words = list(itertools.chain(*mywords[(i-bs):i]))
+            for i in range(bs, len(mywords) + 1):
+                words = list(itertools.chain(*mywords[(i - bs):i]))
                 cwords.append(words)  # always (bs * n) words long
             # print cwords
             sentences.extend(cwords)
@@ -356,42 +356,42 @@ def convert_from_eval_tags_to_inc_disfluency_tags(tags, words,
         if "<rms" in tags[t]:
             rms = re.findall("<rms id\=\"[0-9]+\"\/>", tags[t], re.S)
             for r in rms:
-                repairID = r[r.find("=")+2:-3]
+                repairID = r[r.find("=") + 2:-3]
                 repair_dict[repairID] = [t, 0]
         if "<rps" in tags[t]:
             rps = re.findall("<rps id\=\"[0-9]+\"\/>", tags[t], re.S)
             for r in rps:
-                repairID = r[r.find("=")+2:-3]
-                assert repair_dict.get(repairID), str(repairID)+str(tags)+str(words)
+                repairID = r[r.find("=") + 2:-3]
+                assert repair_dict.get(repairID), str(repairID) + str(tags) + str(words)
                 repair_dict[repairID][1] = t
-                dist = min(t-repair_dict[repairID][0], limit)
+                dist = min(t - repair_dict[repairID][0], limit)
                 # adjust in case the reparandum is shortened due to the limit
-                repair_dict[repairID][0] = t-dist
+                repair_dict[repairID][0] = t - dist
                 current_tag += "<rm-{}/>".format(dist) + "<rpMid/>"
         if "<rpn" in tags[t]:
             rpns = re.findall("<rpnrep id\=\"[0-9]+\"\/>", tags[t], re.S) +\
-             re.findall("<rpnsub id\=\"[0-9]+\"\/>", tags[t], re.S)
+                re.findall("<rpnsub id\=\"[0-9]+\"\/>", tags[t], re.S)
             rpns_del = re.findall("<rpndel id\=\"[0-9]+\"\/>", tags[t], re.S)
             # slight simplifying assumption is to take the repair with
             # the longest reparandum as the end category
             repair_type = ""
             longestlength = 0
             for r in rpns:
-                repairID = r[r.find("=")+2:-3]
+                repairID = r[r.find("=") + 2:-3]
                 l = repair_dict[repairID]
-                if l[1]-l[0] > longestlength:
-                    longestlength = l[1]-l[0]
+                if l[1] - l[0] > longestlength:
+                    longestlength = l[1] - l[0]
                     repair_type = "Sub"
             for r in rpns_del:
-                repairID = r[r.find("=")+2:-3]
+                repairID = r[r.find("=") + 2:-3]
                 l = repair_dict[repairID]
-                if l[1]-l[0] > longestlength:
-                    longestlength = l[1]-l[0]
+                if l[1] - l[0] > longestlength:
+                    longestlength = l[1] - l[0]
                     repair_type = "Del"
             if repair_type == "":
                 raise Exception("Repair not passed \
-            correctly."+str(words)+str(tags))
-            current_tag += "<rpEnd"+repair_type+"/>"
+            correctly." + str(words) + str(tags))
+            current_tag += "<rpEnd" + repair_type + "/>"
             current_tag = current_tag.replace("<rpMid/>", "")
         if current_tag == "":
             current_tag = "<f/>"
@@ -406,9 +406,9 @@ def convert_from_eval_tags_to_inc_disfluency_tags(tags, words,
 
 
 def convert_from_inc_disfluency_tags_to_eval_tags(
-                                                tags, words,
-                                                start=0,
-                                                representation="disf1_uttseg"):
+        tags, words,
+        start=0,
+        representation="disf1_uttseg"):
     """Converts the incremental style output tags of the RNN to the standard
     STIR eval output tags.
     The exact inverse of convertFromEvalTagsToIncrementalDisfluencyTags.
@@ -429,23 +429,23 @@ def convert_from_inc_disfluency_tags_to_eval_tags(
         # assuming the tags up to this point are already converted
         new_tags = tags[:start]
         if "mid" not in representation:
-            rps_s = re.findall("<rps id\=\"[0-9]+\"\/>", tags[start-1])
-            rpmid = re.findall("<rp id\=\"[0-9]+\"\/>", tags[start-1])
+            rps_s = re.findall("<rps id\=\"[0-9]+\"\/>", tags[start - 1])
+            rpmid = re.findall("<rp id\=\"[0-9]+\"\/>", tags[start - 1])
             if rps_s:
                 for r in rps_s:
-                    repairID = r[r.find("=")+2:-3]
+                    repairID = r[r.find("=") + 2:-3]
                     resolved_repair = re.findall(
-                                            "<rpn[repsubdl]+ id\=\"{}\"\/>"
-                                            .format(repairID), tags[start-1])
+                        "<rpn[repsubdl]+ id\=\"{}\"\/>"
+                        .format(repairID), tags[start - 1])
                     if not resolved_repair:
                         if not rpmid:
                             rpmid = []
                         rpmid.append(r.replace("rps ", "rp "))
             if rpmid:
-                newstart = start-1
+                newstart = start - 1
                 for rp in rpmid:
                     rps = rp.replace("rp ", "rps ")
-                    repairID = rp[rp.find("=")+2:-3]
+                    repairID = rp[rp.find("=") + 2:-3]
                     # go back and find the repair
                     for b in range(newstart, -1, -1):
                         if rps in tags[b]:
@@ -468,24 +468,24 @@ def convert_from_inc_disfluency_tags_to_eval_tags(
                     # simply tagging the rps
                     pass
                 else:
-                    dist = int(r[r.find("-")+1:-2])
-                    repair_dict[str(t)] = [max([0, t-dist]), t, False]
+                    dist = int(r[r.find("-") + 1:-2])
+                    repair_dict[str(t)] = [max([0, t - dist]), t, False]
                     # backwards looking search if full set
                     # print new_tags, t, dist, t-dist, max([0, t-dist])
                     # print tags[:t+1]
-                    rms_start_idx = max([0, t-dist])
+                    rms_start_idx = max([0, t - dist])
                     new_tags[rms_start_idx] = '<rms id="{}"/>'\
                         .format(t) + new_tags[rms_start_idx]\
                         .replace("<f/>", "")
                     reparandum = False  # interregnum if edit term
-                    for b in range(t-1, max([0, t-dist]), -1):
+                    for b in range(t - 1, max([0, t - dist]), -1):
                         if "<e" not in new_tags[b]:
                             reparandum = True
                             new_tags[b] = '<rm id="{}"/>'.format(t) +\
                                 new_tags[b].replace("<f/>", "")
                         if reparandum is False and "<e" in new_tags[b]:
                             new_tags[b] = '<i id="{}"/>'.\
-                                            format(t) + new_tags[b]
+                                format(t) + new_tags[b]
         # repair ends
         if "<rpEnd" in tags[t]:
             rpns = re.findall("<rpEndSub/>", tags[t], re.S)
@@ -613,19 +613,19 @@ def dialogue_data_and_indices_from_matrix(d_matrix,
         utt_idx, w, p, l = a_tuple
         current.append((w, p, l))
         if pre_seg:
-            if previous_idx != utt_idx or i == len(labels)-1:
+            if previous_idx != utt_idx or i == len(labels) - 1:
                 if in_utterances:
-                    start = 0 if indices == [] else indices[-1][1]+1
-                    indices.append([start, start + (len(current)-1)])
+                    start = 0 if indices == [] else indices[-1][1] + 1
+                    indices.append([start, start + (len(current) - 1)])
                 else:
                     indices.extend(indices_from_length(len(current), bs,
-                                                   start_index=len(indices)))
+                                                       start_index=len(indices)))
                 word_idx.extend(context_win_backwards([x[0] for x in current],
                                                       window_size))
                 pos_idx.extend(context_win_backwards([x[1] for x in current],
                                                      window_size))
                 current = []
-        elif i == len(labels)-1:
+        elif i == len(labels) - 1:
             # indices = indices_from_length(len(current), bs)
             # currently a simple window of same size
             indices = [[j, j + bs] for j in range(0, len(current))]
@@ -637,9 +637,9 @@ def dialogue_data_and_indices_from_matrix(d_matrix,
         previous_idx = utt_idx
     return np.asarray(word_idx, dtype=np.int32), np.asarray(pos_idx,
                                                             dtype=np.int32),\
-                                                            extra,\
-                                                            labels,\
-                                        np.asarray(indices, dtype=np.int32)
+        extra,\
+        labels,\
+        np.asarray(indices, dtype=np.int32)
 
 
 if __name__ == '__main__':
@@ -651,14 +651,14 @@ if __name__ == '__main__':
     print tags
     print len(tags), len(words)
     new_tags = convert_from_eval_tags_to_inc_disfluency_tags(
-                                                    tags,
-                                                    words,
-                                                    representation="disf1")
+        tags,
+        words,
+        representation="disf1")
     print new_tags
     old_tags = convert_from_inc_disfluency_tags_to_eval_tags(
-                                                    new_tags,
-                                                    words,
-                                                    representation="disf1")
+        new_tags,
+        words,
+        representation="disf1")
     assert old_tags == tags, "\n " + str(old_tags) + "\n" + str(tags)
     x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     print context_win_backwards(x, 2)

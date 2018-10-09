@@ -12,7 +12,7 @@ disf = DeepDisfluencyTagger(
     config_file="experiments/experiment_configs.csv",
     config_number=21,
     saved_model_dir="experiments/021/epoch_40"
-    )
+)
 
 # Tag each word incrementally
 # Notice the incremental diff
@@ -45,11 +45,11 @@ Simple disf tags <e/>, <i/> and repair onsets <rps
 LSTM simple from Hough and Schlangen EACL 2017"""
 print MESSAGE
 disf = DeepDisfluencyTagger(
-        config_file="experiments/experiment_configs.csv",
-        config_number=35,
-        saved_model_dir="experiments/035/epoch_6",
-        use_timing_data=True
-        )
+    config_file="experiments/experiment_configs.csv",
+    config_number=35,
+    saved_model_dir="experiments/035/epoch_6",
+    use_timing_data=True
+)
 
 
 print "tagging..."
@@ -75,7 +75,7 @@ disf = DeepDisfluencyTagger(
     config_number=36,
     saved_model_dir="experiments/036/epoch_15",
     use_timing_data=True
-    )
+)
 
 print "tagging..."
 print disf.tag_new_word("i", pos="PRP", timing=0.33)

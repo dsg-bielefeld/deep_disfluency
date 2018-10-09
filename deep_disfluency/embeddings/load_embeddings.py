@@ -11,7 +11,7 @@ def populate_embeddings(emb_dim, vocsize, words2index, pretrained):
     assert pretrained.layer1_size == emb_dim, str(pretrained.layer1_size) + \
         " " + str(emb_dim)
     emb = 0.2 * numpy.random.uniform(-1.0, 1.0,
-                                     (vocsize+1, emb_dim)).astype('Float32')
+                                     (vocsize + 1, emb_dim)).astype('Float32')
     vocab = deepcopy(words2index.keys())
     for i in range(0, len(pretrained.index2word)):
         word = pretrained.index2word[i]

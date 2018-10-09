@@ -79,6 +79,7 @@ class DisfluencyCorpusCreator:
     """An object which writes disfluency related corpora when
     the makeCorpus method is called.
     """
+
     def __init__(self, path, metadata_path=None, mapdir_path=None,
                  partial=True, d_acts=True, annotation_files=None,
                  annotation_files_relaxed=None, error_log=None, lang='en'):
@@ -132,7 +133,7 @@ class DisfluencyCorpusCreator:
         self.ranges = []
 
     def read_in_self_repair_files(self):
-        """Read in self repair annotations from files 
+        """Read in self repair annotations from files
         into a dictionary used by corpus creation methods.
         """
         rows = []
@@ -170,7 +171,7 @@ class DisfluencyCorpusCreator:
         return
 
     def read_in_relaxed_self_repair_files(self):
-        """Read in relaxed (per-turn) self repair annotations 
+        """Read in relaxed (per-turn) self repair annotations
         from files into a dictionary used by corpus creation methods.
         """
         self.dRelaxedRepairs = defaultdict(list)
@@ -200,9 +201,9 @@ class DisfluencyCorpusCreator:
                           dodgy=["NNP", "NNPS", "CD", "LS", "SYM", "FW"],
                           filled_pauses=["um", "uh"], debug=False):
         """
-        Method to write a disfluency test corpus that can be used by 
+        Method to write a disfluency test corpus that can be used by
         any disfluency detection system for training/testing.
-        Outputs a corpus of words, pos tags (if available) and the 
+        Outputs a corpus of words, pos tags (if available) and the
         repair and edit term tags from the annotations (repairs)
          or marked inline (edit terms).
         """
@@ -282,7 +283,7 @@ class DisfluencyCorpusCreator:
                 if debug:
                     print "(1) repair points for " + uttReference + " " + \
                         str(count) + " " + str(utt.transcript_index)
-                    print [repair.to_string() for repair in repairStack]
+                    print[repair.to_string() for repair in repairStack]
 
                 MD = False  # boolean, whether middle of an edit term or not
                 # iterate over the words, creating the appropriate disfluency
@@ -322,7 +323,7 @@ class DisfluencyCorpusCreator:
 
                     if debug:
                         print "(2) repair points after POP at word", i
-                        print [repair.to_string() for repair in repairStack]
+                        print[repair.to_string() for repair in repairStack]
                         if test_dodgy == my_test_dodgy:
                             raw_input()
 
@@ -395,8 +396,8 @@ class DisfluencyCorpusCreator:
                                 print "incomplete tag"
                             # Have gone past last word of the repair but
                             # not found completion
-                            # Need to backwards search to find it and mark 
-                            #its type
+                            # Need to backwards search to find it and mark
+                            # its type
                             # Can involve searching back before the current
                             # utterance in third pos/intra-utterance repairs
                             if repair.repair == False:  # delete
@@ -501,11 +502,11 @@ class DisfluencyCorpusCreator:
         while i < total:
             # check for + utterances and unfinished repairs
             if uttList[i][3] == '+' or \
-                    (len(overallTagList[i]) > 0 and 
-                            (("<rp" in
-                              overallTagList[i][0]
-                              or "<i" in overallTagList[i][0])
-                             or ("<rm " in overallTagList[i][0]))):
+                    (len(overallTagList[i]) > 0 and
+                     (("<rp" in
+                       overallTagList[i][0]
+                       or "<i" in overallTagList[i][0])
+                      or ("<rm " in overallTagList[i][0]))):
                 if not uttList[i][3] == '+':
                     mergedUtts += 1
                 found = False
@@ -573,8 +574,8 @@ class DisfluencyCorpusCreator:
                         repairID = problem[problem.find("=") + 2:-3]
                         problem_interreg_IDs.append(repairID)
                     remove_non_edit_interregna(
-                        overallTagList[i], 
-                        overallWordsList[i], 
+                        overallTagList[i],
+                        overallWordsList[i],
                         problem_interreg_IDs)
                     warning = "ANNOTATION ERROR: Interregnum but no edit term.\
                      Shifting/removing interrengna. \n\t" + \
@@ -785,7 +786,7 @@ class DisfluencyCorpusCreator:
                                    overallTagList[i][d], re.S)
                     overallTagList[i][
                         d] = edit + "".join(re.findall("<i id\=\"[0-9]+\"\/>",
-                                                       overallTagList[i][d], 
+                                                       overallTagList[i][d],
                                                        re.S))
                     if debug:
                         print "tags after removal", overallTagList[i][d]
@@ -831,8 +832,8 @@ class DisfluencyCorpusCreator:
                                     print reparandum_onsets
                                 if len(repair_types['del']) > 0:
                                     for index in range(
-                                                    0,
-                                                    len(repair_types['del'])):
+                                            0,
+                                            len(repair_types['del'])):
                                         test = repair_types['del'][index]
                                         if test in reparandum_onsets:
                                             repair_types['del'].remove(test)
@@ -842,8 +843,8 @@ class DisfluencyCorpusCreator:
                                             break
                                 elif len(repair_types['sub']) > 0:
                                     for index in range(
-                                                    0,
-                                                    len(repair_types['sub'])):
+                                            0,
+                                            len(repair_types['sub'])):
                                         test = repair_types['sub'][index]
                                         if test in reparandum_onsets:
                                             repair_types['sub'].remove(test)
@@ -853,8 +854,8 @@ class DisfluencyCorpusCreator:
                                             break
                                 elif len(repair_types['rep']) > 0:
                                     for index in range(
-                                                    0,
-                                                   len(repair_types['rep'])):
+                                            0,
+                                            len(repair_types['rep'])):
                                         test = repair_types['rep'][index]
                                         if test in reparandum_onsets:
                                             repair_types['rep'].remove(test)
@@ -901,7 +902,7 @@ class DisfluencyCorpusCreator:
             for df in range(0, len(overallTagList[i])):
                 my_disfluency_tag = overallTagList[i][df]
                 if overallWordsList[i][df] in filled_pauses and \
-                        not ("<e" in my_disfluency_tag or \
+                        not ("<e" in my_disfluency_tag or
                              "<i" in my_disfluency_tag):
                     warning = "ANNOTATION WARNING: possibly missed \
                     filled pause edit term!\n\t" + \
@@ -954,13 +955,13 @@ class DisfluencyCorpusCreator:
             #    extra = int((float(len(uttList[i]))/ 6.) - 1.) * "+"
             #    print extra
             d_act = uttList[i][3]
-            #nb adding extra info into the uttref of dialogue acts
+            # nb adding extra info into the uttref of dialogue acts
             if self.d_acts:
                 extra = ":" + d_act
-            #print d_act
-            dialogue_act[d_act]+=1
+            # print d_act
+            dialogue_act[d_act] += 1
             uttref = uttList[i][4] + \
-            ":" + str(uttList[i][2]) + ":" \
+                ":" + str(uttList[i][2]) + ":" \
                 + str(uttList[i][1]) + extra
             if d_act == "o/aa":
                 print "dialogue act bad"
@@ -1023,16 +1024,16 @@ class DisfluencyCorpusCreator:
         print "number utts = " + str(len(uttList))
         print "number words = " + str(wordCount)
         print "number repairs = " + str(totalRepairs)
-        for k,v in sorted(dialogue_act.items(),key=lambda x : x[1],
-                          reverse=True):
-            print k,v
+        for k, v in sorted(dialogue_act.items(), key=lambda x: x[1],
+                           reverse=True):
+            print k, v
         return easyread_corpus  # Always return the corpus as a string
 
     def write_clean_corpus(self, testcorpus, targetfilename, debug=False):
         """Write a file cleaned of reparanda and edit terms from a test corpus.
 
         Keyword Arguments:
-        testcorpus -- a string separated by newline markers which 
+        testcorpus -- a string separated by newline markers which
         has all the disfluency markup.
         targetfilename -- a string giving the location of the cleaned corpus.
         """
@@ -1079,9 +1080,9 @@ class DisfluencyCorpusCreator:
         """Write a file cleaned of reparanda and edit terms from a test corpus.
 
         Keyword Arguments:
-        testcorpus -- a string separated by newline markers which 
+        testcorpus -- a string separated by newline markers which
         has all the disfluency markup.
-        targetfilename -- a string giving the location of 
+        targetfilename -- a string giving the location of
         the edit term filled corpus.
         """
         print "Writing edit term corpus..."
@@ -1173,18 +1174,18 @@ class DisfluencyCorpusCreator:
 #         return
 
     def disfluency_type_corpus_analysis(self, testcorpus, targetfilename):
-        """Take a test corpus and compute distributions over 
+        """Take a test corpus and compute distributions over
         the types of disfluencies.
-        For repairs, the types we're looking at are the structures 
+        For repairs, the types we're looking at are the structures
         from the minimal edit distance alignment of repair and reparandum.
-        For edit terms/interregna this is the probability of words 
-        being edit terms at all, and the probability of 
+        For edit terms/interregna this is the probability of words
+        being edit terms at all, and the probability of
         them being interregna.
 
         Keyword Arguments:
-        testcorpus -- a string separated by newline markers which 
+        testcorpus -- a string separated by newline markers which
         has all the disfluency markup.
-        targetfilename -- a string giving the location of 
+        targetfilename -- a string giving the location of
         the edit term filled corpus.
         """
         # TODO finish and test
@@ -1215,8 +1216,8 @@ class DisfluencyCorpusCreator:
                             # ONLY ADD ONE EXAMPLE, the top one..
                             if not complexclass in typedict[simpleclass]:
                                 output = graph_viz_repair(
-                                    complexclass, repair.reparandumWords, 
-                                    repair.repairWords, 
+                                    complexclass, repair.reparandumWords,
+                                    repair.repairWords,
                                     repair.continuationWords)
                                 if not output in printdict[simpleclass]:
                                     printdict[simpleclass].extend(output, 1)
@@ -1261,7 +1262,7 @@ class DisfluencyCorpusCreator:
         for key in printdict.keys():
             print str(key) + str(len(typedict[key]))
             typefile.write("\n\n\n\n\n" + str(key) + "MAINTYPE:" +
-                           str(len(printdict[key])) + \
+                           str(len(printdict[key])) +
                            "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
             # writes the most popular mappings-- should do this is order of
             # occurence?
@@ -1273,11 +1274,11 @@ class DisfluencyCorpusCreator:
         typefile.close()
         return
 
-    def make_corpus(self, target_folder=None, corpus=None, range_files=None, 
+    def make_corpus(self, target_folder=None, corpus=None, range_files=None,
                     edit_terms_marked=True, mode=None, debug=False):
-        """Write a disfluency related corpus according to the 
+        """Write a disfluency related corpus according to the
         mode required."""
-        
+
         self.dRepairs = defaultdict(list)
         # all the edit terms ranges, may be able to get round this easier below
         self.dEditTerms = defaultdict(list)
@@ -1313,13 +1314,12 @@ class DisfluencyCorpusCreator:
             else:
                 save_test = True
 
-            test_corpus = self.write_test_corpus(target_folder + os.sep + \
+            test_corpus = self.write_test_corpus(target_folder + os.sep +
                                                  corpus,
                                                  ranges=self.ranges,
                                                  partial=args.partialWords,
                                                  writeFile=save_test,
-                                                 edit_terms_marked=
-                                                 edit_terms_marked,
+                                                 edit_terms_marked=edit_terms_marked,
                                                  debug=debug)
             if mode in ["clean", "both"]:
                 self.write_clean_corpus(
@@ -1331,6 +1331,7 @@ class DisfluencyCorpusCreator:
             self.write_tree_corpus(target_folder + os.sep + corpus + os.sep +
                                    "TREEPATHS" + corpus, ranges=self.ranges,
                                    partial=self.partial_words)
+
 
 if __name__ == '__main__':
     # parse command line parameters

@@ -8,8 +8,8 @@ import csv
 def get_tag_data_from_corpus_file(f):
     """Loads from file into four lists of lists of strings of equal length:
     one for utterance iDs (IDs))
-    one for words (seq), 
-    one for pos (pos_seq) 
+    one for words (seq),
+    one for pos (pos_seq)
     one for tags (targets)."""
 
     f = open(f)
@@ -63,7 +63,7 @@ def get_tag_data_from_corpus_file(f):
 
 
 def lm_corpus_splits(corpus_name, split=0.0, pos_tagged=True):
-    """Build the word lm and pos tag lm (if specified) training corpora from 
+    """Build the word lm and pos tag lm (if specified) training corpora from
     the STIR lm style corpora.
     Returns a 4-tuple of train, pos_train, heldout, pos_heldout
     Some of which can be None, if no POS and/or split==0.0 (no heldout)

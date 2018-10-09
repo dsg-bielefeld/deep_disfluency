@@ -61,8 +61,8 @@ class IncrementalTagger(object):
     def rollback(self, backwards):
         """Revoke the right frontier of the input and labels back backwards.
         """
-        self.word_graph = self.word_graph[:len(self.word_graph)-backwards]
-        self.output_tags = self.output_tags[:len(self.output_tags)-backwards]
+        self.word_graph = self.word_graph[:len(self.word_graph) - backwards]
+        self.output_tags = self.output_tags[:len(self.output_tags) - backwards]
 
     def tag_new_prefix(self, prefix, rollback=0):
         self.rollback(rollback)
@@ -100,6 +100,7 @@ class DeepDisfluencyTagger(IncrementalTagger):
             word will continue it
     <tt/> - a word constituting an entire utterance
     """
+
     def __init__(self, config_file=None,
                  config_number=None,
                  saved_model_dir=None,
@@ -204,13 +205,13 @@ class DeepDisfluencyTagger(IncrementalTagger):
         self.decoder = None
         if use_decoder:
             self.decoder = FirstOrderHMM(
-                                self.hmm_dict,
-                                markov_model_file=self.args.tags,
-                                timing_model=self.timing_model,
-                                timing_model_scaler=self.timing_model_scaler,
-                                constraint_only=True,
-                                noisy_channel=noisy_channel
-                                )
+                self.hmm_dict,
+                markov_model_file=self.args.tags,
+                timing_model=self.timing_model,
+                timing_model_scaler=self.timing_model_scaler,
+                constraint_only=True,
+                noisy_channel=noisy_channel
+            )
 
         # getting the states in the right shape
         self.state_history = []
@@ -236,12 +237,12 @@ class DeepDisfluencyTagger(IncrementalTagger):
             heldout_lm_corpus = "\n".join(lines[split:])
             lm_corpus_file.close()
             self.lm = KneserNeySmoothingModel(
-                                        order=3,
-                                        discount=0.7,
-                                        partial_words=self.args.partial_words,
-                                        train_corpus=lm_corpus,
-                                        heldout_corpus=heldout_lm_corpus,
-                                        second_corpus=None)
+                order=3,
+                discount=0.7,
+                partial_words=self.args.partial_words,
+                train_corpus=lm_corpus,
+                heldout_corpus=heldout_lm_corpus,
+                second_corpus=None)
         if pos_language_model:
             self.pos_lm = pos_language_model
         elif self.args.pos:
@@ -256,12 +257,12 @@ class DeepDisfluencyTagger(IncrementalTagger):
             heldout_lm_corpus = "\n".join(lines[split:])
             lm_corpus_file.close()
             self.pos_lm = KneserNeySmoothingModel(
-                                        order=3,
-                                        discount=0.7,
-                                        partial_words=self.args.partial_words,
-                                        train_corpus=lm_corpus,
-                                        heldout_corpus=heldout_lm_corpus,
-                                        second_corpus=None)
+                order=3,
+                discount=0.7,
+                partial_words=self.args.partial_words,
+                train_corpus=lm_corpus,
+                heldout_corpus=heldout_lm_corpus,
+                second_corpus=None)
         if edit_language_model:
             self.edit_lm = edit_language_model
         else:
@@ -275,10 +276,10 @@ class DeepDisfluencyTagger(IncrementalTagger):
             heldout_edit_lm_corpus = "\n".join(edit_lines[edit_split:])
             edit_lm_corpus_file.close()
             self.edit_lm = KneserNeySmoothingModel(
-                                        train_corpus=edit_lm_corpus,
-                                        heldout_corpus=heldout_edit_lm_corpus,
-                                        order=2,
-                                        discount=0.7)
+                train_corpus=edit_lm_corpus,
+                heldout_corpus=heldout_edit_lm_corpus,
+                order=2,
+                discount=0.7)
             # TODO an object for getting the lm features incrementally
             # in the language model
 
@@ -352,7 +353,7 @@ class DeepDisfluencyTagger(IncrementalTagger):
     def load_embeddings(self, embeddings_name):
         # load pre-trained embeddings
         embeddings_dir = os.path.dirname(os.path.realpath(__file__)) +\
-                                "/../embeddings/"
+            "/../embeddings/"
         pretrained = gensim.models.Word2Vec.load(embeddings_dir +
                                                  embeddings_name)
         print "emb shape", pretrained[pretrained.index2word[0]].shape
@@ -400,12 +401,12 @@ class DeepDisfluencyTagger(IncrementalTagger):
             # if no pos tag provided but there is a pos-tagger, tag word
             test_words = [unicode(x) for x in
                           get_last_n_features(
-                                              "words",
-                                              self.word_graph,
-                                              len(self.word_graph)-1,
-                                              n=4
-                                              )
-                          ] + [unicode(word.lower())]
+                "words",
+                self.word_graph,
+                len(self.word_graph) - 1,
+                n=4
+            )
+            ] + [unicode(word.lower())]
             pos = self.pos_tagger.tag(test_words)[-1][1]
             # print "tagging", word, "as", pos
         # 0. Add new word to word graph
@@ -439,12 +440,12 @@ class DeepDisfluencyTagger(IncrementalTagger):
         # 2. do the softmax output with converted inputs
         word_window = [self.word_to_index_map[x] for x in
                        get_last_n_features("words", self.word_graph,
-                                           len(self.word_graph)-1,
+                                           len(self.word_graph) - 1,
                                            n=self.window_size)
                        ]
         pos_window = [self.pos_to_index_map[x] for x in
                       get_last_n_features("POS", self.word_graph,
-                                          len(self.word_graph)-1,
+                                          len(self.word_graph) - 1,
                                           n=self.window_size)
                       ]
         # print "word_window, pos_window", word_window, pos_window
@@ -472,18 +473,18 @@ class DeepDisfluencyTagger(IncrementalTagger):
             edit_tag = "<e/><cc/>" if "uttseg" in self.args.tags else "<e/>"
             # print self.tag_to_index_map[edit_tag]
             adjustsoftmax = np.concatenate((
-                    softmax,
-                    softmax[
-                        :,
-                        self.tag_to_index_map[edit_tag]].reshape(
-                            softmax.shape[0],
-                            1)), 1)
+                softmax,
+                softmax[
+                    :,
+                    self.tag_to_index_map[edit_tag]].reshape(
+                    softmax.shape[0],
+                    1)), 1)
         else:
             adjustsoftmax = softmax
         last_n_timings = None if ((not self.args.use_timing_data) or
                                   not timing) \
             else get_last_n_features("timings", self.word_graph,
-                                     len(self.word_graph)-1,
+                                     len(self.word_graph) - 1,
                                      n=3)
         if not self.decoder:
             # no decoder, just get the arg max
@@ -494,7 +495,7 @@ class DeepDisfluencyTagger(IncrementalTagger):
             new_tags = [max_tag]
         else:
             new_tags = self.decoder.viterbi_incremental(
-                adjustsoftmax, a_range=(len(adjustsoftmax)-1,
+                adjustsoftmax, a_range=(len(adjustsoftmax) - 1,
                                         len(adjustsoftmax)),
                 changed_suffix_only=True,
                 timing_data=last_n_timings,
@@ -521,9 +522,9 @@ class DeepDisfluencyTagger(IncrementalTagger):
         else:
             # new_words = [word]
             words = get_last_n_features("words", self.word_graph,
-                                        len(self.word_graph)-1,
+                                        len(self.word_graph) - 1,
                                         n=len(self.word_graph) -
-                                        (self.window_size-1))
+                                        (self.window_size - 1))
             simple_conversion = False
             if simple_conversion:
                 if "<e" in new_tags[-1]:
@@ -535,8 +536,8 @@ class DeepDisfluencyTagger(IncrementalTagger):
                 if "rm-" in new_tags[-1]:
                     rps = re.findall("<rm-[0-9]+\/>", new_tags[-1], re.S)
                     for r in rps:  # should only be one
-                        dist = int(r[r.find("-")+1:-2])
-                        for o in range(len(self.output_tags)-2, -1, -1):
+                        dist = int(r[r.find("-") + 1:-2])
+                        for o in range(len(self.output_tags) - 2, -1, -1):
                             dist -= 1
                             if dist < 0:
                                 break
@@ -624,20 +625,20 @@ class DeepDisfluencyTagger(IncrementalTagger):
                                                      output,
                                                      average='macro')
         tag_summary = classification_report(
-                    true_y, output,
-                    labels=[i for i in xrange(len(idx_to_label_dict.items()))],
-                    target_names=[
-                        idx_to_label_dict[i]
-                        for i in xrange(len(idx_to_label_dict.items()))
-                                  ]
-                                            )
+            true_y, output,
+            labels=[i for i in xrange(len(idx_to_label_dict.items()))],
+            target_names=[
+                idx_to_label_dict[i]
+                for i in xrange(len(idx_to_label_dict.items()))
+            ]
+        )
         print tag_summary
         results = {"f1_rmtto": p_r_f_tags[2], "f1_rm": p_r_f_tags[2],
                    "f1_tto1": p_r_f_tags[2], "f1_tto2": p_r_f_tags[2]}
 
         results.update({
-                    'f1_tags': p_r_f_tags[2],
-                    'tag_summary': tag_summary
+            'f1_tags': p_r_f_tags[2],
+            'tag_summary': tag_summary
         })
         return results
 
@@ -653,12 +654,12 @@ class DeepDisfluencyTagger(IncrementalTagger):
         for filepath in [train_dialogues_filepath,
                          validation_dialogues_filepath]:
             if not verify_dialogue_data_matrices_from_folder(
-                            filepath,
-                            word_dict=self.word_to_index_map,
-                            pos_dict=self.pos_to_index_map,
-                            tag_dict=self.tag_to_index_map,
-                            n_lm=self.args.n_language_model_features,
-                            n_acoustic=self.args.n_acoustic_features):
+                    filepath,
+                    word_dict=self.word_to_index_map,
+                    pos_dict=self.pos_to_index_map,
+                    tag_dict=self.tag_to_index_map,
+                    n_lm=self.args.n_language_model_features,
+                    n_acoustic=self.args.n_acoustic_features):
                 raise Exception("Dialogue vectors in wrong format!\
                 See README.md.")
         lr = self.args.lr  # even if decay, start with specific lr
@@ -667,20 +668,20 @@ class DeepDisfluencyTagger(IncrementalTagger):
         # validation matrices filepath much smaller so can store these
         # and preprocess them all:
         validation_matrices = [np.load(
-                                    validation_dialogues_filepath + "/" + fp)
-                               for fp in os.listdir(
-                                validation_dialogues_filepath)]
+            validation_dialogues_filepath + "/" + fp)
+            for fp in os.listdir(
+            validation_dialogues_filepath)]
         validation_matrices = [dialogue_data_and_indices_from_matrix(
-                                  d_matrix,
-                                  n_extra,
-                                  pre_seg=self.args.utts_presegmented,
-                                  window_size=self.window_size,
-                                  bs=self.args.bs,
-                                  tag_rep=self.args.tags,
-                                  tag_to_idx_map=self.tag_to_index_map,
-                                  in_utterances=self.args.utts_presegmented)
-                               for d_matrix in validation_matrices
-                               ]
+            d_matrix,
+            n_extra,
+            pre_seg=self.args.utts_presegmented,
+            window_size=self.window_size,
+            bs=self.args.bs,
+            tag_rep=self.args.tags,
+            tag_to_idx_map=self.tag_to_index_map,
+            in_utterances=self.args.utts_presegmented)
+            for d_matrix in validation_matrices
+        ]
         idx_2_label_dict = {v: k for k, v in self.tag_to_index_map.items()}
         if not os.path.exists(model_dir):
             os.mkdir(model_dir)
@@ -699,7 +700,7 @@ class DeepDisfluencyTagger(IncrementalTagger):
             test = False
             if load_separately:
                 for i, dialogue_f in enumerate(
-                                        os.listdir(train_dialogues_filepath)):
+                        os.listdir(train_dialogues_filepath)):
                     if test and i > 3:
                         break
                     print dialogue_f
@@ -707,12 +708,12 @@ class DeepDisfluencyTagger(IncrementalTagger):
                                        dialogue_f)
                     word_idx, pos_idx, extra, y, indices = \
                         dialogue_data_and_indices_from_matrix(
-                                          d_matrix,
-                                          n_extra,
-                                          window_size=self.window_size,
-                                          bs=self.args.bs,
-                                          pre_seg=self.args.utts_presegmented
-                                                              )
+                            d_matrix,
+                            n_extra,
+                            window_size=self.window_size,
+                            bs=self.args.bs,
+                            pre_seg=self.args.utts_presegmented
+                        )
                     # for i in range(len(indices)):
                     #     print i, word_idx[i], pos_idx[i], \
                     #     y[i], indices[i]
@@ -722,7 +723,7 @@ class DeepDisfluencyTagger(IncrementalTagger):
                                                  indices,
                                                  pos_idx=pos_idx,
                                                  extra_features=extra)
-                    print '[learning] file %i >>' % (i+1),\
+                    print '[learning] file %i >>' % (i + 1),\
                         'completed in %.2f (sec) <<\r' % (time.time() - tic)
             # save the initial states we've learned to override the random
             self.initial_h0_state = self.model.h0.get_value()
@@ -731,11 +732,11 @@ class DeepDisfluencyTagger(IncrementalTagger):
             # reset and evaluate simply
             self.reset()
             results = self.evaluate_fast_from_matrices(
-                                        validation_matrices,
-                                        tag_accuracy_file,
-                                        idx_to_label_dict=idx_2_label_dict
-                                        )
-            val_score = results['f1_tags']  #TODO get best score type
+                validation_matrices,
+                tag_accuracy_file,
+                idx_to_label_dict=idx_2_label_dict
+            )
+            val_score = results['f1_tags']  # TODO get best score type
             print "epoch training loss", train_loss
             print '[learning] epoch %i >>' % (e),\
                 'completed in %.2f (sec) <<\r' % (time.time() - tic)
@@ -767,7 +768,7 @@ class DeepDisfluencyTagger(IncrementalTagger):
                 print "stopping, below learning rate threshold"
                 break
             print '[learning and testing] epoch %i >>' % (e),\
-                'completed in %.2f (sec) <<\r' % (time.time()-tic)
+                'completed in %.2f (sec) <<\r' % (time.time() - tic)
 
         print 'BEST RESULT: epoch', best_epoch, 'valid score', best_score
         tag_accuracy_file.close()
@@ -776,7 +777,7 @@ class DeepDisfluencyTagger(IncrementalTagger):
     def get_output_tags(self, with_words=False):
         if with_words:
             return zip(self.output_tags,
-                       self.word_graph[self.window_size-1:])
+                       self.word_graph[self.window_size - 1:])
         return self.output_tags
 
     def incremental_output_from_file(self, source_file_path,
@@ -865,9 +866,9 @@ class DeepDisfluencyTagger(IncrementalTagger):
                 current_time = end
                 if target_file_path:
                     target_file.write("Time: " + str(current_time) + "\n")
-                    new_words = lex_data[i-(len(diff)-1):i+1]
-                    new_pos = pos_data[i-(len(diff)-1):i+1]
-                    new_timings = timing_data[i-(len(diff)-1):i+1]
+                    new_words = lex_data[i - (len(diff) - 1):i + 1]
+                    new_pos = pos_data[i - (len(diff) - 1):i + 1]
+                    new_timings = timing_data[i - (len(diff) - 1):i + 1]
                     for t, w, p, tag in zip(new_timings,
                                             new_words,
                                             new_pos,

@@ -90,7 +90,7 @@ def convert_to_dot(filename):
         for i in range(1, len(feats)):
             if feats[i].strip() == "1":
                 graph_string += domain + " -> " + \
-                    header[i-1].strip().strip("\n") + ";\n"
+                    header[i - 1].strip().strip("\n") + ";\n"
     file.close()
     return graph_string
 
@@ -115,8 +115,8 @@ def fill_in_time_approximations(word_timing_tuples, idx):
         # this end time is the same as the latest one
         # need backward search for time
         # print "backward search"
-        idx = len(word_timing_tuples)-1
-        for i in range(len(word_timing_tuples)-1, -1, -1):
+        idx = len(word_timing_tuples) - 1
+        for i in range(len(word_timing_tuples) - 1, -1, -1):
             affected_indices.append(i)
             idx = i
             if not word_timing_tuples[i][1] == start_time:
@@ -131,7 +131,7 @@ def fill_in_time_approximations(word_timing_tuples, idx):
     total_time = end_time - start_time
     assert total_time > 0.0, str(word_timing_tuples[affected_indices[0]:]) +\
         str(idx)
-    mean_len = total_time/len(affected_indices)
+    mean_len = total_time / len(affected_indices)
     for i in range(idx, idx + len(affected_indices)):
         end_time = start_time + mean_len
         word_timing_tuples[i] = (word_timing_tuples[i][0], start_time,
@@ -176,8 +176,8 @@ def load_data_from_corpus_file(filename):
                             break
                     if shift > -1:
                         latest_increco = fill_in_time_approximations(
-                                                        latest_increco,
-                                                        shift)
+                            latest_increco,
+                            shift)
                     lex_data.extend(deepcopy(latest_increco))
                     pos_data.extend(deepcopy(latest_pos))
                     # convert to the disfluency tags for this

@@ -11,7 +11,7 @@ sys.path.append(THIS_DIR + "/../..")
 from deep_disfluency.feature_extraction.feature_utils import\
     load_data_from_disfluency_corpus_file
 from deep_disfluency.feature_extraction.feature_utils import\
-     sort_into_dialogue_speakers
+    sort_into_dialogue_speakers
 
 
 # Set the variables according to what you want to do
@@ -24,11 +24,11 @@ TAGGER_PATH = "crfpostagger"  # path to the tagger you want to train/apply
 # Train and test from disfluency detection format files:
 DISF_DIR = THIS_DIR + "/../data/disfluency_detection/switchboard"
 DISFLUENCY_TRAIN_FILES = [
-                    DISF_DIR + "/swbd_disf_train_1_partial_data.csv",
-                    ]
+    DISF_DIR + "/swbd_disf_train_1_partial_data.csv",
+]
 DISFLUENCY_TEST_FILES = [
-                    DISF_DIR + "/swbd_disf_heldout_partial_data.csv",
-                    ]
+    DISF_DIR + "/swbd_disf_heldout_partial_data.csv",
+]
 
 # ASR results from increco outputs
 ASR_DIR = THIS_DIR + "/../data/asr_results/"
@@ -130,10 +130,10 @@ if TEST:
             else:
                 c[hyp + "-" + r[1]] += 1
     print tp, fn, tp
-    p = (tp/(tp+fp))
-    r = (tp/(tp+fn))
-    print "UH p, r, f=", p, r, (2 * p * r)/(p+r)
-    print "overall accuracy", overall_tp/overall_count
+    p = (tp / (tp + fp))
+    r = (tp / (tp + fn))
+    print "UH p, r, f=", p, r, (2 * p * r) / (p + r)
+    print "overall accuracy", overall_tp / overall_count
     print "most common errors hyp-ref", c.most_common()[:20]
 
 if TAG_ASR_RESULTS:
@@ -145,16 +145,16 @@ if TAG_ASR_RESULTS:
             print "newprefix", newprefix
         rollback = 0
         original_length = len(current)
-        for i in range(len(current)-1, -2, -1):
+        for i in range(len(current) - 1, -2, -1):
             if verbose:
                 print "oooo", current[i], newprefix[0]
             if i == -1 or (float(newprefix[0][1]) >= float(current[i][2])):
-                if i == len(current)-1:
+                if i == len(current) - 1:
                     current = current + newprefix
                     break
                 k = 0
-                marker = i+1
-                for j in range(i+1, len(current)):
+                marker = i + 1
+                for j in range(i + 1, len(current)):
                     if k == len(newprefix):
                         break
                     if verbose:
@@ -166,7 +166,7 @@ if TAG_ASR_RESULTS:
                         if verbose:
                             print "repeat"
                         k += 1
-                        marker = j+1
+                        marker = j + 1
                 rollback = original_length - marker
                 current = current[:marker] + newprefix[k:]
                 newprefix = newprefix[k:]
@@ -205,12 +205,12 @@ if TAG_ASR_RESULTS:
                 else:
                     verb = False
                     current, _, rollback = get_diff_and_new_prefix(
-                                                deepcopy(current),
-                                                deepcopy(increment),
-                                                verb)
+                        deepcopy(current),
+                        deepcopy(increment),
+                        verb)
                 for i in range(right_frontier - rollback, len(current)):
                     test = [unicode(x[0].lower().replace("'", ""))
-                            for x in current[max([i-4, 0]):i+1]]
+                            for x in current[max([i - 4, 0]):i + 1]]
                     # if "4074A" in dialogue:
                     #    print "test", test
                     prediction = ct.tag(test)[-1][1]
@@ -220,7 +220,7 @@ if TAG_ASR_RESULTS:
                     start = current[i][1]
                     end = current[i][2]
                     newfile.write("\t".join([str(start),
-                                            str(end), word] +
+                                             str(end), word] +
                                             [prediction]) + "\n"
                                   )
                 right_frontier = len(current)

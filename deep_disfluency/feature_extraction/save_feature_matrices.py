@@ -17,7 +17,7 @@ def open_with_pandas_read_csv(filename, header=None, delim="\t"):
 
 
 def myround(x, base=.01, prec=2):
-    return round(base * round(float(x)/base), prec)
+    return round(base * round(float(x) / base), prec)
 
 
 def get_interval_indices(timings, context_frames):
@@ -64,11 +64,11 @@ def get_audio_features(filename, features=[0, 2, 3, 4, 5, 6, 7, 8],
         # print my_data.shape
         if start < 0 and my_data.shape[0] < 50:
             print "beneath 0 starting context, add padding"
-            padding = np.zeros((0-start, data.shape[1]))
+            padding = np.zeros((0 - start, data.shape[1]))
             my_data = np.concatenate([padding, my_data])
         if my_data.shape[0] < 50:
             print "adding end padding"
-            padding = np.zeros((50-my_data.shape[0], data.shape[1]))
+            padding = np.zeros((50 - my_data.shape[0], data.shape[1]))
             my_data = np.concatenate([my_data, padding])
         assert my_data.shape[0] == 50, my_data.shape[0]
         final_data.append(my_data)
@@ -131,7 +131,7 @@ def save_feature_matrices(target_dir,
                 continue
         if lmfeatures_dir:
             lm_filename = lmfeatures_dir +\
-                 "/sw0{}.csv".format(d_name)
+                "/sw0{}.csv".format(d_name)
             lm_feature_list = open_with_pandas_read_csv(lm_filename)
         for i in range(0, len(frames)):
             tag = labels[i]
@@ -172,7 +172,7 @@ def save_feature_matrices(target_dir,
                 # flatten:
                 #final_audio = audio[i][:, 1:].reshape((audio_d1 * audio_d2, 1))
                 # print final_audio.shape
-                #frame_vector.append(final_audio)
+                # frame_vector.append(final_audio)
             if lmfeatures_dir:
                 frame_vector.extend(lm_feature_list[i])
             frame_vector.append(label_ix)
@@ -181,11 +181,12 @@ def save_feature_matrices(target_dir,
             # print "len frame vector", len(frame_vector)
             all_features.append(np.asarray(frame_vector))
         dialogue_matrix = np.concatenate([all_features])
-        np.save(target_dir+"/"+d_name+".npy", dialogue_matrix)
+        np.save(target_dir + "/" + d_name + ".npy", dialogue_matrix)
     if missed:
         print "dialogues missed", missed
     print unknown_words, "unknown words in corpus"
     print unknown_pos, "unknown pos in corpus"
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Combine all features\
@@ -241,15 +242,15 @@ if __name__ == '__main__':
         print "no timings"
         IDs, timings, seq, pos_seq, targets = \
             load_data_from_disfluency_corpus_file(
-                                                args.corpus_file,
-                                                convert_to_dnn_format=True)
+                args.corpus_file,
+                convert_to_dnn_format=True)
         raw_dialogues = sort_into_dialogue_speakers(IDs,
                                                     timings,
                                                     seq,
                                                     pos_seq,
                                                     targets,
-            add_uttseg="uttseg" in args.label_rep_file,
-            add_dialogue_acts="dact" in args.label_rep_file
+                                                    add_uttseg="uttseg" in args.label_rep_file,
+                                                    add_dialogue_acts="dact" in args.label_rep_file
                                                     )
         dialogues = []
         for conv_no, indices, lex_data, pos_data, labels in raw_dialogues:

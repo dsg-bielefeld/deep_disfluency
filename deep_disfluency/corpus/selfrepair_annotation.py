@@ -22,11 +22,11 @@ class SelfRepair:
         self.extras = []  # unannotated bits
 
         self.forward_acts = ["sv", "qw^d", "qh", "sd", "qy", "qw",
-                             "qy^d", "qrr", "qo", "ad", "oo_co_cc", 
+                             "qy^d", "qrr", "qo", "ad", "oo_co_cc",
                              "fc", "fa", "fp"]
-        self.backward_acts = ["+", "h", "aap_aam", "arp_nd", "no", "bf", 
+        self.backward_acts = ["+", "h", "aap_aam", "arp_nd", "no", "bf",
                               "na", "ng", "^q",
-                              "ar", "^2", "ba", "br", "aa", "bd", "b^m", 
+                              "ar", "^2", "ba", "br", "aa", "bd", "b^m",
                               "ft", "nn", "bh", "bk", "ny", "b"]
         # others will be other! NB have on one occasion, file 97 added a "a/oo" marker with forward backslash to show change of dialogue act
         # self.test()
@@ -59,7 +59,7 @@ class SelfRepair:
         markerfile = open("AnnotationMarker.text")
         for line in markerfile:
             #gives the reparandumStart of the last unannotated pair
-            marker = line.split(",") 
+            marker = line.split(",")
         self.unannotated_marker = []
         for number in marker:
             self.unannotated_marker.append(int(number))
@@ -1217,7 +1217,7 @@ class SelfRepair:
                     for i in range(len(myTreeMaps)):
                         pair = myTreeMaps[i]  #treemaps now a pair- oh balls this screws everything up- maybe not
                         #print pair
-                        if len(pair[1]) > 0: # only take words with tree mapping?? wise?  yes, gets rid of punct etc..        
+                        if len(pair[1]) > 0: # only take words with tree mapping?? wise?  yes, gets rid of punct etc..
                             if [startUtt.transcript_index, pair[1]] < startNum:
                                 origWords.append(pair[0])
                             elif [interregUtt.transcript_index, pair[0]] < interregNum:
@@ -2033,7 +2033,7 @@ class SelfRepair:
 
             # think this works for both, needs slight alteration
             if mytype == "1p" or mytype == "3p":
-                """  
+                """
                 for i in range(number-1,-1,-1): #backwards iter through repairs needs to go back through BOTH lists...
                     yourRepair = self.__lists__[i]
                     print(yourRepair)
@@ -2957,6 +2957,7 @@ class SelfRepair:
             if string == DA:
                 return "b"
         return "o"
+
 
 if __name__ == '__main__':
     s = SelfRepair()

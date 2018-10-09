@@ -22,31 +22,31 @@ for ranges in [ranges1, ranges2]:
 final_file.close()
 
 
-#Based on the results, output the 'good' ASR results
+# Based on the results, output the 'good' ASR results
 results = open("wer_test.text")
 
 no_ho = 0
 no_test = 0
 ingood = True
-file = open("../../../simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfHeldoutASRgood_ranges.text","w")
+file = open("../../../simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfHeldoutASRgood_ranges.text", "w")
 for l in results:
-    #print l
-    if l == "\n": 
+    # print l
+    if l == "\n":
         print no_ho
         no_ho = 0
         file.close()
-        file = open("../../../simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfTestASRgood_ranges.text","w")
+        file = open("../../../simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfTestASRgood_ranges.text", "w")
         continue
-    if float(l.strip('\n').split(" ")[2])<0.4: #both speakers are under 40% error rate- likely half decent separation
-        #print l
+    if float(l.strip('\n').split(" ")[2]) < 0.4:  # both speakers are under 40% error rate- likely half decent separation
+        # print l
         if ingood and "B" in l.strip("\n").split(" ")[1]:
-            no_ho+=1
+            no_ho += 1
             #file.write(l.strip('\n').split(" ")[0]+l.strip('\n').split(" ")[1]+"\n")
-            file.write(l.strip('\n').split(" ")[0]+"\n")
+            file.write(l.strip('\n').split(" ")[0] + "\n")
         ingood = True
     else:
         ingood = False
 print no_ho
 
 results.close()
-file.close() 
+file.close()

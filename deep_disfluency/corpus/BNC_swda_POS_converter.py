@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Methods to convert BNC POS tags to Switchboard ones, and merge 
+"""Methods to convert BNC POS tags to Switchboard ones, and merge
 "do n't" > "dont" and combine their POS tags.
 Creating a clean corpus of line and POS
 """
@@ -115,7 +115,7 @@ def translate_to_PennPOS(pos, pos2, word, word2):
 
 def convert_BNC_sentence(sentence, posconvert=True):
     """Takes BNC input, makes POS tags to be equivalent to Switchboard
-    also compresses words together which were separated 
+    also compresses words together which were separated
     morphologically "don't", "isn't" etc.
     """
     tokensorig = sentence.split()
@@ -134,7 +134,7 @@ def convert_BNC_sentence(sentence, posconvert=True):
             nexttoken = tokensorig[i + 1].replace(".", "").\
                 replace("?", "").replace(";", "").replace(
                 "!", "").replace("(", "").replace(")", "").\
-                    replace('"', "").replace("/", "").lower()
+                replace('"', "").replace("/", "").lower()
             nextpos = get_tag(tokensorig[i + 1])
 
         word = get_word(token).lower()
@@ -167,7 +167,7 @@ def convert_BNC_sentence(sentence, posconvert=True):
             word = "$unc$" + word
 
         if not word == "." and not word == "," and not word == "" \
-        and not pos.startswith("PU"):
+                and not pos.startswith("PU"):
             tokens.append(word)
             postokens.append(pos)
 
@@ -183,6 +183,7 @@ def convert_BNC_sentence(sentence, posconvert=True):
     POS = POS[:-1] + "\n"
     words = words[:-1] + "\n"
     return words, POS
+
 
 if __name__ == '__main__':
     bnc_file = open(

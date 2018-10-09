@@ -49,6 +49,7 @@ class FirstOrderHMM():
     A first order model where the internal state probabilities only depend
     on the previous state.
     """
+
     def __init__(self, disf_dict, markov_model_file=None,
                  timing_model=None, timing_model_scaler=None,
                  n_history=20, constraint_only=True, noisy_channel=None):
@@ -70,13 +71,13 @@ class FirstOrderHMM():
             if any(["<rm-2" in x for x in self.observation_tags]):
                 # full set
                 self.convert_tag = tag_conversion.\
-                        convert_to_disfluency_uttseg_tag
+                    convert_to_disfluency_uttseg_tag
             elif any(["<rm-" in x for x in self.observation_tags]):
                 self.convert_tag = tag_conversion.\
-                        convert_to_disfluency_uttseg_tag_simple
+                    convert_to_disfluency_uttseg_tag_simple
             elif any(["<speaker" in x for x in self.observation_tags]):
                 self.convert_tag = tag_conversion.\
-                        convert_to_diact_uttseg_interactive_tag
+                    convert_to_diact_uttseg_interactive_tag
             elif any(["<speaker" in x for x in self.observation_tags]):
                 # if only dialogue acts
                 self.convert_tag = tag_conversion.convert_to_diact_uttseg_tag
@@ -90,10 +91,10 @@ class FirstOrderHMM():
                 self.convert_tag = tag_conversion.convert_to_disfluency_tag
             elif any(["<rm-" in x for x in self.observation_tags]):
                 self.convert_tag = tag_conversion.\
-                        convert_to_disfluency_tag_simple
+                    convert_to_disfluency_tag_simple
             elif any(["<speaker" in x for x in self.observation_tags]):
                 self.convert_tag = tag_conversion.\
-                        convert_to_diact_interactive_tag
+                    convert_to_diact_interactive_tag
             else:
                 # if only dialogue acts
                 self.convert_tag = tag_conversion.convert_to_diact_tag
@@ -183,7 +184,7 @@ class FirstOrderHMM():
                     print labels_data[i], "not in obs tags"
                     continue
                 if any(["<i" in t for t in self.observation_tags]):
-                    if "<e" in labels_data[i] and i < len(labels_data)-1:
+                    if "<e" in labels_data[i] and i < len(labels_data) - 1:
                         rps_onset = None
                         for j in range(i, len(labels_data)):
                             if "<rm" in labels_data[j]:
@@ -300,11 +301,11 @@ class FirstOrderHMM():
         # print "rollback",n
         # print len(self.history)
         self.history = self.history[n:]
-        self.viterbi = self.viterbi[:len(self.viterbi)-n]
-        self.backpointer = self.backpointer[:len(self.backpointer)-n]
-        self.converted = self.converted[:len(self.converted)-n]
+        self.viterbi = self.viterbi[:len(self.viterbi) - n]
+        self.backpointer = self.backpointer[:len(self.backpointer) - n]
+        self.converted = self.converted[:len(self.converted) - n]
         self.best_tagsequence = self.best_tagsequence[
-            :len(self.best_tagsequence)-n]
+            :len(self.best_tagsequence) - n]
         if self.noisy_channel_source_model:
             end_idx = len(self.best_tagsequence) - n
             self.noisy_channel = self.noisy_channel[: end_idx]  # history
@@ -345,8 +346,8 @@ class FirstOrderHMM():
                 if self.noisy_channel_source_model:
                     # noisy channel eliminate the missing tags
                     source_tags = tag_conversion.\
-                                    convert_to_source_model_tags([tag],
-                                                                 uttseg=True)
+                        convert_to_source_model_tags([tag],
+                                                     uttseg=True)
                     source_prob, node = self.noisy_channel_source_model.\
                         get_log_diff_of_tag_suffix(source_tags,
                                                    n=1)
@@ -505,8 +506,8 @@ class FirstOrderHMM():
                         inc_best_tag_sequence.append(tag)  # add tag
                         source_tags = tag_conversion.\
                             convert_to_source_model_tags(
-                                                inc_best_tag_sequence[1:],
-                                                uttseg=True)
+                                inc_best_tag_sequence[1:],
+                                uttseg=True)
                         source_prob, nc_node = \
                             self.noisy_channel_source_model.\
                             get_log_diff_of_tag_suffix(
@@ -526,15 +527,15 @@ class FirstOrderHMM():
                             n = len(suffix)
                         else:
                             suffix = tag_conversion.\
-                                        convert_to_source_model_tags([tag])
+                                convert_to_source_model_tags([tag])
                             n = 1  # just monotonic extention
                             # print back, i, source_tags
                         source_prob, nc_node = \
                             self.noisy_channel_source_model.\
                             get_log_diff_of_tag_suffix(
-                                        suffix,
-                                        start_node_ID=prev_n_ch_node,
-                                        n=n)
+                                suffix,
+                                start_node_ID=prev_n_ch_node,
+                                n=n)
 
                     prob += (SOURCE_WEIGHT * source_prob)
 
@@ -578,7 +579,7 @@ class FirstOrderHMM():
         best_n = []  # the tag sequences with their probability (tuple)
         # print "len viterbi", len(self.viterbi)
         # print "len backpoint", len(self.backpointer)
-        for viterbi_depth in range(len(self.viterbi)-1, -1, -1):
+        for viterbi_depth in range(len(self.viterbi) - 1, -1, -1):
             if len(best_n) == num_seq:
                 break
             inc_prev_viterbi = deepcopy(self.viterbi[viterbi_depth])
@@ -695,7 +696,7 @@ class FirstOrderHMM():
         best_previous = max(prev_viterbi.keys(),
                             key=lambda prevtag: prev_viterbi[prevtag] +
                             log(self.cpd_tags[prev_converted[prevtag]].
-                            prob("se")))
+                                prob("se")))
         self.best_tagsequence = ["se", best_previous]
         # invert the list of backpointers
         self.backpointer.reverse()
@@ -752,7 +753,7 @@ class FirstOrderHMM():
             # only output the suffix of predictions which has changed-
             # TODO needs IDs to work
             for r in range(1, len(self.best_tagsequence)):
-                if r > len(previous_best)-1 or \
+                if r > len(previous_best) - 1 or \
                         previous_best[r] != self.best_tagsequence[r]:
                     return self.best_tagsequence[r:]
         return self.best_tagsequence[1:]
@@ -764,6 +765,7 @@ class FirstOrderHMM():
     #    Note this should be done before the backpointer is computed
     #    for each new tag?
     #    """
+
 
 if __name__ == '__main__':
     def load_tags(filepath):
@@ -782,7 +784,7 @@ if __name__ == '__main__':
     tags = load_tags(
         "../data/tag_representations/{}_tags.csv".format(
             tags_name)
-                     )
+    )
     if "disf" in tags_name:
         intereg_ind = len(tags.keys())
         interreg_tag = "<i/><cc/>" if "uttseg" in tags_name else "<i/>"

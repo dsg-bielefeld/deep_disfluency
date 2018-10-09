@@ -3,12 +3,12 @@ from __future__ import division
 
 
 def swbd_folds_disfluency_corpus(corpus_input, num_files=496, num_folds=10):
-    """Returns num_folds fold division of the input swbd PTB 
+    """Returns num_folds fold division of the input swbd PTB
     disfluency corpus in num_folds strings
     of the configuration of the division and the folds themselves.
 
     Keyword Arguments:
-    corpus_input -- the (ID,.. up to n features) tuple which will be divded 
+    corpus_input -- the (ID,.. up to n features) tuple which will be divded
     into num_fold tuples
     of the same type
     """
@@ -107,8 +107,8 @@ def bnc_folds():
             if not len(possline.split()) == len(normalline.split()):
                 print possline, normalline
                 continue
-            # Could ignore filled pauses, as these are different, 
-            #though could do normalization
+            # Could ignore filled pauses, as these are different,
+            # though could do normalization
             # if "UH" in possline:
             #    #might be safer to ignore these
             #    continue

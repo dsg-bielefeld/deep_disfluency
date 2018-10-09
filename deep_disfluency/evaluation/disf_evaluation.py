@@ -360,11 +360,11 @@ def final_output_disfluency_eval(prediction_speakers_dict,
                 number_of_utts_hyp,\
                 number_of_utts_gold = \
                 final_output_accuracy_interval_level(
-                                        hyp,
-                                        gold,
-                                        tag_dict=tag_dict_interval,
-                                        utt_eval=utt_eval,
-                                        error_analysis=error_analysis)
+                    hyp,
+                    gold,
+                    tag_dict=tag_dict_interval,
+                    utt_eval=utt_eval,
+                    error_analysis=error_analysis)
         if not speaker_rate_dict.get(s):
             speaker_rate_dict[s] = [0, 0, 0, 0, 0, 0]
         # oesn't matter if word based or interval based, the speaker rate
@@ -580,21 +580,21 @@ def incremental_output_disfluency_eval(prediction_speakers_dict,
                                 gold_speakers_dict[s][0])]
         # we do word + interval in one swoop
         final_hyp = final_hyp_from_increco_and_incremental_metrics(
-                                hyp,
-                                gold,
-                                gold_speakers_dict[s][1],
-                                utt_eval,
-                                ttd_tags=ttd_tags,
-                                word=word,
-                                interval=interval,
-                                tag_dict=tag_dict,
-                                speaker_ID=s)
+            hyp,
+            gold,
+            gold_speakers_dict[s][1],
+            utt_eval,
+            ttd_tags=ttd_tags,
+            word=word,
+            interval=interval,
+            tag_dict=tag_dict,
+            speaker_ID=s)
         # replace the incremental results with the final one only
         prediction_speakers_dict[s] = final_hyp
-        #print gold_speakers_dict[s][1]
+        # print gold_speakers_dict[s][1]
         #final_gold_words = [x[0] for x in gold_speakers_dict[s][1]]
-        #print final_gold_words
-        #gold_speakers_dict[s] = (gold_speakers_dict[s][0],
+        # print final_gold_words
+        # gold_speakers_dict[s] = (gold_speakers_dict[s][0],
         #                         final_gold_words,
         #                         gold_speakers_dict[s][2],
         #                         gold_speakers_dict[s][3])
@@ -613,7 +613,7 @@ def incremental_output_disfluency_eval(prediction_speakers_dict,
             results["t_t_detection_{0}_{1}".format(t_tag, eval_mode)] = \
                 np.average(
                 tag_dict["t_t_detection_{0}_{1}".format(t_tag, eval_mode)]
-                )
+            )
 #     results, speaker_rate_dict, error_analysis = final_output_disfluency_eval(
 #         prediction_speakers_dict,
 #         gold_speakers_dict,
@@ -666,7 +666,7 @@ def incremental_output_disfluency_eval_from_file(prediction_filename,
                                                  interval=False,
                                                  outputfilename=None):
     final_output = load_incremental_outputs_from_increco_file(
-                        prediction_filename)
+        prediction_filename)
     return incremental_output_disfluency_eval(final_output,
                                               gold_speakers_dict,
                                               utt_eval=utt_eval,
@@ -719,6 +719,7 @@ def save_results_to_file(test_filename,
                                                            val[8]]]) + "\n")
     speaker_rate_file.close()
 
+
 if __name__ == '__main__':
 
     # doesn't apply to the rnn/lstm
@@ -754,15 +755,15 @@ if __name__ == '__main__':
 
         e = 9
         results = incremental_output_disfluency_eval_from_file(
-                hyp_dir + "epoch_{0}/{1}{2}_output_increco.text".format(
-                        e, key, partial_string),
-                gold_data,
-                utt_eval=True,
-                error_analysis=False,
-                word=True,
-                interval=False,
-                outputfilename=hyp_dir +
-                "epoch_{0}/{1}{2}_output_final.text".format(e, key,
-                                                            partial_string))
+            hyp_dir + "epoch_{0}/{1}{2}_output_increco.text".format(
+                e, key, partial_string),
+            gold_data,
+            utt_eval=True,
+            error_analysis=False,
+            word=True,
+            interval=False,
+            outputfilename=hyp_dir +
+            "epoch_{0}/{1}{2}_output_final.text".format(e, key,
+                                                        partial_string))
         for k, v in results.items():
             print k, v

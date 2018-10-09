@@ -22,29 +22,29 @@ def wer(r, h, macro=False):
         macro :: Return the overall cost, else the WER
     """
     # initialisation
-    d = numpy.zeros((len(r)+1)*(len(h)+1), dtype=numpy.int)
-    d = d.reshape((len(r)+1, len(h)+1))
+    d = numpy.zeros((len(r) + 1) * (len(h) + 1), dtype=numpy.int)
+    d = d.reshape((len(r) + 1, len(h) + 1))
 
-    for i in range(len(r)+1):
-        for j in range(len(h)+1):
+    for i in range(len(r) + 1):
+        for j in range(len(h) + 1):
             if i == 0:
                 d[0][j] = j
             elif j == 0:
                 d[i][0] = i
 
     # computation
-    for i in range(1, len(r)+1):
-        for j in range(1, len(h)+1):
-            if r[i-1] == h[j-1]:
-                d[i][j] = d[i-1][j-1]
+    for i in range(1, len(r) + 1):
+        for j in range(1, len(h) + 1):
+            if r[i - 1] == h[j - 1]:
+                d[i][j] = d[i - 1][j - 1]
             else:
-                substitution = d[i-1][j-1] + 1
-                insertion = d[i][j-1] + 1
-                deletion = d[i-1][j] + 1
+                substitution = d[i - 1][j - 1] + 1
+                insertion = d[i][j - 1] + 1
+                deletion = d[i - 1][j] + 1
                 d[i][j] = min(substitution, insertion, deletion)
     if macro:
         return d[len(r)][len(h)]
-    wer = 1 if len(r) == 0 and 0 < len(h) else d[len(r)][len(h)]/float(len(r))
+    wer = 1 if len(r) == 0 and 0 < len(h) else d[len(r)][len(h)] / float(len(r))
     return 100 * float(wer)
 
 
@@ -87,7 +87,7 @@ def interactive_dialogue(pair):
     # the uttseg
     for i, label in enumerate(labels_data):
         if "<t" not in label:
-            indices_data[i] = indices_data[i-1]  # dynamically updates
+            indices_data[i] = indices_data[i - 1]  # dynamically updates
     # put a search criteria on the first speaker
     # then sort the rest in place
     # turn into two list of tuples
@@ -100,7 +100,7 @@ def interactive_dialogue(pair):
     frames_data, lex_data, pos_data, indices_data, labels_data = speaker_2
     for i, label in enumerate(labels_data):
         if "<t" not in label:
-            indices_data[i] = indices_data[i-1]  # dynamically updates
+            indices_data[i] = indices_data[i - 1]  # dynamically updates
     s2 = deepcopy([(f, l, p, i, y, "b") for f, l, p, i, y in zip(
         frames_data,
         lex_data,
@@ -112,7 +112,7 @@ def interactive_dialogue(pair):
     previous_tag = ""
     for l in range(len(all_data)):
         line = list(all_data[l])
-        #print line
+        # print line
         speaker = 'keep'
         if not line[5] == previous_speaker:
             speaker = 'take'
@@ -131,9 +131,9 @@ def interactive_dialogue(pair):
 
 def concat_all_data_all_speakers(dialogues, interactive_sort=False,
                                  divide_into_utts=False,
-                                 convert_to_dnn_format = False,
-                                representation="disf_1",
-                                limit=8):
+                                 convert_to_dnn_format=False,
+                                 representation="disf_1",
+                                 limit=8):
     """Concatenates all the data together as lists of lists"""
     frames = []
     words = []
@@ -147,9 +147,9 @@ def concat_all_data_all_speakers(dialogues, interactive_sort=False,
             current_pair.append(deepcopy(d))
             if len(current_pair) == 2:
                 assert(current_pair[0][0][:-1] == current_pair[1][0][:-1])
-                print [x[0] for x in current_pair]
+                print[x[0] for x in current_pair]
                 data = deepcopy(interactive_dialogue(deepcopy([x[1] for x in
-                                                      current_pair])))
+                                                               current_pair])))
                 current_pair = []
             else:
                 continue
@@ -164,11 +164,11 @@ def concat_all_data_all_speakers(dialogues, interactive_sort=False,
             current_label = []
             started = False
             last_idx = ""
-            for i, w_i, p_i, i_i, l_i in zip(range(0,len(lex_data)),
-                                                   lex_data,
-                                                   pos_data,
-                                                   indices_data,
-                                                   labels_data):
+            for i, w_i, p_i, i_i, l_i in zip(range(0, len(lex_data)),
+                                             lex_data,
+                                             pos_data,
+                                             indices_data,
+                                             labels_data):
                 print w_i, p_i, i_i, l_i
                 if (started and i_i.split(":")[0] != last_idx) or \
                         i == len(lex_data) - 1:
@@ -218,7 +218,7 @@ def add_word_continuation_tags(tags):
             tags[i] = tags[i] + "<t"
         else:
             tags[i] = tags[i] + "<c"
-        if i == len(tags)-1:
+        if i == len(tags) - 1:
             tags[i] = tags[i] + "t/>"
         else:
             tags[i] = tags[i] + "c/>"
@@ -317,10 +317,10 @@ def load_data_from_disfluency_corpus_file(fp, representation="disf1", limit=8,
     """Loads from file into five lists of lists of strings of equal length:
     one for utterance iDs (IDs))
     one for word timings of the targets (start,stop)
-    one for words (seq), 
-    one for pos (pos_seq) 
+    one for words (seq),
+    one for pos (pos_seq)
     one for tags (targets).
-     
+
     NB this does not convert them into one-hot arrays, just outputs lists of string tags."""
     print "loading from", fp
     f = open(fp)
@@ -332,24 +332,24 @@ def load_data_from_disfluency_corpus_file(fp, representation="disf1", limit=8,
     targets = []
     timings = []
     currentTimings = []
-    current_fake_time = 0 # marks the current fake time for the dialogue (i.e. end of word)
+    current_fake_time = 0  # marks the current fake time for the dialogue (i.e. end of word)
     current_dialogue = ""
-    
-    reader=csv.reader(f,delimiter='\t')
+
+    reader = csv.reader(f, delimiter='\t')
     counter = 0
     utt_reference = ""
     currentWords = []
     currentPOS = []
     currentTags = []
     current_fake_time = 0
-    
-    #corpus = "" # can write to file
-    for ref,timing,word,postag,disftag in reader: #mixture of POS and Words
+
+    # corpus = "" # can write to file
+    for ref, timing, word, postag, disftag in reader:  # mixture of POS and Words
         # print ref, timing, word, postag, disftag
-        counter+=1
+        counter += 1
         if not ref == "":
-            if count_seq>0: #do not reset the first time
-                #convert to the inc tags
+            if count_seq > 0:  # do not reset the first time
+                # convert to the inc tags
                 if convert_to_dnn_format:
                     currentTags = \
                         convert_from_eval_tags_to_inc_disfluency_tags(
@@ -357,30 +357,30 @@ def load_data_from_disfluency_corpus_file(fp, representation="disf1", limit=8,
                             currentWords,
                             representation,
                             limit)
-                #corpus+=utt_reference #write data to a file for checking
-                #convert to vectors
+                # corpus+=utt_reference #write data to a file for checking
+                # convert to vectors
                 seq.append(tuple(currentWords))
                 pos_seq.append(tuple(currentPOS))
                 targets.append(tuple(currentTags))
                 IDs.append(utt_reference)
                 timings.append(tuple(currentTimings))
-                #reset the words
+                # reset the words
                 currentWords = []
                 currentPOS = []
                 currentTags = []
                 currentTimings = []
-            #set the utterance reference
-            count_seq+=1
+            # set the utterance reference
+            count_seq += 1
             utt_reference = ref
             if not utt_reference.split(":")[0] == current_dialogue:
                 current_dialogue = utt_reference.split(":")[0]
-                current_fake_time = 0 #TODO fake for now- reset the current beginning of word time
+                current_fake_time = 0  # TODO fake for now- reset the current beginning of word time
         currentWords.append(word)
         currentPOS.append(postag)
         currentTags.append(disftag)
         currentTimings.append(timing)
-        current_fake_time+=1
-    #flush
+        current_fake_time += 1
+    # flush
     if not currentWords == []:
         if convert_to_dnn_format:
             currentTags = \
@@ -398,7 +398,7 @@ def load_data_from_disfluency_corpus_file(fp, representation="disf1", limit=8,
     assert len(seq) == len(targets) == len(pos_seq)
     print "loaded " + str(len(seq)) + " sequences"
     f.close()
-    return (IDs,timings,seq,pos_seq,targets)
+    return (IDs, timings, seq, pos_seq, targets)
 
 
 def load_data_from_corpus_file(filename, limit=8,
@@ -442,8 +442,8 @@ def load_data_from_corpus_file(filename, limit=8,
                             break
                     if shift > -1:
                         latest_increco = fill_in_time_approximations(
-                                                        latest_increco,
-                                                        shift)
+                            latest_increco,
+                            shift)
                     lex_data.extend(deepcopy(latest_increco))
                     pos_data.extend(deepcopy(latest_pos))
                     # convert to the disfluency tags for this
@@ -537,52 +537,53 @@ def load_data_from_corpus_file(filename, limit=8,
     return all_speakers
 
 
-def get_diff_and_new_prefix(current,newprefix,verbose=False):
+def get_diff_and_new_prefix(current, newprefix, verbose=False):
     """Only get the different right frontier according to the timings
     and change the current hypotheses"""
-    if verbose: 
+    if verbose:
         print "current", current
         print "newprefix", newprefix
     rollback = 0
     original_length = len(current)
     original_current = deepcopy(current)
-    for i in range(len(current)-1,-2,-1):
-        if verbose: 
+    for i in range(len(current) - 1, -2, -1):
+        if verbose:
             print "oooo", newprefix[0]
             if not current == []:
                 print current[i]
-        if i==-1 or (float(newprefix[0][1]) >= float(current[i][2])):
-            if i==len(current)-1:
+        if i == -1 or (float(newprefix[0][1]) >= float(current[i][2])):
+            if i == len(current) - 1:
                 current = current + newprefix
                 break
             k = 0
-            marker = i+1
-            for j in range(i+1,len(current)):
+            marker = i + 1
+            for j in range(i + 1, len(current)):
                 if k == len(newprefix):
                     break
-                if verbose: 
+                if verbose:
                     print "...", j, k, current[j], newprefix[k], len(newprefix)
-                if not current[j]==newprefix[k]:
+                if not current[j] == newprefix[k]:
                     break
                 else:
-                    if verbose: print "repeat"
-                    k+=1
-                    marker = j+1
-            rollback = original_length - marker   
+                    if verbose:
+                        print "repeat"
+                    k += 1
+                    marker = j + 1
+            rollback = original_length - marker
             current = current[:marker] + newprefix[k:]
             newprefix = newprefix[k:]
             break
     if newprefix == []:
-        rollback = 0 #just no rollback if no prefix
-        current = original_current #reset the current
-    if verbose: 
+        rollback = 0  # just no rollback if no prefix
+        current = original_current  # reset the current
+    if verbose:
         print "current after call", current
-        print  "newprefix after call", newprefix
+        print "newprefix after call", newprefix
         print "rollback after call", rollback
     return (current, newprefix, rollback)
 
 
-def simulate_increco_data(frame,acoustic_data,lexical_data,pos_data):
+def simulate_increco_data(frame, acoustic_data, lexical_data, pos_data):
     """For transcripts + timings, create tuples of single hypotheses
     to simulate perfect ASR at the end of each word."""
     new_lexical_data = []
@@ -591,12 +592,12 @@ def simulate_increco_data(frame,acoustic_data,lexical_data,pos_data):
     current_time = 0
     for my_frame, acoust, word, pos in zip(frame, acoustic_data,
                                            lexical_data, pos_data):
-        #print type(my_frame), type(acoust), type(word), type(pos)
-        new_lexical_data.append([(word,current_time/100,my_frame/100)])
+        # print type(my_frame), type(acoust), type(word), type(pos)
+        new_lexical_data.append([(word, current_time / 100, my_frame / 100)])
         current_time = my_frame
         new_pos_data.append([pos])
         new_acoustic_data.append([acoust])
-    return new_acoustic_data, new_lexical_data, new_pos_data 
+    return new_acoustic_data, new_lexical_data, new_pos_data
 
 
 def fill_in_time_approximations(word_timing_tuples, idx):
@@ -619,8 +620,8 @@ def fill_in_time_approximations(word_timing_tuples, idx):
         # this end time is the same as the latest one
         # need backward search for time
         # print "backward search"
-        idx = len(word_timing_tuples)-1
-        for i in range(len(word_timing_tuples)-1, -1, -1):
+        idx = len(word_timing_tuples) - 1
+        for i in range(len(word_timing_tuples) - 1, -1, -1):
             affected_indices.append(i)
             idx = i
             if not word_timing_tuples[i][1] == start_time:
@@ -635,7 +636,7 @@ def fill_in_time_approximations(word_timing_tuples, idx):
     total_time = end_time - start_time
     assert total_time > 0.0, str(word_timing_tuples[affected_indices[0]:]) +\
         str(idx)
-    mean_len = total_time/len(affected_indices)
+    mean_len = total_time / len(affected_indices)
     for i in range(idx, idx + len(affected_indices)):
         end_time = start_time + mean_len
         word_timing_tuples[i] = (word_timing_tuples[i][0], start_time,
@@ -652,77 +653,82 @@ def process_arguments(config=None,
                       hmm=False,
                       verbose=True):
     """Loads arguments for an experiment from a config file
-    
+
     Keyword arguments:
     config -- the config file location, default None
     exp_id -- the experiment ID name, default None
     """
     parser = argparse.ArgumentParser(description='This script trains a RNN for disfluency detection and saves the best models and results to disk.')
     parser.add_argument('-c', '--config', type=str,
-                        help='The location of the config file.', 
+                        help='The location of the config file.',
                         default=config)
-    parser.add_argument('-e', '--exp_id',type=str,
-                        help='The experiment number from which to load arguments from the config file.', 
+    parser.add_argument('-e', '--exp_id', type=str,
+                        help='The experiment number from which to load arguments from the config file.',
                         default=exp_id)
-    parser.add_argument('-v', '--heldout_file',type=str,
-                        help='The path to the validation file.', 
+    parser.add_argument('-v', '--heldout_file', type=str,
+                        help='The path to the validation file.',
                         default=heldout_file)
-    parser.add_argument('-t', '--test_file',type=str,
-                        help='The path to the test file.', 
+    parser.add_argument('-t', '--test_file', type=str,
+                        help='The path to the test file.',
                         default=test_file)
-    parser.add_argument('-m', '--use_saved_model',type=int,
-                        help='Epoch number of the pre-trained model to load.', 
+    parser.add_argument('-m', '--use_saved_model', type=int,
+                        help='Epoch number of the pre-trained model to load.',
                         default=use_saved)
-    parser.add_argument('-hmm', '--hmm',type=bool,
-                        help='Whether to use hmm disfluency decoder.', 
+    parser.add_argument('-hmm', '--hmm', type=bool,
+                        help='Whether to use hmm disfluency decoder.',
                         default=hmm)
-    parser.add_argument('-verb', '--verbose',type=bool,
-                        help='Whether to output training progress.', 
+    parser.add_argument('-verb', '--verbose', type=bool,
+                        help='Whether to output training progress.',
                         default=verbose)
     args = parser.parse_args()
-    
+
     header = [
-        'exp_id', #experiment id
-        'model', #can be elman/lstm/mt_elman/mt_lstm
-        'lr', #learning rate         
-        'decay', # decay on the learning rate if improvement stops
-        'seed', #random seed
-        'window', # number of words in the context window (backwards only for disfluency)
-        'bs', # number of backprop through time steps
-        'emb_dimension', # dimension of word embedding
-        'nhidden', # number of hidden units
-        'nepochs', # maximum number of epochs
-        'train_data', #which training data
-        'loss_function', #default will be nll, unlikely to change
-        'reg', #regularization type
-        'pos', #whether pos tags or not
-        'acoustic', #whether using aoustic features or not
-        'embeddings', #embedding files, if any
-        'update_embeddings', #whether the embeddings should be updated at runtime or not
-        'batch_size', #batch size, 'word' or 'utterance'
-        'tags', #the output tag representations used
-        'end_utterance' #whether we do combined end of utterance detection too
-        ]
+        'exp_id',  # experiment id
+        'model',  # can be elman/lstm/mt_elman/mt_lstm
+        'lr',  # learning rate
+        'decay',  # decay on the learning rate if improvement stops
+        'seed',  # random seed
+        'window',  # number of words in the context window (backwards only for disfluency)
+        'bs',  # number of backprop through time steps
+        'emb_dimension',  # dimension of word embedding
+        'nhidden',  # number of hidden units
+        'nepochs',  # maximum number of epochs
+        'train_data',  # which training data
+        'loss_function',  # default will be nll, unlikely to change
+        'reg',  # regularization type
+        'pos',  # whether pos tags or not
+        'acoustic',  # whether using aoustic features or not
+        'embeddings',  # embedding files, if any
+        'update_embeddings',  # whether the embeddings should be updated at runtime or not
+        'batch_size',  # batch size, 'word' or 'utterance'
+        'tags',  # the output tag representations used
+        'end_utterance'  # whether we do combined end of utterance detection too
+    ]
     print header
     if args.config:
         for line in open(args.config):
             features = line.strip("\n").split("\t")
-            #print features
-            if features[0] != args.exp_id: continue
-            for i in range(1,len(header)):
-                feat_value = features[i].strip() # if string
-                #print feat_value, "feat"
-                if header[i] in ['lr']: feat_value = float(feat_value)
-                elif header[i] in ['decay','pos','acoustic','update_embeddings','end_utterance']: 
-                    if feat_value == 'True': feat_value = True
-                    else: feat_value = False
-                elif header[i] in ['seed','window','bs','emb_dimension','nhidden','nepochs']:
+            # print features
+            if features[0] != args.exp_id:
+                continue
+            for i in range(1, len(header)):
+                feat_value = features[i].strip()  # if string
+                # print feat_value, "feat"
+                if header[i] in ['lr']:
+                    feat_value = float(feat_value)
+                elif header[i] in ['decay', 'pos', 'acoustic', 'update_embeddings', 'end_utterance']:
+                    if feat_value == 'True':
+                        feat_value = True
+                    else:
+                        feat_value = False
+                elif header[i] in ['seed', 'window', 'bs', 'emb_dimension', 'nhidden', 'nepochs']:
                     feat_value = int(feat_value)
                 elif feat_value == 'None':
                     feat_value = None
                 setattr(args, header[i], feat_value)
-    #print args
+    # print args
     return args
+
 
 if __name__ == "__main__":
     print wer("who is there".split(), "is there".split(), macro=True)

@@ -28,6 +28,7 @@ class MySentences(object):
                     continue
                 yield text.split()
 
+
 training_files = [switchboard_clean_directory +
                   "/swbd_disf_train_1_2_clean.text"]
 sentences = MySentences(training_files)
