@@ -1,6 +1,7 @@
 # TODO class should be eliminated, instead factored into elman
 
 import theano
+theano.config.gcc.cxxflags = "-Wno-c++11-narrowing"
 import numpy
 import os
 import sys
@@ -189,10 +190,10 @@ class model_no_pos(object):
             #print i
             self.normalize()
             if i % 6500 == 0 and i>0:
-                print '[learning] >> %2.2f%%'%((i+1)*100./nw),'completed in %.2f (sec) <<\r'%(time.time()-tic),
+                print('[learning] >> %2.2f%%'%((i+1)*100./nw),'completed in %.2f (sec) <<\r'%(time.time()-tic), end=' ')
                 sys.stdout.flush()
-        print "train_loss (may include reg)"
-        print train_loss/float(i)
+        print("train_loss (may include reg)")
+        print(train_loss/float(i))
         return train_loss/float(i)
                 
     def corpus_nll(self, my_seq, my_indices, my_labels):
@@ -240,7 +241,7 @@ class model_no_pos(object):
 
     def load_weights(self, emb=None, Wx=None, Wh=None, W=None, bh=None, b=None,
                      h0=None):
-        print "loading previous weights"
+        print("loading previous weights")
         if emb is not None:
             self.emb.set_value(emb)
         if Wx is not None:

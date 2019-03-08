@@ -59,10 +59,10 @@ def main():
             # load original bnc corpus file
             orig_xml = safe_open(os.path.join(bnc_dir, filename + ".xml"), 'r')
         except IOError:
-            print "NO file", filename + ".xml"
+            print("NO file", filename + ".xml")
             continue
         readXML_writeCorpus(orig_xml, new_file)  # write to new file
-        print word_count
+        print(word_count)
         if word_count > 20000000:
             break
     new_file.close()

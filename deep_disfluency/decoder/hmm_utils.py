@@ -32,7 +32,7 @@ def tabulate_cfd(cfd, *args, **kwargs):
     else:
         samples = sorted(set(v for c in conditions for v in cfd[c]))
     if samples == []:
-        print "No conditions for tabulate!"
+        print("No conditions for tabulate!")
         return None
     width = max(len("%s" % s) for s in samples)
     freqs = dict()
@@ -158,7 +158,7 @@ def load_data_from_corpus_file(filename):
     conv_no = ""
     prev_word = "<s/>"  # -1
     prev_pos = "<s/>"  # -1
-    print "loading in timings file", filename, "..."
+    print("loading in timings file", filename, "...")
     for line in a_file:
         if "Speaker:" in line:
             if not started:
@@ -239,7 +239,7 @@ def load_data_from_corpus_file(filename):
     indices = [0] * len(lex_data)
     all_speakers.append((conv_no, (frames, lex_data, pos_data,
                                    indices, labels)))
-    print len(all_speakers), "speakers with timings input"
+    print(len(all_speakers), "speakers with timings input")
     # print "first few lengths"
     # limit = 10
     # for s in all_speakers:

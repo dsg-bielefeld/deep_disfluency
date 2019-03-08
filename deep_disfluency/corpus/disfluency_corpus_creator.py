@@ -33,27 +33,27 @@ from copy import deepcopy
 from glob import iglob
 from collections import defaultdict, Counter
 
-from swda import CorpusReader
-from tree_pos_map import TreeMapCorpus, POSMapCorpus
-from tree_pos_map_writer import POSMapWriter, TreeMapWriter
-from repair import Repair
-from corpus_util import classify_repair, graph_viz_repair
-from corpus_util import disf_tags_from_easy_read
-from corpus_util import strip_disf_tags_from_easy_read
-from corpus_util import easy_read_disf_format
-from corpus_util import get_edit_terms_from_easy_read
-from corpus_util import detection_corpus_format
-from corpus_util import detection_corpus_format_from_easy_read
-from corpus_util import easy_read_format_from_detection_corpus
-from corpus_util import verify_disfluency_tags
-from corpus_util import orthography_normalization
-from corpus_util import find_repair_end, find_repair_end_in_previous_utts
-from corpus_util import find_delete_interregna_and_repair_onsets
-from corpus_util import remove_non_edit_interregna
-from corpus_util import find_repair_ends_and_reclassify
-from corpus_util import find_interregna_and_repair_onsets
-from corpus_util import remove_repairs, remove_partial_words
-from spelling_dictionary import SpellingDict
+from .swda import CorpusReader
+from .tree_pos_map import TreeMapCorpus, POSMapCorpus
+from .tree_pos_map_writer import POSMapWriter, TreeMapWriter
+from .repair import Repair
+from .corpus_util import classify_repair, graph_viz_repair
+from .corpus_util import disf_tags_from_easy_read
+from .corpus_util import strip_disf_tags_from_easy_read
+from .corpus_util import easy_read_disf_format
+from .corpus_util import get_edit_terms_from_easy_read
+from .corpus_util import detection_corpus_format
+from .corpus_util import detection_corpus_format_from_easy_read
+from .corpus_util import easy_read_format_from_detection_corpus
+from .corpus_util import verify_disfluency_tags
+from .corpus_util import orthography_normalization
+from .corpus_util import find_repair_end, find_repair_end_in_previous_utts
+from .corpus_util import find_delete_interregna_and_repair_onsets
+from .corpus_util import remove_non_edit_interregna
+from .corpus_util import find_repair_ends_and_reclassify
+from .corpus_util import find_interregna_and_repair_onsets
+from .corpus_util import remove_repairs, remove_partial_words
+from .spelling_dictionary import SpellingDict
 
 
 def annotate_relaxed_repairs(tag_list, repair_list):
@@ -84,7 +84,7 @@ class DisfluencyCorpusCreator:
                  annotation_files_relaxed=None, error_log=None, lang='en'):
         data_warning = "data folder not in raw_data, please move it in there!"
         if not os.path.exists(path):
-            print data_warning, path
+            print(data_warning, path)
             quit()
 
         if error_log:
@@ -102,14 +102,14 @@ class DisfluencyCorpusCreator:
                                                  mapdir=mapdir_path)
         except:
             self.__treemaplist__ = None
-            print "WARNING no treemap files"
+            print("WARNING no treemap files")
         try:
 
             self.__POSmaplist__ = POSMapCorpus(True, self.errorlog,
                                                mapdir=mapdir_path)
         except:
             self.__POSmaplist__ = None
-            print "WARNING no posmap files"
+            print("WARNING no posmap files")
 
         # get spelling dict for language
         self.lang = lang
@@ -141,7 +141,7 @@ class DisfluencyCorpusCreator:
             for myfile in self.annotationFiles:
                 counter = 0
                 with open(myfile, 'r') as g:
-                    print myfile
+                    print(myfile)
                     myreader = csv.reader(g, delimiter='\t')
                     for a, b, c, d, e, f, g, h, i, j, k in myreader:
                         # if not a in self.ranges:
@@ -159,14 +159,14 @@ class DisfluencyCorpusCreator:
                         except:
                             warning = "invalid repair" + \
                                 " ".join([a, b, c, d, e, f, g, h, i, j, k])
-                            print warning
+                            print(warning)
                             if self.errorlog:
-                                print>>self.errorlog, warning
+                                print(warning, file=self.errorlog)
 
         else:
-            print "No normal style repair annotations"
+            print("No normal style repair annotations")
             return
-        print str(len(rows)) + " total repairs loaded"
+        print(str(len(rows)) + " total repairs loaded")
         return
 
     def read_in_relaxed_self_repair_files(self):
@@ -188,10 +188,10 @@ class DisfluencyCorpusCreator:
                         except:
                             warning = "invalid relaxed repair" + " "\
                                 .join([a, b, c, d, e, f, g, h, i])
-                            print warning
+                            print(warning)
                             if self.errorlog:
-                                print>>self.errorlog, warning
-        print repairID, "relaxed repairs loaded"
+                                print(warning, file=self.errorlog)
+        print(repairID, "relaxed repairs loaded")
         return
 
     def write_test_corpus(self, filename, ranges=None, partial=True,
@@ -280,9 +280,9 @@ class DisfluencyCorpusCreator:
                         repairStack.append(repair)
 
                 if debug:
-                    print "(1) repair points for " + uttReference + " " + \
-                        str(count) + " " + str(utt.transcript_index)
-                    print [repair.to_string() for repair in repairStack]
+                    print("(1) repair points for " + uttReference + " " + \
+                        str(count) + " " + str(utt.transcript_index))
+                    print([repair.to_string() for repair in repairStack])
 
                 MD = False  # boolean, whether middle of an edit term or not
                 # iterate over the words, creating the appropriate disfluency
@@ -321,10 +321,10 @@ class DisfluencyCorpusCreator:
                                 break
 
                     if debug:
-                        print "(2) repair points after POP at word", i
-                        print [repair.to_string() for repair in repairStack]
+                        print("(2) repair points after POP at word", i)
+                        print([repair.to_string() for repair in repairStack])
                         if test_dodgy == my_test_dodgy:
-                            raw_input()
+                            input()
 
                     if (trans.has_trees() == True and mytreemap[i][1] == [])\
                             or (trans.has_trees() == False and
@@ -345,15 +345,15 @@ class DisfluencyCorpusCreator:
                     # for this word
                     # or search for previous utterances
                     if debug:
-                        print "word added", i, word
-                        print "repair stack", [repair.to_string()
-                                               for repair in repairStack]
+                        print("word added", i, word)
+                        print("repair stack", [repair.to_string()
+                                               for repair in repairStack])
                         if test_dodgy == my_test_dodgy:
-                            raw_input()
+                            input()
                     for rs in range(0, len(repairStack)):
                         repair = repairStack[rs]
                         if debug:
-                            print repair.to_string()
+                            print(repair.to_string())
                         tag = repair.in_segment([utt.transcript_index, i])
                         if not repair.caller == utt.caller:
                             continue
@@ -371,7 +371,7 @@ class DisfluencyCorpusCreator:
                                 repair.to_string() + "\n" + \
                                 str(utt.text_words())
                             if debug:
-                                print warning
+                                print(warning)
                             errors += 1
                             if self.errorlog:
                                 self.errorlog.write(warning)
@@ -392,7 +392,7 @@ class DisfluencyCorpusCreator:
                             repair.repairWords.append((word, pos))
                         elif tag == None and repair.complete == False:
                             if debug:
-                                print "incomplete tag"
+                                print("incomplete tag")
                             # Have gone past last word of the repair but
                             # not found completion
                             # Need to backwards search to find it and mark 
@@ -422,18 +422,18 @@ class DisfluencyCorpusCreator:
                                             str(disfluencyTagList) + \
                                             str(repair.to_string())
                                         if debug:
-                                            print warning
+                                            print(warning)
                                         errors += 1
                                         if self.errorlog:
                                             self.errorlog.write(warning)
                                         raise Exception
                         if debug:
-                            print tag
+                            print(tag)
                         if tag:  # if there is a tag for this word
                             disfluency_tag += '<{} id="{}"/>'.format(
                                 tag, repair.repairID)
                         if test_dodgy == my_test_dodgy and debug:
-                            raw_input()
+                            input()
 
                     # in edit term but not in interregnum (forward looking
                     # disf)
@@ -463,7 +463,7 @@ class DisfluencyCorpusCreator:
                     word lists in  " + \
                         utt.swda_filename + str(utt.transcript_index) + "\n"
                     if debug:
-                        print warning
+                        print(warning)
                     warnings += 1
                     if self.errorlog:
                         self.errorlog.write(warning + "\n")
@@ -535,15 +535,15 @@ class DisfluencyCorpusCreator:
                 if found == False:
                     warning = "ANNOTATION/MERGE ERROR: COULD NOT merge " + \
                         str(uttList[i])
-                    print warning
+                    print(warning)
                     errors += 1
                     if self.errorlog:
                         self.errorlog.write(warning + "\n")
-                    raw_input()
+                    input()
                     i += 1
             else:
                 i += 1
-        print str(mergedUtts) + " utterances merged!"
+        print(str(mergedUtts) + " utterances merged!")
 
         # Create the corpus as a string with the appropriate
         # utterance references
@@ -559,8 +559,8 @@ class DisfluencyCorpusCreator:
                 str(uttList[i][2]) + ":" + str(uttList[i][1])
             for d in range(0, len(overallTagList[i])):
                 if test_dodgy == my_test_dodgy and debug:
-                    print "initial tag", d, overallTagList[i][d]
-                    print '\ttags', overallTagList[i]
+                    print("initial tag", d, overallTagList[i][d])
+                    print('\ttags', overallTagList[i])
                 # problem 0: interregnum but no edit term- need to adjust tags
                 # up to the repair onset word, only if they're marked
                 # independently like in swda
@@ -580,7 +580,7 @@ class DisfluencyCorpusCreator:
                      Shifting/removing interrengna. \n\t" + \
                         str(uttList[i]) + "\n\t" + str(overallTagList[i])
                     if debug:
-                        print warning
+                        print(warning)
                     errors += 1
                     if self.errorlog:
                         # deletes are special case where interregnum not always
@@ -594,7 +594,7 @@ class DisfluencyCorpusCreator:
                          "<rpn" in overallTagList[i][d] or
                          "<rms" in overallTagList[i][d]):
                     if debug:
-                        print "getting to problem (1)"
+                        print("getting to problem (1)")
                     # Note the affected repairs from context all together
                     problem_rps = re.findall(
                         "<rps id\=\"[0-9]+\"\/>", overallTagList[i][d], re.S)
@@ -628,7 +628,7 @@ class DisfluencyCorpusCreator:
                                 uttList[i])
                             warnings += 1
                             if debug:
-                                print warning
+                                print(warning)
                             if self.errorlog:
                                 # deletes are special case where interregnum
                                 # not always marked so needs to be added
@@ -637,7 +637,7 @@ class DisfluencyCorpusCreator:
                     if problem_rpns:
                         # Try to shift the repair end backwards
                         if debug:
-                            print "problem rpns!"
+                            print("problem rpns!")
                         unresolved = []
                         for r in problem_rpns:
                             if r.replace("rpnsub", "rps") in problem_rps or\
@@ -663,7 +663,7 @@ class DisfluencyCorpusCreator:
                             an edit term. \n\t" + \
                                 str(uttList[i])
                             if debug:
-                                print warning
+                                print(warning)
                             warnings += 1
                             if self.errorlog:
                                 # deletes are special case where interregnum
@@ -704,7 +704,7 @@ class DisfluencyCorpusCreator:
                              onset right of an edit term. \n\t" + \
                                 str(uttList[i])
                             if debug:
-                                print warning
+                                print(warning)
                             warnings += 1
                             if self.errorlog:
                                 # deletes are special case where interregnum
@@ -721,7 +721,7 @@ class DisfluencyCorpusCreator:
                         # along to next non-edit term and mark the interrengum
                         # if possible
                         if debug:
-                            print "removing rps", overallTagList[i][d]
+                            print("removing rps", overallTagList[i][d])
                         resolved = find_interregna_and_repair_onsets(
                             overallTagList[i], problem_rps, d,
                             overallWordsList[i])
@@ -735,7 +735,7 @@ class DisfluencyCorpusCreator:
                                 str(uttList[i])
                             warnings += 1
                             if debug:
-                                print warning
+                                print(warning)
                             if self.errorlog:
                                 # deletes are special case where interregnum
                                 # not always marked so needs to be added
@@ -750,7 +750,7 @@ class DisfluencyCorpusCreator:
                         Removing repair. \n\t" + \
                             str(uttList[i])
                         if debug:
-                            print warning
+                            print(warning)
                         errors += 1
                         if self.errorlog:
                             # deletes are special case where interregnum not
@@ -772,7 +772,7 @@ class DisfluencyCorpusCreator:
                     mid-repair element. \n\t" + \
                         str(uttList[i])
                     if debug:
-                        print warning
+                        print(warning)
                     warnings += 1
                     if self.errorlog:
                         self.errorlog.write(warning + "\n")
@@ -780,7 +780,7 @@ class DisfluencyCorpusCreator:
                     if "<e" in overallTagList[i][d]:
                         edit = "<e/>"
                     if debug:
-                        print "refinall interreg",
+                        print("refinall interreg", end=' ')
                         re.findall("<i id\=\"[0-9]+\"\/>",
                                    overallTagList[i][d], re.S)
                     overallTagList[i][
@@ -788,7 +788,7 @@ class DisfluencyCorpusCreator:
                                                        overallTagList[i][d], 
                                                        re.S))
                     if debug:
-                        print "tags after removal", overallTagList[i][d]
+                        print("tags after removal", overallTagList[i][d])
 
                 else:
                     # problem 3: embedded repairs (two or more repairs with
@@ -800,7 +800,7 @@ class DisfluencyCorpusCreator:
                             str(uttList[i])
                         errors += 1
                         if debug:
-                            print warning
+                            print(warning)
                         if self.errorlog:
                             self.errorlog.write(warning + "\n")
                         embedded_repairs_to_remove = []
@@ -808,7 +808,7 @@ class DisfluencyCorpusCreator:
                         # backwards search from end of utterance
                         for b in range(len(overallTagList[i]) - 1, -1, -1):
                             # get repair ends of the suspicious repairs first
-                            for key in repair_types.keys():
+                            for key in list(repair_types.keys()):
                                 for rps in repair_onsets:
                                     rpn = rps.replace("rps", "rpn" + key)
                                     if rpn in overallTagList[i][b]:
@@ -828,7 +828,7 @@ class DisfluencyCorpusCreator:
                             while len(reparandum_onsets) > 1:
                                 # remove deletes, then subs, then reps
                                 if debug:
-                                    print reparandum_onsets
+                                    print(reparandum_onsets)
                                 if len(repair_types['del']) > 0:
                                     for index in range(
                                                     0,
@@ -879,8 +879,8 @@ class DisfluencyCorpusCreator:
             problem_repairs += len(repairs_to_remove)
             showchange = False
             if debug and len(repairs_to_remove) > 0:
-                print easy_read_disf_format(overallWordsList[i],
-                                            overallTagList[i])
+                print(easy_read_disf_format(overallWordsList[i],
+                                            overallTagList[i]))
                 showchange = True  # Todo which it
             problem_IDs = []
             for problem in repairs_to_remove:
@@ -889,12 +889,12 @@ class DisfluencyCorpusCreator:
                     problem_IDs.append(repairID)
             overallTagList[i] = remove_repairs(overallTagList[i], problem_IDs)
             if showchange and debug:
-                print problem_IDs
-                print easy_read_disf_format(overallWordsList[i],
-                                            overallTagList[i])
+                print(problem_IDs)
+                print(easy_read_disf_format(overallWordsList[i],
+                                            overallTagList[i]))
 
             if test_dodgy == my_test_dodgy and debug:
-                raw_input()
+                input()
 
             # now check for possibly missed filled pause edit terms or
             # interregna
@@ -908,7 +908,7 @@ class DisfluencyCorpusCreator:
                         str(uttList[i]) + str(overallWordsList[i]) + \
                         str(overallTagList[i])
                     if debug:
-                        print warning
+                        print(warning)
                     warnings += 1
                     if self.errorlog:
                         self.errorlog.write(warning + "\n")
@@ -925,7 +925,7 @@ class DisfluencyCorpusCreator:
                     overallTagList[i], self.dRelaxedRepairs[relaxedRef])
 
             if debug:
-                print overallWordsList[i], overallTagList[i]
+                print(overallWordsList[i], overallTagList[i])
             # No partial words allowed, remove them
             if not partial:
                 removal = remove_partial_words(
@@ -936,10 +936,10 @@ class DisfluencyCorpusCreator:
                 overallPOSList[i] = removal[2]
                 overallIndexList[i] = removal[3]
                 # if debug:
-                print 'after partials removed\n',
-                print str(overallWordsList[i]) + "\n", str(overallTagList[i]), overallIndexList[i]
+                print('after partials removed\n', end=' ')
+                print(str(overallWordsList[i]) + "\n", str(overallTagList[i]), overallIndexList[i])
                 if len(overallTagList[i]) == 0:
-                    print "ERROR empty list"
+                    print("ERROR empty list")
                     continue
             # normalise tag IDs and check them
             verify_disfluency_tags(overallTagList[i], normalize_ID=True)
@@ -963,10 +963,10 @@ class DisfluencyCorpusCreator:
             ":" + str(uttList[i][2]) + ":" \
                 + str(uttList[i][1]) + extra
             if d_act == "o/aa":
-                print "dialogue act bad"
-                print uttref
-                print uttList[i]
-                raw_input()
+                print("dialogue act bad")
+                print(uttref)
+                print(uttList[i])
+                input()
             wordstring = easy_read_disf_format(
                 overallWordsList[i], overallTagList[i])
             posstring = easy_read_disf_format(
@@ -1010,22 +1010,22 @@ class DisfluencyCorpusCreator:
             disffile.write(corpus)
             disffile.close()
 
-        print>>self.errorlog, "Problematic repairs removed = " + \
-            str(problem_repairs)
-        print "Problematic repairs removed = " + str(problem_repairs)
-        print>>self.errorlog, "Disfluency corpus constructed with\
+        print("Problematic repairs removed = " + \
+            str(problem_repairs), file=self.errorlog)
+        print("Problematic repairs removed = " + str(problem_repairs))
+        print("Disfluency corpus constructed with\
          {} Errors and {} Warnings".format(
-            errors, warnings)
-        print "Disfluency corpus constructed with \
-        {} Errors and {} Warnings".format(errors, warnings)
-        print "Disfluency detection corpus complete"
-        print "number trans = " + str(numberTrans)
-        print "number utts = " + str(len(uttList))
-        print "number words = " + str(wordCount)
-        print "number repairs = " + str(totalRepairs)
-        for k,v in sorted(dialogue_act.items(),key=lambda x : x[1],
+            errors, warnings), file=self.errorlog)
+        print("Disfluency corpus constructed with \
+        {} Errors and {} Warnings".format(errors, warnings))
+        print("Disfluency detection corpus complete")
+        print("number trans = " + str(numberTrans))
+        print("number utts = " + str(len(uttList)))
+        print("number words = " + str(wordCount))
+        print("number repairs = " + str(totalRepairs))
+        for k,v in sorted(list(dialogue_act.items()),key=lambda x : x[1],
                           reverse=True):
-            print k,v
+            print(k,v)
         return easyread_corpus  # Always return the corpus as a string
 
     def write_clean_corpus(self, testcorpus, targetfilename, debug=False):
@@ -1036,7 +1036,7 @@ class DisfluencyCorpusCreator:
         has all the disfluency markup.
         targetfilename -- a string giving the location of the cleaned corpus.
         """
-        print "Writing clean corpus..."
+        print("Writing clean corpus...")
         clean_corpus = open(targetfilename + "_clean.text", "w")
         for line in testcorpus.split("\n"):
             # print line
@@ -1072,7 +1072,7 @@ class DisfluencyCorpusCreator:
                 uttref + "," + clean_word_string + "\nPOS," +
                 clean_pos_string + "\n")
         clean_corpus.close()
-        print "done"
+        print("done")
         return
 
     def write_edit_term_corpus(self, testcorpus, targetfilename, debug=False):
@@ -1084,7 +1084,7 @@ class DisfluencyCorpusCreator:
         targetfilename -- a string giving the location of 
         the edit term filled corpus.
         """
-        print "Writing edit term corpus..."
+        print("Writing edit term corpus...")
         edit_term_corpus = open(targetfilename + "_edit.text", "w")
         for line in testcorpus.split("\n"):
             if line == "":
@@ -1106,7 +1106,7 @@ class DisfluencyCorpusCreator:
                         uttref + "," + my_editterm + "\nPOS," +
                         my_poseditterm + "\n")
         edit_term_corpus.close()
-        print "done"
+        print("done")
         return
 
 #     def write_tree_corpus(self, testcorpus, targetfilename, debug=False):
@@ -1230,11 +1230,11 @@ class DisfluencyCorpusCreator:
                                         mytype[2] += 1
 
                     except:
-                        print sys.exc_info()
-                        print repair.reparandumWords
-                        print repair.repairWords
-                        print repair.continuationWords
-                        raw_input("third one")
+                        print(sys.exc_info())
+                        print(repair.reparandumWords)
+                        print(repair.repairWords)
+                        print(repair.continuationWords)
+                        input("third one")
         # Do the interregnum and edit term analysis
         interregDict = defaultdict(int)
         for edit in editingTermList:
@@ -1251,15 +1251,15 @@ class DisfluencyCorpusCreator:
 
         # creates
         for w in sorted(interregDict, key=interregDict.get, reverse=True):
-            print w, interregDict[w]
+            print(w, interregDict[w])
             editingTermList[w] = [0, 0, 0]
             # interregFile.write(w+","+str(interregDict[w])+"\n")
         # interregFile.close()
 
         typefile = open(targetfilename + "RepairTypeDistributions.text", "w")
-        print "writing to typefile" + typefile.name
-        for key in printdict.keys():
-            print str(key) + str(len(typedict[key]))
+        print("writing to typefile" + typefile.name)
+        for key in list(printdict.keys()):
+            print(str(key) + str(len(typedict[key])))
             typefile.write("\n\n\n\n\n" + str(key) + "MAINTYPE:" +
                            str(len(printdict[key])) + \
                            "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n")
@@ -1299,7 +1299,7 @@ class DisfluencyCorpusCreator:
                     self.ranges.append(a)  # conversation_no
                     # print a
                 rangeFile.close()
-            print "files in ranges = " + str(len(self.ranges))
+            print("files in ranges = " + str(len(self.ranges)))
         else:
             self.ranges = None
         # write the corpus for the accepted mode
@@ -1388,8 +1388,8 @@ if __name__ == '__main__':
         try:
             os.mkdir(treeposmapdir)  # If POSmap doesn't exist yet, make one
         except OSError:
-            print "already made POS map dir", treeposmapdir
-        print "writing a word -> pos mapping directory"
+            print("already made POS map dir", treeposmapdir)
+        print("writing a word -> pos mapping directory")
         TreeMapWriter(args.corpusLocation,
                       target_folder_path=treeposmapdir,
                       ranges=None,
@@ -1399,7 +1399,7 @@ if __name__ == '__main__':
                      ranges=None,
                      errorLog="POSmap_error_log.text")
     if not args.annotationFolder:
-        print "WARNING NO DISFLUENCY ANNOTATION FOLDER! Quitting"
+        print("WARNING NO DISFLUENCY ANNOTATION FOLDER! Quitting")
         quit()
     annotation_files = [filename for filename in
                         iglob(os.path.join(args.annotationFolder,

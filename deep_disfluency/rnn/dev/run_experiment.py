@@ -8,10 +8,11 @@ import random
 from copy import deepcopy
 import itertools
 import theano
+theano.config.gcc.cxxflags = "-Wno-c++11-narrowing"
 import theano.tensor as T
 import gensim
 from collections import defaultdict
-import cPickle
+import pickle
 # sys.path.append('../') #path to the src files
 
 from rnn.elman import Elman
@@ -30,7 +31,7 @@ from experiment_util import save_predictions_and_quick_eval
 theano.config.optimizer='None' #speeds things up marginally
 
 full_label2idx = load_tags("../data/tag_representations/swbd1_trp_tags.csv") #NB mainly for experiments
-full_idx2label = dict((k,v) for v,k in full_label2idx.iteritems()) # fir
+full_idx2label = dict((k,v) for v,k in full_label2idx.items()) # fir
 
 def run_experiment(args):
     #make the args into a dict
@@ -38,7 +39,7 @@ def run_experiment(args):
     for feat,val in args._get_kwargs():
         s[feat] = val
         #print feat,val
-    print s
+    print(s)
     #raw_input()
     
     if s['acoustic']:
@@ -46,15 +47,15 @@ def run_experiment(args):
         
     pre_load_training = True # TODO if not on Bender this is quite big so can't load training- switch to true on Bender
     
-    print "loading data and tag sets" #NB Don't get the tag sets here directly anymore
+    print("loading data and tag sets") #NB Don't get the tag sets here directly anymore
     _, _, _, train_dict = switchboard_data(train_data=s['train_data'],
                                                 tags=s['tags'])
     
     #get relevant dictionaries
-    idx2label = dict((k,v) for v,k in train_dict['labels2idx'].iteritems()) # first half (28) the same as the test
-    idx2word  = dict((k,v) for v,k in train_dict['words2idx'].iteritems())
+    idx2label = dict((k,v) for v,k in train_dict['labels2idx'].items()) # first half (28) the same as the test
+    idx2word  = dict((k,v) for v,k in train_dict['words2idx'].items())
     if not train_dict.get('pos2idx') == None:
-        idx2pos = dict((k,v) for v,k in train_dict['pos2idx'].iteritems())
+        idx2pos = dict((k,v) for v,k in train_dict['pos2idx'].items())
 
     range_dir = "../data/disfluency_detection/swda_divisions_disfluency_detection/"
     range_files = [
@@ -95,7 +96,7 @@ def run_experiment(args):
                 #if we're pre-loading up data, which we do anyway for the test/heldout
                 #but also for training when using a big machine
                 if key != "train" or pre_load_training:
-                    print "loading",dialogue_speaker_data
+                    print("loading",dialogue_speaker_data)
                     dialogue_speaker_data = np.load(dialogue_speaker_data)
                     dialogue_speaker_data = load_data_from_array(dialogue_speaker_data,
                                                                  n_acoust=s['acoustic'],
@@ -105,25 +106,25 @@ def run_experiment(args):
                                                                  idx_to_label=idx2label)
                 data[key].append((f + part, dialogue_speaker_data)) #tuple of name + data/file location
     
-    vocsize = len(train_dict['words2idx'].items())
-    nclasses = len(train_dict['labels2idx'].items())
+    vocsize = len(list(train_dict['words2idx'].items()))
+    nclasses = len(list(train_dict['labels2idx'].items()))
     #nsentences = len(train_lex)
     possize = None
     if not train_dict.get('pos2idx') == None:
-        possize = len(idx2pos.items())
+        possize = len(list(idx2pos.items()))
     #nwords = len(list(itertools.chain(*train_y)))
     
-    print str(len(train_dict['labels2idx'].items())) + " training classes"
-    print str(len(train_dict['words2idx'].items())) + " words in vocab"
+    print(str(len(list(train_dict['labels2idx'].items()))) + " training classes")
+    print(str(len(list(train_dict['words2idx'].items()))) + " words in vocab")
     if not train_dict.get('pos2idx') == None:
-        print str(len(train_dict['pos2idx'].items())) + " pos tags in vocab"
+        print(str(len(list(train_dict['pos2idx'].items()))) + " pos tags in vocab")
     #print str(nsentences) + " training sequences"
     na = 0
     if s['acoustic']:
-        print "with acoustic data..."
+        print("with acoustic data...")
         na = s['acoustic']
     
-    print "instantiating model " + s['model'] + "..."
+    print("instantiating model " + s['model'] + "...")
     np.random.seed(s['seed'])
     rnn = None
     random.seed(s['seed'])
@@ -152,18 +153,18 @@ def run_experiment(args):
                    cost_function='nll')
         
     if s['decoder_file']:
-        print "instantiating hmm decoder..."
+        print("instantiating hmm decoder...")
         #add the interregnum tag (not predicted by the rnn, derived from context)
         hmm_dict = deepcopy(train_dict['labels2idx'])
-        intereg_ind = len(hmm_dict.keys())
+        intereg_ind = len(list(hmm_dict.keys()))
         hmm_dict["<i/><cc>"] = intereg_ind #add the interregnum tag
-        print "loading timing model"
+        print("loading timing model")
         with open('../decoder/LogReg_balanced_timing_classifier.pkl',
                   'rb') as fid:
-            timing_model = cPickle.load(fid)
+            timing_model = pickle.load(fid)
         with open('../decoder/LogReg_balanced_timing_scaler.pkl',
                   'rb') as fid:
-            timing_model_scaler = cPickle.load(fid)
+            timing_model_scaler = pickle.load(fid)
         hmm = FirstOrderHMM(hmm_dict, rnn=rnn, markov_model_file = s['tags'],
                       timing_model=timing_model,
                       timing_model_scaler=timing_model_scaler)
@@ -171,9 +172,9 @@ def run_experiment(args):
         hmm=None
     
     if s['embeddings']:
-        print "loading embeddings..."
+        print("loading embeddings...")
         pretrained = gensim.models.Word2Vec.load("../embeddings/"+s['embeddings']) # load pre-trained embeddings
-        print pretrained[pretrained.index2word[0]].shape
+        print(pretrained[pretrained.index2word[0]].shape)
         #print pretrained[0].shape
         emb = populate_embeddings(s['emb_dimension'], vocsize, train_dict['words2idx'], pretrained) #assign and fill in the gaps
         rnn.load_weights(emb)
@@ -183,7 +184,7 @@ def run_experiment(args):
     #folder  = "/home/dsg-labuser/Desktop/rnn_experiments/"+ s['exp_id']
     if os.path.exists(folder): 
         if not s['use_saved_model']:
-            quit = raw_input('Overwrite contents of folder for experiment {}? [y][n]'.format(s['exp_id']))
+            quit = input('Overwrite contents of folder for experiment {}? [y][n]'.format(s['exp_id']))
             if quit != "y": return
     else:
         os.mkdir(folder)
@@ -199,7 +200,7 @@ def run_experiment(args):
     s['best_epoch'] = 0 
     best_f1 = -np.inf #lowest f-score possible
     
-    print "training..."
+    print("training...")
     start = 1
     end = s['nepochs']
     if s['use_saved_model']:
@@ -216,7 +217,7 @@ def run_experiment(args):
         
         
         if s['use_saved_model']:
-            print "loading stored model and weights- not actually training from " + epochfolder
+            print("loading stored model and weights- not actually training from " + epochfolder)
             rnn.load_weights_from_folder(epochfolder)
             #if s['model'] == "lstm":
             #    rnn.load_weights_from_folder(epochfolder)
@@ -230,14 +231,14 @@ def run_experiment(args):
                 pass
         
         if s['verbose']: # output final learning time
-            print '[learning] epoch %i >>'%(e),'completed in %.2f (sec) <<\r'%(time.time()-tic),
+            print('[learning] epoch %i >>'%(e),'completed in %.2f (sec) <<\r'%(time.time()-tic), end=' ')
         
-        print "saving predictions and evaluating tags..."
+        print("saving predictions and evaluating tags...")
         
         results = {}
         for corpus in ['heldout','test']: #nb for training just test and heldout
             #if not corpus == 'heldout': continue
-            print corpus
+            print(corpus)
             predictions_file = epochfolder + '/predictions_{}.csv'.format(corpus)
             incremental_eval = False
             if s['use_saved_model']:
@@ -253,7 +254,7 @@ def run_experiment(args):
                                      incremental_eval=incremental_eval,
                                      s=s,
                                      increco_style="_asr" in corpus or incremental_eval)
-            for key, val in corpus_results.items():
+            for key, val in list(corpus_results.items()):
                 results[corpus+'_'+key] = val
         if s['use_saved_model']:
             #for using saved model we assume only one eval on that given epoch
@@ -264,7 +265,7 @@ def run_experiment(args):
         #results['heldout_loss'] = 100.0
         #results['test_loss'] = 100.0
         
-        print "saving epoch folder and writing results to file"
+        print("saving epoch folder and writing results to file")
         rnn.save(epochfolder) #Epoch file dump
 
         coi = 'rmtto' #class of interest
@@ -294,8 +295,8 @@ def run_experiment(args):
             rnn.save(folder)
             best_f1 = results['heldout_f1_'+coi]
             if s['verbose']:
-                print 'NEW BEST raw labels at epoch ', e, 'best valid', best_f1 
-                print 'NEW BEST: epoch', e, 'heldout F1', results['heldout_f1_'+coi], 'best test F1', results['test_f1_'+coi], ' '*20
+                print('NEW BEST raw labels at epoch ', e, 'best valid', best_f1) 
+                print('NEW BEST: epoch', e, 'heldout F1', results['heldout_f1_'+coi], 'best test F1', results['test_f1_'+coi], ' '*20)
             s['vf1']  = results['heldout_f1_'+coi]
             s['tf1'] = results['test_f1_'+coi]
             s['best_epoch'] = e
@@ -305,19 +306,19 @@ def run_experiment(args):
         
         # stopping criteria = if no improvement in 10 epochs
         if s['current_epoch'] - s['best_epoch'] >= 10: 
-            print "stopping, no improvement in 10 epochs"
+            print("stopping, no improvement in 10 epochs")
             break
         #decay
         if s['decay'] and abs(s['best_epoch']-s['current_epoch']) >= 2: 
             s['clr'] *= 0.85 #just a steady decay if things aren't improving for 2 epochs, more a hyper param?
-            print "learning rate decayed, now ", s['clr']
+            print("learning rate decayed, now ", s['clr'])
         if s['clr'] < 1e-5:
-            print "stopping, below learning rate threshold" 
+            print("stopping, below learning rate threshold") 
             break
         if s['verbose']: # output final testing time
-            print '[learning] epoch %i >>'%(e),'testing in %.2f (sec) <<\r'%(time.time()-tic),
+            print('[learning] epoch %i >>'%(e),'testing in %.2f (sec) <<\r'%(time.time()-tic), end=' ')
 
-    print 'BEST RESULT: epoch', s['best_epoch'], 'valid F1', s['vf1'], 'best test F1', s['tf1'], 'with the model', folder
+    print('BEST RESULT: epoch', s['best_epoch'], 'valid F1', s['vf1'], 'best test F1', s['tf1'], 'with the model', folder)
     resultsFile.close()
     summariesFile.close()
     

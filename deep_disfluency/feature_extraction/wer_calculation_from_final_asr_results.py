@@ -17,8 +17,8 @@ for ranges in [ranges1, ranges2]:
             ref = " ".join(iframe['Ref']['text'])
             wer = wer(ref, hyp)
             cost = wer(ref, hyp, macro=True)
-            print r, s, wer
-            print>>final_file, r, s, wer, cost
+            print(r, s, wer)
+            print(r, s, wer, cost, file=final_file)
 final_file.close()
 
 
@@ -32,7 +32,7 @@ file = open("../../../simple_rnn_disf/rnn_disf_detection/data/disfluency_detecti
 for l in results:
     #print l
     if l == "\n": 
-        print no_ho
+        print(no_ho)
         no_ho = 0
         file.close()
         file = open("../../../simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/SWDisfTestASRgood_ranges.text","w")
@@ -46,7 +46,7 @@ for l in results:
         ingood = True
     else:
         ingood = False
-print no_ho
+print(no_ho)
 
 results.close()
 file.close() 

@@ -3,9 +3,9 @@ from collections import defaultdict
 import re
 from nltk import tree
 
-from swda import CorpusReader
-from tree_pos_map import TreeMapCorpus
-from tree_pos_map import POSMapCorpus
+from .swda import CorpusReader
+from .tree_pos_map import TreeMapCorpus
+from .tree_pos_map import POSMapCorpus
 
 possibleMistranscription = [("its", "it's"), 
                            ("Its", "It's"), 
@@ -41,7 +41,7 @@ class TreeMapWriter:
                  target_folder_path="Maps",
                  ranges=None,
                  errorLog=None):
-        print "started TreeMapWriting"
+        print("started TreeMapWriting")
         self.write_to_file(corpus_path, 
                            metadata_path, 
                            target_folder_path, 
@@ -88,7 +88,7 @@ class TreeMapWriter:
                 corpus_file = open(target_folder_path  +\
                             "/Tree_map_{0}.csv.text".format(folder), 'w')
                 wordTreeMapList = TreeMapCorpus(False,errorLog)
-                print "new map for folder",folder
+                print("new map for folder",folder)
 
             translist = trans.utterances
             translength = len(translist)
@@ -542,19 +542,19 @@ class TreeMapWriter:
                             if errorLog:
                                 errorLog.write("possible wrong tree mapping:"\
                                                 + errormessage + "\n")
-                            raw_input()
+                            input()
                 #end of while loop (words)
                 mytreenumbers = []
                 for treemap in trees:
                     #the whole list but the tree
                     mytreenumbers.append(treemap[:-1])
                 if not len(utt.text_words()) == len(wordTreeMap):
-                    print "ERROR. uneven lengths!"
-                    print utt.text_words()
-                    print wordTreeMap
-                    print trans.swda_filename
-                    print utt.transcript_index
-                    raw_input()
+                    print("ERROR. uneven lengths!")
+                    print(utt.text_words())
+                    print(wordTreeMap)
+                    print(trans.swda_filename)
+                    print(utt.transcript_index)
+                    input()
                     count+=1
                     continue
                 #add the treemap
@@ -565,7 +565,7 @@ class TreeMapWriter:
                 count+=1
             #rewrite after each transcript
             filedict = defaultdict(str)
-            for key in wordTreeMapList.keys():
+            for key in list(wordTreeMapList.keys()):
                 csv_string = '"' + str(list(wordTreeMapList[key])) + '"'
                 mytreenumbers = wordTreeMapList[key].transcript_numbers
                 myptbnumbers = wordTreeMapList[key].treebank_numbers
@@ -583,7 +583,7 @@ class TreeMapWriter:
                 corpus_file.write(filedict[key])
             
             wordTreeMapList = TreeMapCorpus(False,errorLog) #reset each time
-        print "\n" + str(incorrectTrees) + " incorrect trees"
+        print("\n" + str(incorrectTrees) + " incorrect trees")
         corpus_file.close()
         if not errorLog ==None:
             errorLog.close()
@@ -598,7 +598,7 @@ class POSMapWriter:
                  target_folder_path="Maps",
                  ranges=None, 
                  errorLog=None):
-        print "started MapWriting"
+        print("started MapWriting")
         self.write_to_file(corpus_path, 
                            metadata_path, 
                            target_folder_path,
@@ -642,7 +642,7 @@ class POSMapWriter:
                 corpus_file = open(target_folder_path  +\
                             "/POS_map_{0}.csv.text".format(folder), 'w')
                 wordPOSMapList = POSMapCorpus(False, errorLog)
-                print "new map for folder",folder
+                print("new map for folder",folder)
 
             translist = trans.utterances
             translength = len(translist)
@@ -872,12 +872,12 @@ class POSMapWriter:
                                     
                     #end of while loop (words)
                     if not len(wordPOSMap) == len(utt.text_words()):
-                        print "Error "
-                        print "Length mismatch in file/utt: " + \
-                        str(utt.swda_filename) + str(utt.transcript_index)
-                        print utt.text_words()
-                        print wordPOSMap
-                        raw_input()
+                        print("Error ")
+                        print("Length mismatch in file/utt: " + \
+                        str(utt.swda_filename) + str(utt.transcript_index))
+                        print(utt.text_words())
+                        print(wordPOSMap)
+                        input()
                     
                     wordPOSMapList.append(trans.conversation_no, 
                                           str(utt.transcript_index), 

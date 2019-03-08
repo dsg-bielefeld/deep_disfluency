@@ -53,7 +53,7 @@ def convert_to_simple_label(tag, rep="disf1_uttseg"):
         if m:
             return disftag + m.group(0)
         else:
-            print "WARNING NO TAG", tag
+            print("WARNING NO TAG", tag)
             return ""
     return disftag  # if not TT0
 
@@ -80,7 +80,7 @@ def convert_from_full_tag_set_to_idx(tag, rep, idx_to_label):
     """Maps from the full tag set of trp repairs to the new dictionary"""
     if "simple" in rep:
         tag = convert_to_simple_label(tag)
-    for k, v in idx_to_label.items():
+    for k, v in list(idx_to_label.items()):
         if v in tag:  # a substring relation
             return k
 
@@ -122,9 +122,9 @@ def verify_disfluency_tags(tags, normalize_ID=False):
     # key: old repair ID, value, list [reparandum,interregnum,repair]
     # all True when repair is all there
     repairs = defaultdict(list)
-    for r in id_map.keys():
+    for r in list(id_map.keys()):
         repairs[r] = [None, None, None]  # three valued None<False<True
-    print repairs
+    print(repairs)
     # second pass verify the validity of the tags
     # and (optionally) modify the IDs
     for i in range(0, len(tags)):  # iterate over all tag strings
@@ -132,10 +132,10 @@ def verify_disfluency_tags(tags, normalize_ID=False):
         if tags[i] == "":
             assert(all([repairs[ID][2] or
                         repairs[ID] == [None, None, None]
-                        for ID in repairs.keys()])),\
+                        for ID in list(repairs.keys())])),\
                         "Unresolved repairs at fluent tag\n\t" + str(repairs)
         for tag in get_tags(tags[i]):  # iterate over all tags
-            print i, tag
+            print(i, tag)
             if tag == "<e/>":
                 new_tags.append(tag)
                 continue
@@ -193,7 +193,7 @@ def verify_disfluency_tags(tags, normalize_ID=False):
             new_tags.append(tag.replace(ID, id_map[ID]))
         if normalize_ID:
             tags[i] = "".join(new_tags)
-    assert all([repairs[ID][2] for ID in repairs.keys()]),\
+    assert all([repairs[ID][2] for ID in list(repairs.keys())]),\
         "Unresolved repairs:\n\t" + str(repairs)
 
 
@@ -218,8 +218,8 @@ def minibatch(l, bs):
 
     l :: list of word idxs
     """
-    out = [l[:i] for i in xrange(1, min(bs, len(l)+1))]
-    out += [l[i-bs:i] for i in xrange(bs, len(l)+1)]
+    out = [l[:i] for i in range(1, min(bs, len(l)+1))]
+    out += [l[i-bs:i] for i in range(bs, len(l)+1)]
     assert len(l) == len(out)
     return out
 
@@ -232,11 +232,11 @@ def indices_from_length(sentence_length, bs, start_index=0):
     will output:
     [[0,0],[0,1],[0,2],[1,3]]
     """
-    l = map(lambda x: start_index+x, xrange(sentence_length))
+    l = [start_index+x for x in range(sentence_length)]
     out = []
-    for i in xrange(0, min(bs, len(l))):
+    for i in range(0, min(bs, len(l))):
         out.append([l[0], l[i]])
-    for i in xrange(bs+1, len(l)+1):
+    for i in range(bs+1, len(l)+1):
         out.append([l[i-bs], l[i-1]])
     assert len(l) == sentence_length
     return out
@@ -309,7 +309,7 @@ def corpus_to_indexed_matrix(my_array_list, win, bs, sentence=False):
             totalSize += len(cwords)
     for s in sentences:
         if any([x is None for x in s]):
-            print s
+            print(s)
     return np.matrix(sentences, dtype='int32'), indices
 
 
@@ -492,7 +492,7 @@ def convert_from_inc_disfluency_tags_to_eval_tags(
             rpns_del = re.findall("<rpEndDel/>", tags[t], re.S)
             rpnAll = rpns + rpns_del
             if rpnAll:
-                for k, v in repair_dict.items():
+                for k, v in list(repair_dict.items()):
                     if t >= int(k) and v[2] is False:
                         repair_dict[k][2] = True
                         # classify the repair
@@ -516,7 +516,7 @@ def convert_from_inc_disfluency_tags_to_eval_tags(
                         else:
                             current_tag += '<rpnsub id="{}"/>'.format(k)
         # mid repair phases still in progress
-        for k, v in repair_dict.items():
+        for k, v in list(repair_dict.items()):
             if t > int(k) and v[2] is False:
                 current_tag += '<rp id="{}"/>'.format(k)
         if current_tag == "":
@@ -549,7 +549,7 @@ def verify_dialogue_data_matrix(dialogue_data_matrix, word_dict=None,
             assert tag_dict[row[-1]] is not None,\
                 "row[-1][{}] {} not in tag dict".format(i, row[-1])
     except AssertionError as a:
-        print a
+        print(a)
         return False
     return True
 
@@ -571,7 +571,7 @@ def verify_dialogue_data_matrices_from_folder(matrices_folder_filepath,
                                            tag_dict=tag_dict,
                                            n_lm=n_lm,
                                            n_acoustic=n_acoustic):
-            print "{} failed test".format(dialogue_file)
+            print("{} failed test".format(dialogue_file))
             return False
     return True
 
@@ -648,18 +648,18 @@ if __name__ == '__main__':
         '<f/>'
     tags = tags.split(",")
     words = "i,like,uh,love,to,uh,love,alot".split(",")
-    print tags
-    print len(tags), len(words)
+    print(tags)
+    print(len(tags), len(words))
     new_tags = convert_from_eval_tags_to_inc_disfluency_tags(
                                                     tags,
                                                     words,
                                                     representation="disf1")
-    print new_tags
+    print(new_tags)
     old_tags = convert_from_inc_disfluency_tags_to_eval_tags(
                                                     new_tags,
                                                     words,
                                                     representation="disf1")
     assert old_tags == tags, "\n " + str(old_tags) + "\n" + str(tags)
     x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    print context_win_backwards(x, 2)
-    print "indices", indices_from_length(11, 9)
+    print(context_win_backwards(x, 2))
+    print("indices", indices_from_length(11, 9))

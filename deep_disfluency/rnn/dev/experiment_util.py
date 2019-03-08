@@ -1,8 +1,8 @@
-from __future__ import division
+
 import argparse
 import numpy as np
 from math import log
-import cPickle
+import pickle
 import os
 from copy import deepcopy
 from collections import defaultdict
@@ -27,16 +27,16 @@ def get_diff_and_new_prefix(current, newprefix, verbose=False):
     and change the current hypotheses.
     """
     if verbose:
-        print "current", current
-        print "newprefix", newprefix
+        print("current", current)
+        print("newprefix", newprefix)
     rollback = 0
     original_length = len(current)
     original_current = deepcopy(current)
     for i in range(len(current)-1, -2, -1):
         if verbose:
-            print "oooo", newprefix[0]
+            print("oooo", newprefix[0])
             if not current == []:
-                print current[i]
+                print(current[i])
         if i == -1 or (float(newprefix[0][1]) >= float(current[i][2])):
             if i == len(current)-1:
                 current = current + newprefix
@@ -47,12 +47,12 @@ def get_diff_and_new_prefix(current, newprefix, verbose=False):
                 if k == len(newprefix):
                     break
                 if verbose:
-                    print "...", j, k, current[j], newprefix[k], len(newprefix)
+                    print("...", j, k, current[j], newprefix[k], len(newprefix))
                 if not current[j] == newprefix[k]:
                     break
                 else:
                     if verbose:
-                        print "repeat"
+                        print("repeat")
                     k += 1
                     marker = j+1
             rollback = original_length - marker
@@ -63,9 +63,9 @@ def get_diff_and_new_prefix(current, newprefix, verbose=False):
         rollback = 0  # just no rollback if no prefix
         current = original_current  # reset the current
     if verbose:
-        print "current after call", current
-        print "newprefix after call", newprefix
-        print "rollback after call", rollback
+        print("current after call", current)
+        print("newprefix after call", newprefix)
+        print("rollback after call", rollback)
     return (current, newprefix, rollback)
 
 
@@ -93,7 +93,7 @@ def get_last_n_features(feature, current_words, idx, n=3):
     else:
         # words or pos
         start = max(0, (idx - n) + 1)
-        print start, idx + 1
+        print(start, idx + 1)
         position = 1 if feature == "POS" else 0
         return [triple[position] for triple in
                 current_words[start: idx + 1]]
@@ -131,7 +131,7 @@ def save_predictions_and_quick_eval(predictions_filename=None,
     Does a rough evaluation for the purposes of the stopping criterion.
     i.e. No revision of the distributions due to HMM.
     """
-    label_to_idx_dict = {v: k for k, v in idx_to_label_dict.items()}
+    label_to_idx_dict = {v: k for k, v in list(idx_to_label_dict.items())}
     classes = [idx_to_label_dict[idx]
                for idx in sorted(idx_to_label_dict.keys())]
     raw_predictions_file = open(predictions_filename, "w")
@@ -156,14 +156,14 @@ def save_predictions_and_quick_eval(predictions_filename=None,
         prev_predictions = []
         labels = []
         dialogue_id, dialogue_data = d
-        print dialogue_id
+        print(dialogue_id)
         frame, acoustic_data, lexical_data, pos_data, _, tag_labels = \
             dialogue_data
         if (not increco_style) and incremental_eval:
             acoustic_data, lexical_data, pos_data = \
                 simulate_increco_data(frame, acoustic_data,
                                       lexical_data, pos_data)
-            print "simulating asr"
+            print("simulating asr")
         if hmm:
             hmm.viterbi_init()
         # 1. take increco input
@@ -329,13 +329,13 @@ def save_predictions_and_quick_eval(predictions_filename=None,
     raw_predictions_file.close()
     if incremental_eval:
         inc_predictions_file.close()
-    print "overall loss/cross entropy", loss/total
+    print("overall loss/cross entropy", loss/total)
     av_loss = []
-    for key, val in sorted(class_loss.items(), key=lambda x: x[0]):
-        print key, val
+    for key, val in sorted(list(class_loss.items()), key=lambda x: x[0]):
+        print(key, val)
         av_loss.append(np.average(val))
     class_loss = np.average(av_loss)
-    print "per class loss", class_loss
+    print("per class loss", class_loss)
     if incremental_eval:
         return {}
     p_r_f_tags = precision_recall_fscore_support(raw_tag_labels,
@@ -343,9 +343,9 @@ def save_predictions_and_quick_eval(predictions_filename=None,
                                                  average='weighted')
     tag_summary = classification_report(
         raw_tag_labels, raw_tag_predictions,
-        labels=[i for i in xrange(len(classes))],
-        target_names=[idx_to_label_dict[i] for i in xrange(len(classes))])
-    print tag_summary
+        labels=[i for i in range(len(classes))],
+        target_names=[idx_to_label_dict[i] for i in range(len(classes))])
+    print(tag_summary)
     results = {"f1_rmtto": p_r_f_tags[2], "f1_rm": p_r_f_tags[2],
                "f1_tto1": p_r_f_tags[2], "f1_tto2": p_r_f_tags[2]}
 

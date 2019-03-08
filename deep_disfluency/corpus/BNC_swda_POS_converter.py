@@ -108,7 +108,7 @@ def translate_to_PennPOS(pos, pos2, word, word2):
     elif "-" in pos:
         pos = translate_to_PennPOS(pos[0:pos.rfind("-")], pos2, word, word2)
     else:
-        print "UNIDENTIFIED " + pos + word
+        print("UNIDENTIFIED " + pos + word)
 
     return pos
 
@@ -160,8 +160,8 @@ def convert_BNC_sentence(sentence, posconvert=True):
                 continue
         # TODO check consistency, not neccessarily, this is their unknown
         # words, not ours
-        elif pos in dodgy or "\u" in word:
-            word = word.replace("\u", "")
+        elif pos in dodgy or "\\u" in word:
+            word = word.replace("\\u", "")
             # not differentiating numbers for now, could get this from CD
             # (cardinal numbers), above
             word = "$unc$" + word

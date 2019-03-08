@@ -32,10 +32,10 @@ sep_dir = rootdir + "split_channels/"
 converted_to_wav = True #turn off and on
 if not converted_to_wav:
     sph_files = os.listdir(rootdir)
-    sph_files = filter(lambda x : x[-4:]==".sph",sph_files)
+    sph_files = [x for x in sph_files if x[-4:]==".sph"]
     for sph in sph_files:
         c = 'sox ' + '"' + rootdir + sph + '"' + " -e signed-integer " + '"' + rootdir + "wav/" + sph.replace(".sph",".wav") + '"'
-        print c
+        print(c)
         os.system(c)
 
 
@@ -51,12 +51,12 @@ for wav in sorted(wavfiles):
         start = True
     if not start:
         continue
-    print wav
+    print(wav)
     wavfile = rootdir+"wav/"+wav
     commandl = 'sox ' + '"' + wavfile + '" ' + '"' + sep_dir+wav.replace(".wav","_l.wav") + '" ' +  ' remix 1'
     commandr = 'sox ' + '"' + wavfile + '" ' + '"' + sep_dir+wav.replace(".wav","_r.wav") + '" ' +  ' remix 2'
     #commanddel = "rm " + rootdir+"wav/"+wav
-    print wavfile
+    print(wavfile)
     #print commandl
     os.system(commandl)
     #print commandr
@@ -74,7 +74,7 @@ wavfiles = os.listdir(rootdir+"/wav")
 asr_dir = rootdir+"/asr"
 for wav in sorted(wavfiles):
     wavfile = rootdir + "wav/"+ wav
-    print wavfile
+    print(wavfile)
     
 
 
@@ -92,7 +92,7 @@ for wav in sorted(wavfiles):
     csv = wavfile.replace("/wav/","/audio_features/").replace(".wav",".csv")
     c = '/Applications/openSMILE-2.1.0/inst/bin/SMILExtract -nologfile -C {} -I "{}" -O "{}"'.format(config,wavfile,csv)
     #print c
-    print wavfile
+    print(wavfile)
     os.system(c)
     #h = raw_input()
     #if h == "q": break

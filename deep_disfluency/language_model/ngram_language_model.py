@@ -1,12 +1,12 @@
 # Ngrams models
-from __future__ import division
+
 import math
 from collections import defaultdict
-import cPickle
+import pickle
 from operator import itemgetter
 import numpy
 
-from util import safe_open,flush_and_close
+from .util import safe_open,flush_and_close
 
 infinity = float('inf')
 minus_infinity = - infinity
@@ -121,7 +121,7 @@ class LanguageModel(object):
         tokens = self.tokenize_sentence(text,order)
         s = 0.
         delta = self.order - 1
-        for i in xrange(delta, len(tokens)):
+        for i in range(delta, len(tokens)):
             ng = tokens[i - delta : i + 1]
             p = self.ngram_prob(ng,order) #got a partial word factor
             s += (p * -log(p))
@@ -138,9 +138,9 @@ class LanguageModel(object):
         tokens = text.split()
         s = 0
         for i in range(order-1,len(tokens)):
-            print tokens[i-order+1:i+1]
+            print(tokens[i-order+1:i+1])
             p = self.surprisal(tokens[i-order+1:i+1],order)
-            print p
+            print(p)
             s+=p
         return s * (1.0/float(len(tokens)))
 
@@ -155,7 +155,7 @@ class LanguageModel(object):
         Returns the sum of the n-grams logprobs divided by the inverse of 
         the sum of the unigram probabilities"""
         test = sum(self.tokens_logprob(tokens,1,special=special))
-        if test == 0: print tokens
+        if test == 0: print(tokens)
         return sum(self.tokens_logprob(tokens,self.order,special)) / \
             (-1. * test)
 
@@ -164,14 +164,14 @@ class LanguageModel(object):
         divided by its unigram logprob"""
         logprobs = self.tokens_logprob(tokens,self.order)
         unigram_logprobs = self.tokens_logprob(tokens,1)
-        return min(map(lambda x,y: - (x / y),logprobs,unigram_logprobs))
+        return min(list(map(lambda x,y: - (x / y),logprobs,unigram_logprobs)))
 
     def normalized_max_logprob(self,tokens):
         """Returns the highest logprob assigned to the n-grams of the sentence 
         divided by its unigram logprob"""
         logprobs = self.tokens_logprob(tokens,self.order)
         unigram_logprobs = self.tokens_logprob(tokens,1)
-        return max(map(lambda x,y: - (x / y),logprobs,unigram_logprobs))
+        return max(list(map(lambda x,y: - (x / y),logprobs,unigram_logprobs)))
 
     def mean_of_n_smallest_ngrams(self,tokens,n=2):
         """Returns the mean value of the n lowest scoring n-grams (normalized 
@@ -202,8 +202,8 @@ class LanguageModel(object):
     def cache_result(self,ngram,mytuple):
         """simple caching procedure that should help speed things up"""
         self.cache[str(ngram)] = mytuple
-        if len(self.cache.keys())>self.cache_limit:
-            for key in self.cache.iterkeys():#removes any other element
+        if len(list(self.cache.keys()))>self.cache_limit:
+            for key in self.cache.keys():#removes any other element
                 if not key == str(ngram): del self.cache[key]; break
     
     def init_cache(self):
@@ -352,21 +352,21 @@ class KneserNeySmoothingModel(LanguageModel):
         if train_corpus != None:
             self.train(train_corpus)
         if second_corpus !=None:
-            print "using second corpus"
+            print("using second corpus")
             self.train(second_corpus)
         if heldout_corpus != None:
-            print "using heldout corpus"
+            print("using heldout corpus")
             self.train(heldout_corpus,heldout=True)
         
         if train_corpus !=None: #this is required to 
             #order the unigrams and bigrams for entropies, 
             #can probably discard after entropy cacheing,
-            print str(self.train_length), "total words of training data"    
-            for ngram,val in sorted(self.unigram_counts.items(), \
+            print(str(self.train_length), "total words of training data")    
+            for ngram,val in sorted(list(self.unigram_counts.items()), \
                                     key=itemgetter(1),reverse=True): \
                                     self.unigrams.append(ngram)
             self.vocab_size = len(self.unigrams)
-            for ngram,val in sorted(self.bigram_counts.items(), \
+            for ngram,val in sorted(list(self.bigram_counts.items()), \
                                     key=itemgetter(1),reverse=True): \
                                     self.bigrams.append(ngram)
             self.init_entropy_cache(0.40) #initialise max ent
@@ -377,9 +377,9 @@ class KneserNeySmoothingModel(LanguageModel):
             self.load(saved_file)
         
         #self.init_cache() #TODO we could look at cacheing
-        print "1-grams =", str(self.vocab_size)
-        print "2-grams =", str(self.bigram_types)
-        print "3-grams =", str(self.trigram_types)
+        print("1-grams =", str(self.vocab_size))
+        print("2-grams =", str(self.bigram_types))
+        print("3-grams =", str(self.trigram_types))
         # print self.unigrams
         
     def glue_tokens(self,tokens,order):
@@ -398,9 +398,9 @@ class KneserNeySmoothingModel(LanguageModel):
         smoothing,
         taken from Goodman 2001 and generalized to arbitrary orders"""
         l = len(tokens)
-        for i in xrange(order-1,l): # tokens should have a prefix of order - 1
+        for i in range(order-1,l): # tokens should have a prefix of order - 1
             #print i
-            for d in xrange(order,0,-1): #go through all the different 'n's
+            for d in range(order,0,-1): #go through all the different 'n's
                 if d == 1:
                     self.unigram_denominator += 1
                     #print "unigram_denom" + str(self.unigram_denominator)
@@ -455,19 +455,19 @@ class KneserNeySmoothingModel(LanguageModel):
         of the given order"""
         #if special mode, i.e. string, split on new line character \n
         if isinstance(train_corpus,str):
-            print "training corpus is a string"
+            print("training corpus is a string")
             train_corpus = train_corpus.split("\n") #split string by new line
             is_file = False
         else:
-            print "training corpus is a file"
+            print("training corpus is a file")
             train_corpus.seek(0) # we reset the corpus reading position
             is_file = True
         
         if heldout == True:
             totalunk = 0
-            print "Training language model on heldout data..."
+            print("Training language model on heldout data...")
         else:
-            print "Training language model on standard data..."
+            print("Training language model on standard data...")
             
         for line in train_corpus:
             if is_file: #assuming a REF file here
@@ -497,15 +497,15 @@ class KneserNeySmoothingModel(LanguageModel):
             self.train_length+=len(tokens)-self.order
             self.ngrams_interpolated_kneser_ney(tokens,self.order)
 
-        self.vocab_size = len(self.unigram_counts.keys()) 
+        self.vocab_size = len(list(self.unigram_counts.keys())) 
         #always updates after any training
         if heldout == True: 
-            print "unknown words in heldout data",totalunk
+            print("unknown words in heldout data",totalunk)
             if totalunk == 0: #have to add the dummy <unk> if no unknown ones
                 text = "<unk>"
                 tokens = self.tokenize_sentence(text, self.order)
                 self.ngrams_interpolated_kneser_ney(tokens, self.order)
-        print "TOTAL WORDS TRAINED ON =",self.train_length
+        print("TOTAL WORDS TRAINED ON =",self.train_length)
     
     def raw_ngram_prob(self,ngram,discount,order,partialWordFactor=False):
         """The internal implementation of ngram_prob.
@@ -550,15 +550,15 @@ class KneserNeySmoothingModel(LanguageModel):
         probability = previous_prob = float(uni_num) / \
         float(self.unigram_denominator)
         if probability == 0.0:
-            print "0 prob!"
-            print self.glue_tokens(ngram[-1],1)
-            print ngram
-            print self.ngram_numerator_map.get(self.glue_tokens(ngram[-1],1))
-            print self.unigram_denominator
-            raw_input()
+            print("0 prob!")
+            print(self.glue_tokens(ngram[-1],1))
+            print(ngram)
+            print(self.ngram_numerator_map.get(self.glue_tokens(ngram[-1],1)))
+            print(self.unigram_denominator)
+            input()
             
         # now we compute the higher order probs and interpolate
-        for d in xrange(2,order+1):
+        for d in range(2,order+1):
             ngram_den = self.ngram_denominator_map.get(
                                         self.glue_tokens(ngram[-(d):-1],d))
             if ngram_den == None: ngram_den = 0
@@ -766,7 +766,7 @@ class KneserNeySmoothingModel(LanguageModel):
                 #raw_input("KL prob = 0!! " + str(contexttokens1) +\
                 # str(target))
             elif p2 == 0:
-                print "INFINITE KL DIVERGENCE!" #todo should we 
+                print("INFINITE KL DIVERGENCE!") #todo should we 
                 #still check they're proper prob dists?
                 return infinity
             else:
@@ -777,8 +777,8 @@ class KneserNeySmoothingModel(LanguageModel):
         "NOT SUMMING TO 1. total mass 1 = " + str(totalMass1) +\
          " total mass 2 = " \
         + str(totalMass2) + str(contexttokens1) + str(contexttokens2)
-        print "KL div" + str(contexttokens1) + str(contexttokens2) + \
-        " = " +  str(KL) + "\n"
+        print("KL div" + str(contexttokens1) + str(contexttokens2) + \
+        " = " +  str(KL) + "\n")
         return KL
     
     def KL_divergence_continuation_fast(self,contexttokens1,contexttokens2):
@@ -836,7 +836,7 @@ class KneserNeySmoothingModel(LanguageModel):
                 #raw_input("KL prob = 0!! " + str(contexttokens1) +\
                 # str(target))
             elif p2 == 0:
-                print "INFINITE KL DIVERGENCE!" #TODO prob dist?
+                print("INFINITE KL DIVERGENCE!") #TODO prob dist?
                 return infinity
             else:
                 newKL = log(p1/p2) * p1
@@ -895,10 +895,10 @@ class KneserNeySmoothingModel(LanguageModel):
         #self.matrices = OrderedDict(bsr) #simple list of top 
         #bigram histories indexed to a sparse matrix, their epsilon
         # and their entropy
-        for bigram in self.bigrams.keys():    
+        for bigram in list(self.bigrams.keys()):    
             self.ngram_denominator_map[bigram]
         i = 0
-        for bigram,val in sorted(bigram.items(), key=itemgetter(1),\
+        for bigram,val in sorted(list(bigram.items()), key=itemgetter(1),\
                                  reverse=True): #most fertile bigrams
             self.cache[bigram] = self.entropy_continuation_fast(\
                                     bigram.split(),returnEps=True,
@@ -913,16 +913,16 @@ class KneserNeySmoothingModel(LanguageModel):
         probdist = defaultdict(float)
         Z = 0  #normalising constant
         missing = 0
-        for key in self.unigrams.keys():
+        for key in list(self.unigrams.keys()):
             if not prefix in key == None:
                 missing+=1; continue #TODO what's the best way of smoothing?
             prob = self.ngram_prob([key],1) #unigram prob
             Z+= prob
             probdist[key] = prob
             #total+=1
-        print prefix + ":___\n"
+        print(prefix + ":___\n")
         totalMass = 0
-        for key,val in sorted(probdist.items(), key=itemgetter(1),\
+        for key,val in sorted(list(probdist.items()), key=itemgetter(1),\
                               reverse=True): #can get entropy on line for this?
             newprob = (1/Z) * probdist[key]
             probdist[key] = newprob
@@ -951,7 +951,7 @@ class KneserNeySmoothingModel(LanguageModel):
         Z = 0.
         #epsilon = 1/len(self.unigrams.keys())
         count = 0
-        for unigram in self.unigrams.keys():
+        for unigram in list(self.unigrams.keys()):
             test = ngram[:-1]  + [unigram]
             #print self.ngram_prob(test,order)
             #print self.raw_prob_completion(ngram[-1],unigram)
@@ -971,7 +971,7 @@ class KneserNeySmoothingModel(LanguageModel):
             if prob>highest:
                 highest=prob
                 best = unigram
-        print best
+        print(best)
         return Z / float(count)
     
     def prob_fluent_simple(self,ngram,order):
@@ -1004,8 +1004,8 @@ class KneserNeySmoothingModel(LanguageModel):
         db = open(attrs['num_db'],'r')
         while flag:
             try:
-                k = cPickle.load(db)
-                v = cPickle.load(db)
+                k = pickle.load(db)
+                v = pickle.load(db)
                 update(self.ngram_numerator_map,k,v)
             except EOFError:
                 flag = False
@@ -1014,8 +1014,8 @@ class KneserNeySmoothingModel(LanguageModel):
         db = open(attrs['den_db'],'r')
         while flag:
             try:
-                k = cPickle.load(db)
-                v = cPickle.load(db)
+                k = pickle.load(db)
+                v = pickle.load(db)
                 update(self.ngram_denominator_map,k,v)
             except EOFError:
                 flag = False
@@ -1024,8 +1024,8 @@ class KneserNeySmoothingModel(LanguageModel):
         db = open(attrs['nz_db'],'r')
         while flag:
             try:
-                k = cPickle.load(db)
-                v = cPickle.load(db)
+                k = pickle.load(db)
+                v = pickle.load(db)
                 update(self.ngram_non_zero_map,k,v)
             except EOFError:
                 flag = False
@@ -1190,7 +1190,7 @@ class KneserNeySmoothingModel(LanguageModel):
     def load(self, index_filename):
         """"Loads a Kneser-Ney model from index_filename"""
         f = safe_open(index_filename,'rb')
-        attributes = cPickle.load(f)
+        attributes = pickle.load(f)
         self.order = attributes['order']
         self.partial_words = attributes['partial_words']
         self.discount = attributes['discount']
@@ -1219,7 +1219,7 @@ class KneserNeySmoothingModel(LanguageModel):
         """Saves a Kneser-Ney model to index_filename"""
         
         f = safe_open(index_filename,'wb')
-        cPickle.dump({'smoothing' : 'kneser-ney',\
+        pickle.dump({'smoothing' : 'kneser-ney',\
             'order' : self.order, 'partial_words': self.partial_words, 
             'discount' : self.discount, 'verbose' : self.verbose,\
             'bigram_types' : self.bigram_types, 

@@ -1,7 +1,7 @@
 # Create the source part of the noisy channel through language modelling
 # Consumes utterances or word streams word-by-word and outputs every single
 # 'clean' underlying sequence of utterances
-from __future__ import division
+
 from copy import deepcopy
 import math
 import os
@@ -46,9 +46,9 @@ class SourceModel(object):
             def score(x):
                 return log(0) if x[1][1] == 0 else x[1][1]
         if len(self.word_tree) >= 9:
-            n = int(len(self.word_tree[-1].keys()) / 3)
+            n = int(len(list(self.word_tree[-1].keys())) / 3)
             n = 100
-            top_n = sorted(self.word_tree[-1].items(),
+            top_n = sorted(list(self.word_tree[-1].items()),
                     key=lambda x: score(x),
                     reverse=True)[:n]
             # for k,v in top_n:
@@ -180,18 +180,17 @@ class SourceModel(object):
         assert(node_value)
         if depth > (len(self.word_tree)-len(suffix)-1):
             if debug:
-                print "start node in front of suffix start, chain back", depth, len(suffix)
+                print("start node in front of suffix start, chain back", depth, len(suffix))
             # should be a fairly straightforward chain back
             last_node = (node_address, node_value)
             # print 'last node', last_node
             for d in range(depth-1, (len(self.word_tree)-len(suffix)-1), -1):
                 # get the father
                 if debug:
-                    print 'last node int', last_node
-                    print d
-                    print self.word_tree[d]
-                last_node = filter(lambda x: x[0] == last_node[1][-1],
-                                   self.word_tree[d].items())[0]
+                    print('last node int', last_node)
+                    print(d)
+                    print(self.word_tree[d])
+                last_node = [x for x in list(self.word_tree[d].items()) if x[0] == last_node[1][-1]][0]
                 depth = d
             node_value = last_node[1]
             node_address = last_node[0]
@@ -199,13 +198,11 @@ class SourceModel(object):
         # now chain through the successor depths to find a path
         # through consistent with the suffix tags, else
         # create the path
-        for d, tag in zip(range(depth+1, len(self.word_tree)), suffix):
+        for d, tag in zip(list(range(depth+1, len(self.word_tree))), suffix):
             if not new:
                 # 1. see if successor node exists with right tag
-                nodes = filter(lambda x: x[1][0] == tag,
-                               self.word_tree[d].items())
-                nodes = filter(lambda x: x[1][-1] == node_address,
-                               nodes)
+                nodes = [x for x in list(self.word_tree[d].items()) if x[1][0] == tag]
+                nodes = [x for x in nodes if x[1][-1] == node_address]
                 if nodes:
                     # get the new successor nodes
                     node_address, node_value = nodes[0]
@@ -220,8 +217,8 @@ class SourceModel(object):
             node_value = self.get_successor_node_value(node_address,
                                                        node_value, tag, d)
             
-            node_address = 0 if len(self.word_tree[d].items()) == 0 \
-                                else max(self.word_tree[d].items(),
+            node_address = 0 if len(list(self.word_tree[d].items())) == 0 \
+                                else max(list(self.word_tree[d].items()),
                                          key=lambda x: x[0])[0] + 1
             self.word_tree[d][node_address] = node_value
             node_path.append((node_address, node_value))
@@ -234,25 +231,22 @@ class SourceModel(object):
         """
         node_path = []
         for s, d in zip(
-                range(0, len(suffix)),
-                range(len(self.word_tree)-len(suffix),
-                      len(self.word_tree))):
+                list(range(0, len(suffix))),
+                list(range(len(self.word_tree)-len(suffix),
+                      len(self.word_tree)))):
             # print "s,d", s,d
             # if we're in the loop we're still assuming there is 
             # an existing path
             tag = suffix[s]
             if s == 0:
                 # first one, just get the ones with the right tags
-                nodes = filter(lambda x: x[1][0] == tag,
-                           self.word_tree[d].items())
+                nodes = [x for x in list(self.word_tree[d].items()) if x[1][0] == tag]
             else:
                 # otherwise, get the ones with the right tags which
                 # are the children of the existing nodes
-                successors = filter(lambda x: x[1][0] == tag,
-                           self.word_tree[d].items())
-                nodes = filter(lambda x: any([x[1][-1] ==
-                                              n[0] for n in nodes]),
-                                 successors)
+                successors = [x for x in list(self.word_tree[d].items()) if x[1][0] == tag]
+                nodes = [x for x in successors if any([x[1][-1] ==
+                                              n[0] for n in nodes])]
             if nodes:
                 node_path.append(deepcopy(nodes))
             else:
@@ -265,8 +259,7 @@ class SourceModel(object):
                     new_node_path = [last_node]
                     for b in range(len(node_path)-2, -1, -1):
                         # get the father
-                        last_node = filter(lambda x: x[0] == last_node[1][-1],
-                                           node_path[b])[0]
+                        last_node = [x for x in node_path[b] if x[0] == last_node[1][-1]][0]
                         assert(last_node)
                         new_node_path = [last_node] + new_node_path
                     node_path = new_node_path
@@ -274,7 +267,7 @@ class SourceModel(object):
                 else:
                     # empty node path so far
                     # just get most likely node at d-1
-                    node = max(self.word_tree[d-1].items(),
+                    node = max(list(self.word_tree[d-1].items()),
                                 key=lambda x: x[1][1])
                 node_ID = (d-1, node[0])
                 path_tail = self.find_or_generate_path_of_suffix_from_node(
@@ -291,8 +284,7 @@ class SourceModel(object):
             # get the father
             # print 'last node int', last_node
             # print "node path[b]", node_path[b]
-            last_node = filter(lambda x: x[0] == last_node[1][-1],
-                               node_path[b])[0]
+            last_node = [x for x in node_path[b] if x[0] == last_node[1][-1]][0]
             assert(last_node)
             new_node_path = [last_node] + new_node_path
         node_path = new_node_path
@@ -307,7 +299,7 @@ class SourceModel(object):
         assert len(suffix) <= len(self.word_tree)
         # print "suffix", suffix
         if not suffix:
-            print "WARNING empty suffix queried"
+            print("WARNING empty suffix queried")
             return 0, None
         if len(self.word_tree) == 2 and suffix[0] == "<f/>":  # i.e. first word
             return log(0.0), None  # the only illegal sequence
@@ -344,7 +336,7 @@ class SourceModel(object):
         """
         top_n = []
         lm_tree_dict = self.word_tree[-1]
-        final_nodes = sorted(lm_tree_dict.items(),
+        final_nodes = sorted(list(lm_tree_dict.items()),
                         key=lambda x: log(0) if x[1][2] == 0 
                         else x[1][1]/-x[1][2],
                         reverse=True)[:n]
@@ -362,7 +354,7 @@ class SourceModel(object):
             top_n.append(deepcopy(sequence))
         for seq, x in zip(top_n, final_nodes):
             wml = log(0) if x[1][2] == 0 else x[1][1]/-x[1][2]
-            print seq, wml
+            print(seq, wml)
         return top_n
 
 
@@ -374,14 +366,14 @@ class LMTester(object):
     def init_language_models(self, language_model=None,
                              pos_language_model=None,
                              edit_language_model=None):
-        print "Init language models ..."
+        print("Init language models ...")
         pos = True
         clean_model_dir = os.path.dirname(os.path.realpath(__file__)) +\
             "/../data/lm_corpora"
         if language_model:
             self.lm = language_model
         else:
-            print "No language model specified, using default switchboard one"
+            print("No language model specified, using default switchboard one")
             lm_corpus_file = open(clean_model_dir +
                                   "/swbd_disf_train_1_clean.text")
             lines = [line.strip("\n").split(",")[1] for line in lm_corpus_file
@@ -400,8 +392,8 @@ class LMTester(object):
         if pos_language_model:
             self.pos_lm = pos_language_model
         elif pos:
-            print "No pos language model specified, \
-            using default switchboard one"
+            print("No pos language model specified, \
+            using default switchboard one")
             lm_corpus_file = open(clean_model_dir +
                                   "/swbd_disf_train_1_clean.text")
             lines = [line.strip("\n").split(",")[1] for line in lm_corpus_file
@@ -425,17 +417,17 @@ if __name__ == '__main__':
     pos = "PRP RB RB MDRB MDRB VB WPBES VBG TO VB UH".split()
     tags = ['<s/>', '<e/>', '<e/>', '<e/>', '<f/>', '<f/>', '<f/>', '<f/>',
             '<f/>', '<s/>', '<s/>']
-    for w, p, i in zip(words, pos, range(0, len(words))):
+    for w, p, i in zip(words, pos, list(range(0, len(words)))):
         s.consume_word(w)
-        print "dimen of word tree,", len(s.word_tree), len(s.word_tree[-1])
+        print("dimen of word tree,", len(s.word_tree), len(s.word_tree[-1]))
         # print s.word_tree[-1]
         # top_n = s.get_top_n_sequences(5)
         # print top_n
         # print top_n[:10]
         #raw_input()
     # check all 
-        print s.get_log_diff_of_tag_suffix(tags[:i], n=1)
+        print(s.get_log_diff_of_tag_suffix(tags[:i], n=1))
     
-    print s.get_log_diff_of_tag_suffix([
-        "<s/>", "<s/>", "<s/>"], n=1, start_node_ID=(10,0))
+    print(s.get_log_diff_of_tag_suffix([
+        "<s/>", "<s/>", "<s/>"], n=1, start_node_ID=(10,0)))
     

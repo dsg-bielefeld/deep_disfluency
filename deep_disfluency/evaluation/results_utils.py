@@ -4,9 +4,9 @@ import numpy as np
 from scipy import ndimage
 import matplotlib.pyplot as plt
 
-from disf_evaluation import ACCURACY_HEADER
-from disf_evaluation import FINAL_OUTPUT_TTO_ACCURACY_HEADER
-from disf_evaluation import INCREMENTAL_OUTPUT_TTO_ACCURACY_HEADER
+from .disf_evaluation import ACCURACY_HEADER
+from .disf_evaluation import FINAL_OUTPUT_TTO_ACCURACY_HEADER
+from .disf_evaluation import INCREMENTAL_OUTPUT_TTO_ACCURACY_HEADER
 
 
 final_result_to_latex_dict = OrderedDict((key, val) for key, val in [
@@ -53,7 +53,7 @@ def convert_to_latex(results, eval_level=["word", "interval"],
         result_to_latex_dict = final_result_to_latex_dict
     else:
         result_to_latex_dict = incremental_result_to_latex_dict
-    system_results = {sys: [] for sys in results.keys()}
+    system_results = {sys: [] for sys in list(results.keys())}
     utt_seg_measures = FINAL_OUTPUT_TTO_ACCURACY_HEADER.split(',') + \
         INCREMENTAL_OUTPUT_TTO_ACCURACY_HEADER.split(',')
     raw_header = []
@@ -63,7 +63,7 @@ def convert_to_latex(results, eval_level=["word", "interval"],
             continue
         for e in eval_level:
             raw = raw.format(e)
-            if raw not in result_to_latex_dict.keys():
+            if raw not in list(result_to_latex_dict.keys()):
                 # print "skipping 2", raw
                 continue
             raw_header.append(raw)
@@ -75,7 +75,7 @@ def convert_to_latex(results, eval_level=["word", "interval"],
         # print h, "*"
         conversion = result_to_latex_dict[h]
         header.append(conversion)
-        for sys in results.keys():
+        for sys in list(results.keys()):
             if "asr" in sys and "_word" in h:
                 result = "-"
             else:
@@ -138,7 +138,7 @@ def my_legend(axis=None):
 
     N = 32
     Nlines = len(axis.lines)
-    print Nlines
+    print(Nlines)
 
     xmin, xmax = axis.get_xlim()
     ymin, ymax = axis.get_ylim()
@@ -199,11 +199,11 @@ def accuracyCurvePlot(my_accuracies, limit, filename, upperlimit=None):
     """Plots the learning curve against the number of epochs.
     """
     epoch_numbers = []
-    print "plotting learning curve"
+    print("plotting learning curve")
     plt.gca().set_color_cycle(['red', 'green', 'blue'])
     plt.clf()
     legendlist = []
-    for i in xrange(1, limit+1):
+    for i in range(1, limit+1):
         epoch_numbers.append(i)
     plt.figure(figsize=(8, 4))
     plt.subplot(1, 1, 1)

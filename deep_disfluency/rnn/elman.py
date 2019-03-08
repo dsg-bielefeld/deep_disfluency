@@ -1,4 +1,5 @@
 import theano
+theano.config.gcc.cxxflags = "-Wno-c++11-narrowing"
 import numpy as np
 import os
 

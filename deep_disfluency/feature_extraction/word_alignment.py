@@ -28,10 +28,10 @@ def align(string1,string2):
     #pointers
     
     #do lower case for all
-    string1 = map(lambda x : x.lower().replace("<laughter>","").\
-                  replace("</laughter>",""), string1)
-    string2 = map(lambda x : x.lower().replace("<laughter>","").\
-                  replace("</laughter>",""), string2)
+    string1 = [x.lower().replace("<laughter>","").\
+                  replace("</laughter>","") for x in string1]
+    string2 = [x.lower().replace("<laughter>","").\
+                  replace("</laughter>","") for x in string2]
     
     
     left = "<"
@@ -221,7 +221,7 @@ def matchBlock(ss):
     #print best
     bestset = set()
     bestset.add(tuple(best))
-    remainder = set(xrange(len(ss)))  #step 3 align the remaining sequence to the sequence it matches best to to that sequence
+    remainder = set(range(len(ss)))  #step 3 align the remaining sequence to the sequence it matches best to to that sequence
     remainder.remove(best[0])
     remainder.remove(best[1])
     for i in remainder: # should only be one
@@ -240,7 +240,7 @@ if __name__ == '__main__':
     #s = SelfRepair()
     string1= ["I", "like", "john"]
     string2 = ["<laughter/>I","like","john"]
-    print align(string2,string1)
+    print(align(string2,string1))
     #===========================================================================
     # a = "<breathing/> Wo man richtig geil drauf chillen kann"
     # b = "Wo man richtig geil drauf chillen kann"

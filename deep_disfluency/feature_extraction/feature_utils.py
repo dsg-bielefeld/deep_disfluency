@@ -1,4 +1,4 @@
-from __future__ import division
+
 import csv
 import numpy
 from copy import deepcopy
@@ -120,8 +120,8 @@ def interactive_dialogue(pair):
         line[4] = line[4] + '<speaker floor="{}"/>'.format(speaker)
         all_data[l] = tuple(line)
         if "t/>" in previous_tag and "<c" in line[4]:
-            print "warning interactive, continuation after end"
-            print line
+            print("warning interactive, continuation after end")
+            print(line)
         previous_tag = line[4]
     final_data = []
     for i in range(5):
@@ -147,7 +147,7 @@ def concat_all_data_all_speakers(dialogues, interactive_sort=False,
             current_pair.append(deepcopy(d))
             if len(current_pair) == 2:
                 assert(current_pair[0][0][:-1] == current_pair[1][0][:-1])
-                print [x[0] for x in current_pair]
+                print([x[0] for x in current_pair])
                 data = deepcopy(interactive_dialogue(deepcopy([x[1] for x in
                                                       current_pair])))
                 current_pair = []
@@ -164,12 +164,12 @@ def concat_all_data_all_speakers(dialogues, interactive_sort=False,
             current_label = []
             started = False
             last_idx = ""
-            for i, w_i, p_i, i_i, l_i in zip(range(0,len(lex_data)),
+            for i, w_i, p_i, i_i, l_i in zip(list(range(0,len(lex_data))),
                                                    lex_data,
                                                    pos_data,
                                                    indices_data,
                                                    labels_data):
-                print w_i, p_i, i_i, l_i
+                print(w_i, p_i, i_i, l_i)
                 if (started and i_i.split(":")[0] != last_idx) or \
                         i == len(lex_data) - 1:
                     if convert_to_dnn_format:
@@ -200,7 +200,7 @@ def concat_all_data_all_speakers(dialogues, interactive_sort=False,
             indices.append(deepcopy(indices_data))
             labels.append(deepcopy(labels_data))
 
-    print "concatenated all data"
+    print("concatenated all data")
     # print [len(x) for x in [frames, words, pos, indices, labels]]
     return frames, words, pos, indices, labels
 
@@ -322,9 +322,9 @@ def load_data_from_disfluency_corpus_file(fp, representation="disf1", limit=8,
     one for tags (targets).
      
     NB this does not convert them into one-hot arrays, just outputs lists of string tags."""
-    print "loading from", fp
+    print("loading from", fp)
     f = open(fp)
-    print "loading data", f.name
+    print("loading data", f.name)
     count_seq = 0
     IDs = []
     seq = []
@@ -396,7 +396,7 @@ def load_data_from_disfluency_corpus_file(fp, representation="disf1", limit=8,
         timings.append(tuple(currentTimings))
 
     assert len(seq) == len(targets) == len(pos_seq)
-    print "loaded " + str(len(seq)) + " sequences"
+    print("loaded " + str(len(seq)) + " sequences")
     f.close()
     return (IDs,timings,seq,pos_seq,targets)
 
@@ -424,7 +424,7 @@ def load_data_from_corpus_file(filename, limit=8,
     prev_word = -1
     prev_pos = -1
     prev_index = ""
-    print "loading in timings file", filename, "..."
+    print("loading in timings file", filename, "...")
     for line in a_file:
         if "Speaker:" in line:
             if not started:
@@ -526,7 +526,7 @@ def load_data_from_corpus_file(filename, limit=8,
     # indices = [0] * len(lex_data)
     all_speakers.append((conv_no, (frames, lex_data, pos_data,
                                    indices, labels)))
-    print len(all_speakers), "speakers with timings input"
+    print(len(all_speakers), "speakers with timings input")
     # print "first few lengths"
     # limit = 10
     # for s in all_speakers:
@@ -541,16 +541,16 @@ def get_diff_and_new_prefix(current,newprefix,verbose=False):
     """Only get the different right frontier according to the timings
     and change the current hypotheses"""
     if verbose: 
-        print "current", current
-        print "newprefix", newprefix
+        print("current", current)
+        print("newprefix", newprefix)
     rollback = 0
     original_length = len(current)
     original_current = deepcopy(current)
     for i in range(len(current)-1,-2,-1):
         if verbose: 
-            print "oooo", newprefix[0]
+            print("oooo", newprefix[0])
             if not current == []:
-                print current[i]
+                print(current[i])
         if i==-1 or (float(newprefix[0][1]) >= float(current[i][2])):
             if i==len(current)-1:
                 current = current + newprefix
@@ -561,11 +561,11 @@ def get_diff_and_new_prefix(current,newprefix,verbose=False):
                 if k == len(newprefix):
                     break
                 if verbose: 
-                    print "...", j, k, current[j], newprefix[k], len(newprefix)
+                    print("...", j, k, current[j], newprefix[k], len(newprefix))
                 if not current[j]==newprefix[k]:
                     break
                 else:
-                    if verbose: print "repeat"
+                    if verbose: print("repeat")
                     k+=1
                     marker = j+1
             rollback = original_length - marker   
@@ -576,9 +576,9 @@ def get_diff_and_new_prefix(current,newprefix,verbose=False):
         rollback = 0 #just no rollback if no prefix
         current = original_current #reset the current
     if verbose: 
-        print "current after call", current
-        print  "newprefix after call", newprefix
-        print "rollback after call", rollback
+        print("current after call", current)
+        print("newprefix after call", newprefix)
+        print("rollback after call", rollback)
     return (current, newprefix, rollback)
 
 
@@ -703,7 +703,7 @@ def process_arguments(config=None,
         'tags', #the output tag representations used
         'end_utterance' #whether we do combined end of utterance detection too
         ]
-    print header
+    print(header)
     if args.config:
         for line in open(args.config):
             features = line.strip("\n").split("\t")
@@ -725,6 +725,6 @@ def process_arguments(config=None,
     return args
 
 if __name__ == "__main__":
-    print wer("who is there".split(), "is there".split(), macro=True)
-    print wer("who is there".split(), "".split(), macro=True)
-    print wer("".split(), "who is there".split(), macro=True)
+    print(wer("who is there".split(), "is there".split(), macro=True))
+    print(wer("who is there".split(), "".split(), macro=True))
+    print(wer("".split(), "who is there".split(), macro=True))

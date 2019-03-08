@@ -13,18 +13,18 @@
 #
 # To find the best tag sequence for a given sequence of words,
 # we want to find the tag sequence that has the maximum P(tags | words)
-from __future__ import division
+
 import os
 import re
 from copy import deepcopy
 import numpy as np
 from collections import defaultdict
-import cPickle as pickle
+import pickle as pickle
 import nltk
 
-import tag_conversion
-from hmm_utils import tabulate_cfd
-from hmm_utils import log
+from . import tag_conversion
+from .hmm_utils import tabulate_cfd
+from .hmm_utils import log
 
 # boosts for rare classes
 SPARSE_WEIGHT_T_ = 3.0  # for <t  # with timings this naturally gets boost
@@ -99,7 +99,7 @@ class FirstOrderHMM():
                 self.convert_tag = tag_conversion.convert_to_diact_tag
 
         if markov_model_file:
-            print "loading", markov_model_file, "Markov model"
+            print("loading", markov_model_file, "Markov model")
 
             # print "If we have just seen 'DET', \
             # the probability of 'N' is", cpd_tags["DET"].prob("N")
@@ -122,13 +122,13 @@ class FirstOrderHMM():
             #        tags.append((spl[0], spl[2]))
             #    self.cfd_tags += nltk.ConditionalFreqDist(tags)
         else:
-            print 'No Markov model file specified, empty CFD. Needs training.'
+            print('No Markov model file specified, empty CFD. Needs training.')
         # whatever happens turn this into a cond prob dist:
         self.cpd_tags = nltk.ConditionalProbDist(self.cfd_tags,
                                                  nltk.MLEProbDist)
 
-        all_outcomes = [v.keys() for v in self.cfd_tags.values()]
-        self.tag_set = set(self.cfd_tags.keys() +
+        all_outcomes = [list(v.keys()) for v in list(self.cfd_tags.values())]
+        self.tag_set = set(list(self.cfd_tags.keys()) +
                            [y for x in all_outcomes for y in x])
         self.viterbi_init()  # initialize viterbi
         # print "Test: If we have just seen 'rpSM',\
@@ -143,12 +143,12 @@ class FirstOrderHMM():
             # Only use the Inbetween and Start tags
             self.simple_trp_idx2label = {0: "<c", 1: "<t"}
         else:
-            print "No timing model given"
-        print "Markov Model ready mode:"
+            print("No timing model given")
+        print("Markov Model ready mode:")
         if self.constraint_only:
-            print "constraint only"
+            print("constraint only")
         else:
-            print "conditional probability"
+            print("conditional probability")
 
     def train_markov_model_from_file(self, corpus_path, mm_path, update=False,
                                      non_sparse=False):
@@ -167,7 +167,7 @@ class FirstOrderHMM():
         tags = []
         # expects line separated sequences
         corpus_file = open(corpus_path)
-        print "training decoder from", corpus_path
+        print("training decoder from", corpus_path)
         for line in corpus_file:
             if line.strip("\n") == "":
                 continue
@@ -180,7 +180,7 @@ class FirstOrderHMM():
             # print "length sequence", len(labels_data)
             for i in range(len(labels_data)):
                 if labels_data[i] not in self.observation_tags:
-                    print labels_data[i], "not in obs tags"
+                    print(labels_data[i], "not in obs tags")
                     continue
                 if any(["<i" in t for t in self.observation_tags]):
                     if "<e" in labels_data[i] and i < len(labels_data)-1:
@@ -226,10 +226,10 @@ class FirstOrderHMM():
             self.cfd_tags += nltk.ConditionalFreqDist(tags)
         else:
             self.cfd_tags = nltk.ConditionalFreqDist(tags)
-        print "cfd trained, counts:"
+        print("cfd trained, counts:")
         self.cfd_tags.tabulate()
-        print "test:"
-        print tabulate_cfd(self.cfd_tags)
+        print("test:")
+        print(tabulate_cfd(self.cfd_tags))
         # save this new cfd for later use
         pickle.dump(self.cfd_tags, open(mm_path, "wb"))
         # initialize the cpd
@@ -237,9 +237,9 @@ class FirstOrderHMM():
                                                  nltk.MLEProbDist)
         # print "cpd summary:"
         # print self.cpd_tags.viewitems()
-        print tabulate_cfd(self.cpd_tags)
-        all_outcomes = [v.keys() for v in self.cfd_tags.values()]
-        self.tag_set = set(self.cfd_tags.keys() +
+        print(tabulate_cfd(self.cpd_tags))
+        all_outcomes = [list(v.keys()) for v in list(self.cfd_tags.values())]
+        self.tag_set = set(list(self.cfd_tags.keys()) +
                            [y for x in all_outcomes for y in x])
         self.viterbi_init()  # initialize viterbi
 
@@ -258,10 +258,10 @@ class FirstOrderHMM():
                     for _ in range(0, int(s)):
                         tags.append((domain, range_states[i]))
         self.cfd_tags = nltk.ConditionalFreqDist(tags)
-        print "cfd trained, counts:"
+        print("cfd trained, counts:")
         self.cfd_tags.tabulate()
-        print "test:"
-        print tabulate_cfd(self.cfd_tags)
+        print("test:")
+        print(tabulate_cfd(self.cfd_tags))
         # save this new cfd for later use
         pickle.dump(self.cfd_tags, open(mm_path, "wb"))
         # initialize the cpd
@@ -269,9 +269,9 @@ class FirstOrderHMM():
                                                  nltk.MLEProbDist)
         # print "cpd summary:"
         # print self.cpd_tags.viewitems()
-        print tabulate_cfd(self.cpd_tags)
-        all_outcomes = [v.keys() for v in self.cfd_tags.values()]
-        self.tag_set = set(self.cfd_tags.keys() +
+        print(tabulate_cfd(self.cpd_tags))
+        all_outcomes = [list(v.keys()) for v in list(self.cfd_tags.values())]
+        self.tag_set = set(list(self.cfd_tags.keys()) +
                            [y for x in all_outcomes for y in x])
         self.viterbi_init()  # initialize viterbi
 
@@ -422,7 +422,7 @@ class FirstOrderHMM():
             best_prob = log(0.0)  # has to be -inf for log numbers
             # the inner loop which makes this quadratic complexity
             # in the size of the tag set
-            for prevtag in prev_viterbi.keys():
+            for prevtag in list(prev_viterbi.keys()):
                 # the best converted tag, needs to access the previous one
                 prev_converted_tag = prev_converted[prevtag]
                 # TODO there could be several conversions for this tag
@@ -450,13 +450,13 @@ class FirstOrderHMM():
                         tag_prob = tag_prob * SPARSE_WEIGHT_T
                     if timing_data and self.timing_model:
                         found = False
-                        for k, v in self.simple_trp_idx2label.items():
+                        for k, v in list(self.simple_trp_idx2label.items()):
                             if v in tag:
                                 timing_tag = k
                                 found = True
                                 break
                         if not found:
-                            raw_input("warning")
+                            input("warning")
                         # using the prob from the timing classifier
                         # array over the different classes
                         timing_prob = input_distribution_timing[0][timing_tag]
@@ -585,7 +585,7 @@ class FirstOrderHMM():
             # inc_best_previous = max(inc_prev_viterbi.keys(),
             #                        key=lambda prevtag:
             # inc_prev_viterbi[prevtag])
-            inc_previous = sorted(inc_prev_viterbi.items(),
+            inc_previous = sorted(list(inc_prev_viterbi.items()),
                                   key=lambda x: x[1], reverse=True)
             for tag, prob in inc_previous:
                 # print tag, prob
@@ -616,10 +616,10 @@ class FirstOrderHMM():
         best_n = sorted(best_n, key=lambda x: x[1], reverse=True)
         debug = False
         if debug:
-            print "getting best n"
+            print("getting best n")
             for s, p in best_n:
-                print s[-1], p
-            print "***"
+                print(s[-1], p)
+            print("***")
         assert(best_n[0][1] > log(0.0)), "best prob 0!"
 
         if not noisy_channel_source_model:
@@ -692,7 +692,7 @@ class FirstOrderHMM():
         # and use that to find the overall best sequence
         prev_converted = self.converted[-1]
         prev_viterbi = self.viterbi[-1]
-        best_previous = max(prev_viterbi.keys(),
+        best_previous = max(list(prev_viterbi.keys()),
                             key=lambda prevtag: prev_viterbi[prevtag] +
                             log(self.cpd_tags[prev_converted[prevtag]].
                             prob("se")))
@@ -738,7 +738,7 @@ class FirstOrderHMM():
         if not a_range:
             # if not specified consume the whole soft_max input
             a_range = (0, len(soft_max))
-        for i in xrange(a_range[0], a_range[1]):
+        for i in range(a_range[0], a_range[1]):
             if self.noisy_channel_source_model:
                 self.noisy_channel_source_model.consume_word(words.pop(0))
             self.viterbi_step(soft_max, i, sequence_initial=self.viterbi == [],
@@ -784,10 +784,10 @@ if __name__ == '__main__':
             tags_name)
                      )
     if "disf" in tags_name:
-        intereg_ind = len(tags.keys())
+        intereg_ind = len(list(tags.keys()))
         interreg_tag = "<i/><cc/>" if "uttseg" in tags_name else "<i/>"
         tags[interreg_tag] = intereg_ind  # add the interregnum tag
-    print tags
+    print(tags)
 
     h = FirstOrderHMM(tags, markov_model_file=None)
     mm_path = "models/{}_tags.pkl".format(tags_name)

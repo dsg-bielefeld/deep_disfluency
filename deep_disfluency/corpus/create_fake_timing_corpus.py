@@ -1,5 +1,5 @@
 import csv
-from corpus_util import add_word_continuation_tags
+from .corpus_util import add_word_continuation_tags
 
 
 def get_tag_data_from_corpus_file(f):
@@ -10,7 +10,7 @@ def get_tag_data_from_corpus_file(f):
     one for tags (targets)."""
 
     f = open(f)
-    print "loading data", f.name
+    print("loading data", f.name)
     count_seq = 0
     IDs = []
     seq = []
@@ -60,7 +60,7 @@ def get_tag_data_from_corpus_file(f):
         mappings.append(tuple(currentMappings))
 
     assert len(seq) == len(targets) == len(pos_seq)
-    print "loaded " + str(len(seq)) + " sequences"
+    print("loaded " + str(len(seq)) + " sequences")
     f.close()
     return (IDs, mappings, seq, pos_seq, targets)
 
@@ -88,7 +88,7 @@ def sort_into_dialogue_speakers(IDs, mappings, utts, pos_tags=None,
         speaker = split[1]
         # uttID = split[2]
         current_speaker = "-".join([dialogue, speaker])
-        if current_speaker not in dialogue_speaker_dict.keys():
+        if current_speaker not in list(dialogue_speaker_dict.keys()):
             dialogue_speaker_dict[current_speaker] = [[], [], [], []]
 
         dialogue_speaker_dict[current_speaker][0].extend(list(mapping))
@@ -116,18 +116,18 @@ def write_corpus_file_add_fake_timings_and_utt_tags(f, target_path,
                                                     labels)
     for speaker_name, mapping, utt, pos, label in dialogue_speakers:
         if verbose:
-            print "*" * 30
-            print speaker_name
-            print mapping
-            print utt
-            print pos
-            print label
-            y = raw_input()
+            print("*" * 30)
+            print(speaker_name)
+            print(mapping)
+            print(utt)
+            print(pos)
+            print(label)
+            y = input()
             if y == "y":
                 quit()
         target_file.write("Speaker: " + speaker_name + "\n")
-        starts = range(0, len(label))
-        ends = range(1, len(label)+1)
+        starts = list(range(0, len(label)))
+        ends = list(range(1, len(label)+1))
         for m, s, e, w, p, l in zip(mapping, starts, ends, utt, pos, label):
             l = "\t".join([m, str(float(s)), str(float(e)), w, p, l])
             target_file.write(l + "\n")

@@ -61,9 +61,9 @@ class Metadata:
         appropriate).
         """        
         csvreader = csv.reader(open(self.metadata_filename))
-        header = csvreader.next()
+        header = next(csvreader)
         for row in csvreader:
-            d = dict(zip(header, row))
+            d = dict(list(zip(header, row)))
             for key in ('length', 'from_caller_education', 
                         'to_caller_education'):
                 d[key] = int(d[key]) #nb have removed conversation_no
@@ -112,7 +112,7 @@ class CorpusReader:
         #Always src_dirname/*/...utt.csv
         for filename in sorted(iglob(os.path.join(self.src_dirname, "sw*",
                                                    "*utt.csv"))):
-            print filename
+            print(filename)
             if "metadata" in filename: continue
             #print "scanning file:",filename
             # Optional progress bar:
@@ -170,7 +170,7 @@ class Transcript:
         """
         self.swda_filename = swda_filename
         # If the supplied value is a filename:
-        if isinstance(metadata, str) or isinstance(metadata, unicode):
+        if isinstance(metadata, str) or isinstance(metadata, str):
             self.metadata = Metadata(metadata)        
         else: # Where the supplied value is already a Metadata object or None.
             self.metadata = metadata
@@ -182,7 +182,7 @@ class Transcript:
         rows.pop(0)
         # Extract the conversation_no to get the meta-data. Use the
         # header for this in case the column ordering is ever changed:
-        row0dict = dict(zip(self.header, rows[1]))
+        row0dict = dict(list(zip(self.header, rows[1])))
         #changing from int to string
         #self.conversation_no = int(row0dict['conversation_no'])
         self.conversation_no = row0dict['conversation_no']
@@ -191,17 +191,17 @@ class Transcript:
         # The dictionary of metadata for this transcript:
         if not self.metadata == None:
             transcript_metadata = self.metadata[self.conversation_no]
-            for key, _ in transcript_metadata.iteritems():
+            for key, _ in transcript_metadata.items():
                 setattr(self, key, transcript_metadata[key])
         else:
             transcript_metadata = None
         # Create the utterance list:
-        self.utterances = map((lambda x : Utterance(x, transcript_metadata)), 
-                              rows)
+        self.utterances = list(map((lambda x : Utterance(x, transcript_metadata)), 
+                              rows))
         # Coder's Manual: ``We also removed any line with a "@" 
         #(since @ marked slash-units with bad segmentation).''
-        self.utterances = filter((lambda x : not re.search(r"[@]", x.act_tag)),
-                                  self.utterances)
+        self.utterances = list(filter((lambda x : not re.search(r"[@]", x.act_tag)),
+                                  self.utterances))
     
     def next_utt(self, myUtt):
         for utt in self.utterances:
@@ -309,7 +309,7 @@ class Utterance:
         """        
         ##################################################
         # Utterance data:
-        for i in xrange(len(Utterance.header)):
+        for i in range(len(Utterance.header)):
             att_name = Utterance.header[i]
             row_value = None
             if i < len(row):
@@ -327,7 +327,7 @@ class Utterance:
                     row_value = trees
                 else: row_value = []
             elif att_name == "ptb_treenumbers":
-                if row_value: row_value = map(int, row_value.split("|||"))
+                if row_value: row_value = list(map(int, row_value.split("|||")))
                 else: row_value = []
             elif att_name == 'act_tag':
                 # I thought these conjoined tags were meant to be split.
@@ -406,10 +406,10 @@ class Utterance:
         of self.pos. The output is a list of (string, pos) pairs.
         """        
         tree_lems = self.tree_lemmas()
-        tree_lems = filter((lambda x : x[1] not in ('-NONE-', '-DFL-')), 
-                           tree_lems)
-        tree_lems = map((lambda x : (re.sub(r"-$", "", x[0]), x[1])), 
-                        tree_lems)
+        tree_lems = list(filter((lambda x : x[1] not in ('-NONE-', '-DFL-')), 
+                           tree_lems))
+        tree_lems = list(map((lambda x : (re.sub(r"-$", "", x[0]), x[1])), 
+                        tree_lems))
         return tree_lems
 
     def regularize_pos_lemmas(self):
@@ -419,16 +419,16 @@ class Utterance:
         is a list of (string, pos) pairs.
         """ 
         pos_lems = self.pos_lemmas()
-        pos_lems = filter((lambda x : len(x) == 2), pos_lems)
-        pos_lems = filter((lambda x : x), pos_lems)
+        pos_lems = list(filter((lambda x : len(x) == 2), pos_lems))
+        pos_lems = list(filter((lambda x : x), pos_lems))
         nontree_nodes = ('^PRP^BES', '^FW', '^MD', '^MD^RB', '^PRP^VBZ',
                           '^WP$', '^NN^HVS',
                          'NN|VBG', '^DT^BES', '^MD^VB', '^DT^JJ', '^PRP^HVS',
                           '^NN^POS',
                          '^WP^BES', '^NN^BES', 'NN|CD', '^WDT', '^VB^PRP')        
-        pos_lems = filter((lambda x : x[1] not in nontree_nodes), pos_lems)
-        pos_lems = filter((lambda x : x[0] != "--"), pos_lems)
-        pos_lems = map((lambda x : (re.sub(r"-$", "", x[0]), x[1])), pos_lems)
+        pos_lems = list(filter((lambda x : x[1] not in nontree_nodes), pos_lems))
+        pos_lems = list(filter((lambda x : x[0] != "--"), pos_lems))
+        pos_lems = list(map((lambda x : (re.sub(r"-$", "", x[0]), x[1])), pos_lems))
         return pos_lems
         
     def text_words(self, filter_disfluency=False):
@@ -471,8 +471,8 @@ class Utterance:
         """
         pos = self.pos
         pos = pos.strip()
-        word_tag = map((lambda x : tuple(x.split("/"))), re.split(r"\s+", pos))
-        word_tag = filter((lambda x : len(x) == 2), word_tag)
+        word_tag = list(map((lambda x : tuple(x.split("/"))), re.split(r"\s+", pos)))
+        word_tag = list(filter((lambda x : len(x) == 2), word_tag))
         word_tag = self.wn_lemmatizer(word_tag, wn_format=wn_format,
                                        wn_lemmatize=wn_lemmatize)
         return word_tag        
@@ -493,11 +493,11 @@ class Utterance:
     def wn_lemmatizer(self, word_tag, wn_format=False, wn_lemmatize=False):
         # Lemmatizing implies converting to WordNet tags.
         if wn_lemmatize:
-            word_tag = map(self.__treebank2wn_pos, word_tag)
-            word_tag = map(self.__wn_lemmatize, word_tag)
+            word_tag = list(map(self.__treebank2wn_pos, word_tag))
+            word_tag = list(map(self.__wn_lemmatize, word_tag))
         # This is tag conversion without lemmatizing.
         elif wn_format:
-            word_tag = map(self.__treebank2wn_pos, word_tag)            
+            word_tag = list(map(self.__treebank2wn_pos, word_tag))            
         return word_tag
     
     def __treebank2wn_pos(self, lemma):

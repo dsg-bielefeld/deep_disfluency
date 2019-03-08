@@ -2,9 +2,9 @@
 from collections import defaultdict
 from operator import itemgetter
 
-from swda import CorpusReader
-from tree_pos_map import TreeMapCorpus, POSMapCorpus
-from corpus_util import clean, parse_list
+from .swda import CorpusReader
+from .tree_pos_map import TreeMapCorpus, POSMapCorpus
+from .corpus_util import clean, parse_list
 
 
 class SelfRepair:
@@ -48,7 +48,7 @@ class SelfRepair:
         #    a = line.replace("\n","")
         #    self.ranges.append(a)
 
-        print "files in ranges = " + str(len(self.ranges))
+        print("files in ranges = " + str(len(self.ranges)))
 
         self.filename = "SW1Full"
         #self.file1p = open("Annotations\p1RepairsNgram_"+ self.filename +".csv.text","w")
@@ -172,46 +172,46 @@ class SelfRepair:
                     # file4.write(trans.swda_filename+"\n")
                 else:  # fine for our bigger training set
                     if trans.conversation_no == 4330:
-                        raw_input()
+                        input()
                     otherNumber += 1
                     otherUtterances += len(trans.utterances)
                     # file22.write(trans.swda_filename+"\n")
                     # file2.write(trans.swda_filename+"\n")
         file5.close()
-        print "training"
-        print trainingNumber
-        print trainingUtterances
-        print "semdial testing"
-        print semdialtestNumber
-        print semdialtestUtterances
-        print "dev"
-        print developmentNumber
-        print developmentUtterances
-        print "not used (either future for JC or not in treebank)"
-        print otherNumber
-        print otherUtterances
+        print("training")
+        print(trainingNumber)
+        print(trainingUtterances)
+        print("semdial testing")
+        print(semdialtestNumber)
+        print(semdialtestUtterances)
+        print("dev")
+        print(developmentNumber)
+        print(developmentUtterances)
+        print("not used (either future for JC or not in treebank)")
+        print(otherNumber)
+        print(otherUtterances)
 
-        print "test for JC (the ones in PTB that that is, otherwise we can use them)"
-        print testNumber
-        print testUtterances
-        print len(missed)
-        print "sw_1_sw_2"
-        print trainingNumber + otherNumber
-        print trainingUtterances + otherUtterances
-        raw_input()
+        print("test for JC (the ones in PTB that that is, otherwise we can use them)")
+        print(testNumber)
+        print(testUtterances)
+        print(len(missed))
+        print("sw_1_sw_2")
+        print(trainingNumber + otherNumber)
+        print(trainingUtterances + otherUtterances)
+        input()
         # for pair in missed:
         #    print pair
 
-        print "total utts"
-        print totalUtterances
+        print("total utts")
+        print(totalUtterances)
         data = trainingNumber + semdialtestNumber + \
             developmentNumber + otherNumber
-        print data
-        print 1126 - data == testNumber
+        print(data)
+        print(1126 - data == testNumber)
         datautts = trainingUtterances + semdialtestUtterances + \
             developmentUtterances + otherUtterances
-        print datautts
-        print totalUtterances - datautts == testUtterances
+        print(datautts)
+        print(totalUtterances - datautts == testUtterances)
 
     def show_tree(self, filenumber, uttnumber, treenumber):
         #corpus = CorpusReader('..\swda')
@@ -722,28 +722,28 @@ class SelfRepair:
                 filepair[0].write(str(origLength) + "\t" + str(myDistanceBack) + "\t" + str(reparandumOnsetPathlength) + "\t" + str(
                     onsetCommonMother) + "\t" + str(nextCommonMother) + "\t" + str(lastConstitPathlength) + "\t" + str(lastConstitCommonMother) + "\t")
                 filepair[0].write(str(relativePathLength) + "\n")
-                print COUNT
+                print(COUNT)
             firstP = False
             filepair[0].close()
 
         corpus = open(
             "SelfRepairResults\REPAIRCORPUSSTATS22May13.csv.text", "w")
         corpus.write("POS frequency \n")
-        for key1, val1 in sorted(onsetPOSdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(list(onsetPOSdict.items()), key=itemgetter(0), reverse=True):
             relativefreq = float(val1) / float(3861)
             corpus.write(
                 str(key1) + "\t" + str(val1) + "\t" + str(relativefreq) + "\n")
         corpus.write("Interreg occurence \n")
-        for key1, val1 in sorted(interregnumDict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(list(interregnumDict.items()), key=itemgetter(0), reverse=True):
             corpus.write(str(key1) + "\t" + str(val1) + "\n")
         corpus.write("\n OVERALL lengths \n")
-        for key1, val1 in sorted(lengthdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(list(lengthdict.items()), key=itemgetter(0), reverse=True):
             corpus.write(str(key1) + "\t" + str(val1) + "\n")
         corpus.write("\n OVERALL buckets \n")
         for pair in NUMBERBUCKETS:
             corpus.write(str(pair[0]) + "\t" + str(pair[1]) + "\n")
         corpus.write("\n 1p lengths \n")
-        for key1, val1 in sorted(firstPlengthdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(list(firstPlengthdict.items()), key=itemgetter(0), reverse=True):
             corpus.write(str(key1) + "\t" + str(val1) + "\n")
         corpus.write("\n 1p buckets \n")
         for pair in firstPNUMBERBUCKETS:
@@ -1047,8 +1047,8 @@ class SelfRepair:
                                     pos += 1  # shift along one as "--"
 
                     if nextWordFound == False:  # still haven't found it
-                        print(
-                            "UNRESOLVED possible thirdPos REPAIR BEGINNING UTT" + str(startNum))
+                        print((
+                            "UNRESOLVED possible thirdPos REPAIR BEGINNING UTT" + str(startNum)))
                         # raw_input()
                         break  # just crack on and treat it as a normal DEL
 
@@ -1340,8 +1340,8 @@ class SelfRepair:
                                 mytreenumber = startUttTreeMap[d][1][0][0]
                                 break
                     if mytree == None:
-                        print("NO TREE FOUND FOR 1p repair in  " + startUtt.swda_filename + " utt no." + str(
-                            startUtt.transcript_index) + "from startNum" + str(startNum) + str(startUtt.text_words()))
+                        print(("NO TREE FOUND FOR 1p repair in  " + startUtt.swda_filename + " utt no." + str(
+                            startUtt.transcript_index) + "from startNum" + str(startNum) + str(startUtt.text_words())))
                         # print(str(startUttTreeMap))
                         # raw_input()
 
@@ -1474,7 +1474,7 @@ class SelfRepair:
                         utt = trans.next_utt(utt)
                         uttTreeMap = self.__treeMapList__.get_treemap(
                             trans, utt)
-                        print("my utt= " + str(utt.text_words()))
+                        print(("my utt= " + str(utt.text_words())))
                         # raw_input()
                         words = utt.text_words()
                         pos = 0
@@ -1662,7 +1662,7 @@ class SelfRepair:
             if check == False and ((interregnumBool == True) or (reparandumBool == True)
                                    or ("Reparandum" in embeddedIn)):
                 if "Reparandum" in embeddedIn:
-                    print string
+                    print(string)
                 self.editedWords[utt.transcript_index].append(pos)
 
             if string == '[':  # embedded
@@ -1760,10 +1760,10 @@ class SelfRepair:
                 # should add repair to appropriate list and then give back the
                 # string position
                 if not reparandumBool == False:
-                    print "ERROR- + not observed"
-                    print uttpos
-                    print pos
-                    print startNum
+                    print("ERROR- + not observed")
+                    print(uttpos)
+                    print(pos)
+                    print(startNum)
                     self.errorlog.write(
                         "not observed" + str(transcriptFile) + str(utt.transcript_index))
                 # i.e. interregnum and repair never reached, only reparandum
@@ -1776,10 +1776,10 @@ class SelfRepair:
                 if repairBool == None:
                     # repair not reached yet, interregnum could be over/in progress, should be a delete,
                     # should only have delete types
-                    print "delete type!!"
-                    print uttpos
-                    print pos
-                    print startNum
+                    print("delete type!!")
+                    print(uttpos)
+                    print(pos)
+                    print(startNum)
                     repairUtt = utt
                     repairNum = [utt.transcript_index, pos]
                     # raw_input()
@@ -1849,9 +1849,9 @@ class SelfRepair:
             if pos >= len(words):
                 # we might have a second position type annotation, where it's really a first pos
                 # for now ignore these- no- don't!
-                print startNum
-                print utt.swda_filename
-                print utt.transcript_index
+                print(startNum)
+                print(utt.swda_filename)
+                print(utt.transcript_index)
                 nextutt = trans.next_utt(utt)
                 if (nextutt != None and nextutt.caller == startUtt.caller):
                     errormessage = "POSSIBLE SECOND POS REPAIR: START= " +\
@@ -1859,26 +1859,26 @@ class SelfRepair:
                         str(trans.next_utt(utt).text_words()) + " " \
                         + startUtt.swda_filename + \
                         str(startUtt.transcript_index)
-                    print errormessage
-                    print nextutt.transcript_index
+                    print(errormessage)
+                    print(nextutt.transcript_index)
                     # self.errorlog.write(errormessage+"\n")
                     secondPos = True
                     utt = nextutt
                 else:
-                    print "3p!"
+                    print("3p!")
                     thirdPos = True
                     utt = trans.next_utt_same_speaker(utt)
                 if utt != None:
                     words = utt.text_words()
                     uttTreeMap, uttpos = self.getTreeMapAndPos(trans, utt)
                 else:
-                    print "UNFINISHED REPAIR"
-                    print startNum
+                    print("UNFINISHED REPAIR")
+                    print(startNum)
                 pos = 0
 
         # at the moment don't add this repair if it doesn't terminate in this
         # turn /TODO change can do this now for 3t's/some 3p's
-        print "WARNING returning length! " + str(utt.transcript_index)
+        print("WARNING returning length! " + str(utt.transcript_index))
         # TODO need more reliable way of getting position in its iteration..
         return [utt.transcript_index, len(words)]
 
@@ -1904,8 +1904,8 @@ class SelfRepair:
         # self.__1plist__ = [] # clear the lists, re-enter them later?
         #self.__3plist__ = []
         swapHappened = True
-        print("total no of repairs = " + str(len(lists)))
-        raw_input()
+        print(("total no of repairs = " + str(len(lists))))
+        input()
         while swapHappened == True:
             swapHappened = False
             for i in range(len(lists) - 1):
@@ -1942,8 +1942,8 @@ class SelfRepair:
                 mytype = "3p"
             edit = self.editing_type(repair, mytype, i)
             if edit[0] == "quit":
-                print("\n Terminating annotation at repair " + str(i) +
-                      " : \n " + str(repair[0]) + " start utt " + str(repair[1]))
+                print(("\n Terminating annotation at repair " + str(i) +
+                      " : \n " + str(repair[0]) + " start utt " + str(repair[1])))
                 break
             if mytype == "3p":
                 repair.insert(16, edit)
@@ -1956,8 +1956,8 @@ class SelfRepair:
                 self.__3plist__.append(repair)
                 self.print_3p(repair, file3p)
             i += 1
-            print("Repair number " + str(i) + " of" + str(len(lists)))
-            raw_input()
+            print(("Repair number " + str(i) + " of" + str(len(lists))))
+            input()
             # if i == 1: break
 
         file1p.close()
@@ -2218,11 +2218,11 @@ class SelfRepair:
 
             print(
                 "\n ANNOTATE REPAIR. \n TYPES: Rep, RepPartial, RepDel, RepSub, Del, Sub, SupRep, SubDel, Insert, InsertPhrase or Other \n CONSTITUENTS: f, fp, m(n), mp(n), r(n), s(n), i(n), d(n), ed(n), t(n)")
-            print("\n WORDS = " + origString +
-                  "[ " + reparandumString + "+ { " + interregString + "} " + repairString + "] " + endString)
-            print("\n EMBEDDED IN= " + thisRepair[12])
+            print(("\n WORDS = " + origString +
+                  "[ " + reparandumString + "+ { " + interregString + "} " + repairString + "] " + endString))
+            print(("\n EMBEDDED IN= " + thisRepair[12]))
             #print("\n editString so far = " + str(myOrig) + "[" + str(myReparandum) + ".{" + str(myInterreg) + "} " + str(myRepair) + " \n words so far = " + str(origWords) + ": [ :" + str(reparandum) + ":+: {" + str(interregWords) + "}" + str(repair) + ":]" + str(endWords))
-            myquit = raw_input(
+            myquit = input(
                 "For each one: alter or press y to agree then y again to confirm.")
             if myquit == "quit":
                 return ["quit", []]
@@ -2248,18 +2248,18 @@ class SelfRepair:
                 elif k == 4:
                     theType = "end"
 
-                print("words so far : " + str(allwordssofar))
-                print("edits so far : " + str(alleditssofar))
-                inputString = raw_input(theType + " WORDS: " + str(words) + ". EDIT STRING: " + (
+                print(("words so far : " + str(allwordssofar)))
+                print(("edits so far : " + str(alleditssofar)))
+                inputString = input(theType + " WORDS: " + str(words) + ". EDIT STRING: " + (
                     str(alledits[k])) + ". length = " + str(len(alledits[k])) + "\n")
                 if inputString == "y":
-                    inputString = raw_input(
+                    inputString = input(
                         "Edit string = " + str(alledits[k]) + "  y?: ")
                     # gives a confirm check,two "Y"s and skips over next bit
                 if inputString != "y":   # get new values for editstring
                     while True:
-                        print("Edit string = " + inputString)
-                        happy = raw_input("happy? y or alter: ")
+                        print(("Edit string = " + inputString))
+                        happy = input("happy? y or alter: ")
                         if happy == "y":
                             break
                         else:
@@ -2275,25 +2275,25 @@ class SelfRepair:
                                 myed += s
                             if s in mynums:
                                 mynum += s
-                        print("my num..." + str(mynum) + "...")
+                        print(("my num..." + str(mynum) + "..."))
                         alledits[k][i] = [myed, int(mynum)]
 
                 allwordssofar += words
                 alleditssofar += alledits[k]
 
-            print("reparandum =" + str(myReparandum) +
-                  "  repair = " + str(myRepair))
-            print(
-                "reparandum =" + reparandumString + "  repair = " + repairString)
+            print(("reparandum =" + str(myReparandum) +
+                  "  repair = " + str(myRepair)))
+            print((
+                "reparandum =" + reparandumString + "  repair = " + repairString))
             print(
                 "Rep, RepPartial, RepDel, RepSub, Sub, SubDel, Insert, InsertSub, Other")
-            inputString = raw_input("Edit type = " + editType + "  y?")
+            inputString = input("Edit type = " + editType + "  y?")
             if inputString == "y":
-                inputString = raw_input("Edit type = " + editType + "  y?")
+                inputString = input("Edit type = " + editType + "  y?")
             if inputString != "y":
                 while True:
-                    print("edit type = " + inputString)
-                    happy = raw_input("happy? y or alter")
+                    print(("edit type = " + inputString))
+                    happy = input("happy? y or alter")
                     if happy == "y":
                         break
                     else:
@@ -2456,7 +2456,7 @@ class SelfRepair:
                             treeIndex = None
                             leafIndex = None
                         if missed == True:
-                            print "missed edited word"
+                            print("missed edited word")
                             # for first automatic step just do one-word delete
                             # structures, obviously more in practice
 
@@ -2466,45 +2466,45 @@ class SelfRepair:
                                 # starts bang on the word
                                 startNum = [utt.transcript_index, pos]
 
-                                print utt.swda_filename + str(utt.transcript_index)
-                                print pos
-                                print uttTreeMap[pos]
-                                print "\n" + str(utt.text_words())
+                                print(utt.swda_filename + str(utt.transcript_index))
+                                print(pos)
+                                print(uttTreeMap[pos])
+                                print("\n" + str(utt.text_words()))
                                 for l in range(0, len(uttTreeMap)):
                                     edited = ""
                                     if l == pos:
                                         edited = "!!E!!"
-                                    print str(l) + ": " + str(uttTreeMap[l]) + " " + edited
+                                    print(str(l) + ": " + str(uttTreeMap[l]) + " " + edited)
                                 if (transnumber, startNum[0], startNum[1]) <= self.unannotated_marker:
-                                    print "seen this!!"
+                                    print("seen this!!")
                                     break
 
-                                skipCheck = raw_input("go on?")
+                                skipCheck = input("go on?")
                                 if skipCheck == "n":
                                     break
                                 elif skipCheck == "d":
                                     utt.trees[treeIndex].draw()  # raw_input()
-                                    skipCheck = raw_input("go on?")
+                                    skipCheck = input("go on?")
                                     if skipCheck == "n":
                                         break
                                 # need a way of scrolling forwards after seeing the
                                 # first EDITed word in a sequence
-                                startCheck = raw_input(
+                                startCheck = input(
                                     str(startNum) + " startNum OK?")
                                 if startCheck == "n":
                                     startNum = [
-                                        utt.transcript_index, int(raw_input("startNum (inc)?"))]
+                                        utt.transcript_index, int(input("startNum (inc)?"))]
                                 # should give use the right thing..
                                 interregNum = [
-                                    utt.transcript_index, int(raw_input("interreg (inc)?"))]
+                                    utt.transcript_index, int(input("interreg (inc)?"))]
                                 repairNum = [
-                                    utt.transcript_index, int(raw_input("repair(inc)?"))]
+                                    utt.transcript_index, int(input("repair(inc)?"))]
                                 endNum = [
-                                    utt.transcript_index, int(raw_input("end(exc)?"))]
+                                    utt.transcript_index, int(input("end(exc)?"))]
                                 nextUtt = trans.next_utt_same_speaker(utt)
                                 if nextUtt != None:
-                                    print "\n" + str(nextUtt.text_words())
-                                    thirdPos = raw_input("3RD?")
+                                    print("\n" + str(nextUtt.text_words()))
+                                    thirdPos = input("3RD?")
                                 else:
                                     thirdPos = ""
                                 if thirdPos == "y":
@@ -2515,13 +2515,13 @@ class SelfRepair:
                                     #    nextUtt = trans.next_utt_same_speaker(nextUtt)
                                     #    nextUttTreeMap = self.__treeMapList__.get_treemap(trans, nextUtt)
                                     for l in range(0, len(nextUttTreeMap)):
-                                        print str(l) + ": " + str(nextUttTreeMap[l])
-                                    interregNum = parse_list(raw_input(
+                                        print(str(l) + ": " + str(nextUttTreeMap[l]))
+                                    interregNum = parse_list(input(
                                         "interreg (inc) [m,n] (either " + str(nextUtt.transcript_index)or str(utt.transcript_index) + "?"))
                                     repairNum = parse_list(
-                                        raw_input("repair(inc)?"))
-                                    endNum = parse_list(raw_input("end(exc)?"))
-                                    confirm = raw_input("confirm?")
+                                        input("repair(inc)?"))
+                                    endNum = parse_list(input("end(exc)?"))
+                                    confirm = input("confirm?")
                                     if confirm == "n":
                                         continue
                                     #nextUtt = trans.next_utt_same_speaker(utt)
@@ -2529,7 +2529,7 @@ class SelfRepair:
                                     self.print_1p_NoTreeStuff(
                                         [trans.swda_filename, startNum, interregNum, repairNum, endNum, "", utt.damsl_act_tag()], self.file3p)
                                 else:
-                                    confirm = raw_input("confirm?")
+                                    confirm = input("confirm?")
                                     if confirm == "n":
                                         continue
                                     # might miss nested ones here..
@@ -2586,7 +2586,7 @@ class SelfRepair:
                     count = 0
                     check = True
                 """
-        print str(self.unannotated) + " unannotated"
+        print(str(self.unannotated) + " unannotated")
         # raw_input()
         # file1p.close()
         # file3p.close()
@@ -2594,39 +2594,39 @@ class SelfRepair:
         # just 1 and 3 for now
         self.__lists__ = [self.__1plist__, self.__3plist__]
         self.remove_duplicates()  # get rid of duplicated entries
-        print "1ps = " + str(len(self.__1plist__))
-        print "3ps = " + str(len(self.__3plist__))
+        print("1ps = " + str(len(self.__1plist__)))
+        print("3ps = " + str(len(self.__3plist__)))
         #file1p = open("1pRepairsPathLength.csv.text", "w")
         #file3p = open("3pRepairsPathLength.csv.text", "w")
         # for repair in self.__1plist__:
         #    self.print_1p_NoTreeStuff(repair, file1p)
         # for repair in self.__3plist__:
         #    self.print_3p_NoTreeStuff(repair, file3p)
-        print("WORDS = " + str(totalWords))
-        print("UTTS = " + str(totalUtts))
-        print("MALE = " + str(totalSpeakersMale))
-        print("FEMALE = " + str(totalSpeakersFemale))
+        print(("WORDS = " + str(totalWords)))
+        print(("UTTS = " + str(totalUtts)))
+        print(("MALE = " + str(totalSpeakersMale)))
+        print(("FEMALE = " + str(totalSpeakersFemale)))
         if (not totalSpeakersMale + totalSpeakersFemale == totalSpeakers):
             self.errorlog.write("MISMATCH in total speakers!\n")
-        print("10-19: " + str(speakers1019))
-        print("20-29: " + str(speakers2029))
-        print("30-39: " + str(speakers3039))
-        print("40-49: " + str(speakers4049))
-        print("50-59: " + str(speakers5059))
-        print("60-69: " + str(speakers6069))
-        print("70-79: " + str(speakers7079))
+        print(("10-19: " + str(speakers1019)))
+        print(("20-29: " + str(speakers2029)))
+        print(("30-39: " + str(speakers3039)))
+        print(("40-49: " + str(speakers4049)))
+        print(("50-59: " + str(speakers5059)))
+        print(("60-69: " + str(speakers6069)))
+        print(("70-79: " + str(speakers7079)))
         #print("(ages sanity check " + str(speakers1019+speakers2029+speakers3039+speakers4049+speakers5059+speakers6069+speakers7079) + " actual " + str(totalSpeakers))
-        print("average age = " + str(float(totalAges) / float(totalSpeakers)))
-        print("prompts = " + str(totalPrompts))
-        print("trees = " + str(totalTrees))
+        print(("average age = " + str(float(totalAges) / float(totalSpeakers))))
+        print(("prompts = " + str(totalPrompts)))
+        print(("trees = " + str(totalTrees)))
         corpusStatsFile = open(
             "SelfRepairResults\FileCorpusStatsfiles" + self.filename + ".text", "w")
         # how about automatic stats for graphs here?
         # link all categories to those in repair lists then print them side by side?
         # can also get local models here
-        for key1, val1 in sorted(lengthdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(list(lengthdict.items()), key=itemgetter(0), reverse=True):
             corpusStatsFile.write(str(key1) + "\t" + str(val1) + "\n")
-        for key1, val1 in sorted(POSdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(list(POSdict.items()), key=itemgetter(0), reverse=True):
             corpusStatsFile.write(
                 str(key1) + "\t" + str(val1) + "\t" + str(float(val1) / float(totalWords)) + "\n")
         corpusStatsFile.close()
@@ -2653,7 +2653,7 @@ class SelfRepair:
                     else:
                         j += 1
                 i += 1
-        print("\n" + str(duplicateNumber) + " duplicates removed")
+        print(("\n" + str(duplicateNumber) + " duplicates removed"))
         return
 
     def corpus_stats(self):
@@ -2789,7 +2789,7 @@ class SelfRepair:
                     count = 0
                     check = True
                 """
-        print str(self.unannotated) + " unannotated"
+        print(str(self.unannotated) + " unannotated")
         # raw_input()
         # file1p.close()
         # file3p.close()
@@ -2797,8 +2797,8 @@ class SelfRepair:
         # just 1 and 3 for now
         self.__lists__ = [self.__1plist__, self.__3plist__]
         self.remove_duplicates()  # get rid of duplicated entries
-        print "1ps = " + str(len(self.__1plist__))
-        print "3ps = " + str(len(self.__3plist__))
+        print("1ps = " + str(len(self.__1plist__)))
+        print("3ps = " + str(len(self.__3plist__)))
         #file1p = open("1pRepairsPathLength.csv.text", "w")
         #file3p = open("3pRepairsPathLength.csv.text", "w")
         # for repair in self.__1plist__:
@@ -2807,43 +2807,43 @@ class SelfRepair:
         #    self.print_3p_NoTreeStuff(repair, file3p)
         corpusStatsFile = open(
             "SelfRepairResults\FileCorpusStatsfiles" + self.filename + ".csv.text", "w")
-        print("WORDS = " + str(totalWords))
+        print(("WORDS = " + str(totalWords)))
         corpusStatsFile.write("WORDS = \t" + str(totalWords) + "\n")
-        print("UTTS = " + str(totalUtts))
+        print(("UTTS = " + str(totalUtts)))
         corpusStatsFile.write("UTTS = \t" + str(totalUtts) + "\n")
-        print("MALE = " + str(totalSpeakersMale))
+        print(("MALE = " + str(totalSpeakersMale)))
         corpusStatsFile.write("MALE = \t" + str(totalSpeakersMale) + "\n")
-        print("FEMALE = " + str(totalSpeakersFemale))
+        print(("FEMALE = " + str(totalSpeakersFemale)))
         corpusStatsFile.write("FEMALE = \t" + str(totalSpeakersFemale) + "\n")
-        print("10-19: " + str(speakers1019))
+        print(("10-19: " + str(speakers1019)))
         corpusStatsFile.write("10-19: \t" + str(speakers1019) + "\n")
-        print("20-29: " + str(speakers2029))
+        print(("20-29: " + str(speakers2029)))
         corpusStatsFile.write("20-29: \t" + str(speakers2029) + "\n")
-        print("30-39: " + str(speakers3039))
+        print(("30-39: " + str(speakers3039)))
         corpusStatsFile.write("30-39: \t" + str(speakers3039) + "\n")
-        print("40-49: " + str(speakers4049))
+        print(("40-49: " + str(speakers4049)))
         corpusStatsFile.write("40-49: \t" + str(speakers4049) + "\n")
-        print("50-59: " + str(speakers5059))
+        print(("50-59: " + str(speakers5059)))
         corpusStatsFile.write("50-59: \t" + str(speakers5059) + "\n")
-        print("60-69: " + str(speakers6069))
+        print(("60-69: " + str(speakers6069)))
         corpusStatsFile.write("60-69: \t" + str(speakers6069) + "\n")
-        print("70-79: " + str(speakers7079))
+        print(("70-79: " + str(speakers7079)))
         corpusStatsFile.write("70-79: \t" + str(speakers7079) + "\n")
         #print("(ages sanity check " + str(speakers1019+speakers2029+speakers3039+speakers4049+speakers5059+speakers6069+speakers7079) + " actual " + str(totalSpeakers))
-        print("average age = " + str(float(totalAges) / float(totalSpeakers)))
+        print(("average age = " + str(float(totalAges) / float(totalSpeakers))))
         corpusStatsFile.write(
             "average age = \t" + str(float(totalAges) / float(totalSpeakers)) + "\n")
-        print("prompts = " + str(totalPrompts))
+        print(("prompts = " + str(totalPrompts)))
         corpusStatsFile.write("prompts = \t " + str(totalPrompts) + "\n")
-        print("trees = " + str(totalTrees))
+        print(("trees = " + str(totalTrees)))
         corpusStatsFile.write("trees = \t" + str(totalTrees) + "\n")
 
         # how about automatic stats for graphs here?
         # link all categories to those in repair lists then print them side by side?
         # can also get local models here
-        for key1, val1 in sorted(lengthdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(list(lengthdict.items()), key=itemgetter(0), reverse=True):
             corpusStatsFile.write(str(key1) + "\t" + str(val1) + "\n")
-        for key1, val1 in sorted(POSdict.items(), key=itemgetter(0), reverse=True):
+        for key1, val1 in sorted(list(POSdict.items()), key=itemgetter(0), reverse=True):
             corpusStatsFile.write(
                 str(key1) + "\t" + str(val1) + "\t" + str(float(val1) / float(totalWords)) + "\n")
         corpusStatsFile.close()
@@ -2869,22 +2869,22 @@ class SelfRepair:
         for list in self.__repairlist__:
             d1[list[3]] += 1
             totalrepairs += 1
-        for key1, val1 in sorted(d1.items(), key=itemgetter(1), reverse=True):
+        for key1, val1 in sorted(list(d1.items()), key=itemgetter(1), reverse=True):
             # normalising by dividing by number of words per act tag
             # indent th next three lines!
             if percentage:
-                for key, val in sorted(d.items(), key=itemgetter(1), reverse=True):
+                for key, val in sorted(list(d.items()), key=itemgetter(1), reverse=True):
                     # Getting raw acts over entire corpus
                     file1.write(key + "," + str(val))
                     if key == key1:
                         # replacing value with normalized value
                         # float(val1/len(self.__repairlist__)) * 100
                         d1[key] = float(val1) / val
-        for key1, val1 in sorted(d1.items(), key=itemgetter(1), reverse=True):
+        for key1, val1 in sorted(list(d1.items()), key=itemgetter(1), reverse=True):
             # print to csv format
             file.write(key1 + "," + str(val1) + "," +
                        self.forward_backward(key1) + "," + str(d[key1]) + "\n")
-            print key1, val1
+            print(key1, val1)
         file.close()
         file1.close()
 
@@ -2918,36 +2918,36 @@ class SelfRepair:
                             # tag
                             count += 1
                             continue
-                    print '------------------'
+                    print('------------------')
                     file.write("------------------------- \n")
                     if count > 0:  # give if there
-                        print trans.utterances[count - 2].damsl_act_tag(), " ", trans.utterances[count - 2].caller, " : ", trans.utterances[count - 2].text_words()
+                        print(trans.utterances[count - 2].damsl_act_tag(), " ", trans.utterances[count - 2].caller, " : ", trans.utterances[count - 2].text_words())
                         file.write(trans.utterances[count - 2].damsl_act_tag() + " " + trans.utterances[
                                    count - 2].caller + " : " + str(trans.utterances[count - 2].text_words()) + "\n")
-                        print trans.utterances[count - 1].damsl_act_tag(), " ", trans.utterances[count - 1].caller, " : ", trans.utterances[count - 1].text_words()
+                        print(trans.utterances[count - 1].damsl_act_tag(), " ", trans.utterances[count - 1].caller, " : ", trans.utterances[count - 1].text_words())
                         file.write(trans.utterances[count - 1].damsl_act_tag() + " " + trans.utterances[
                                    count - 1].caller + " : " + str(trans.utterances[count - 1].text_words()) + "\n")
 
                     # give target utterance
-                    print utt.damsl_act_tag(), " ", utt.caller, " : ", utt.text_words()
+                    print(utt.damsl_act_tag(), " ", utt.caller, " : ", utt.text_words())
                     file.write(
                         utt.damsl_act_tag() + " " + utt.caller + " : " + str(utt.text_words()) + "\n")
 
                     # give following utterance if there
                     if (count < (translength - 1)):
-                        print trans.utterances[count + 1].damsl_act_tag(), " " + trans.utterances[count + 1].caller, " : ", trans.utterances[count + 1].text_words()
+                        print(trans.utterances[count + 1].damsl_act_tag(), " " + trans.utterances[count + 1].caller, " : ", trans.utterances[count + 1].text_words())
                         file.write(trans.utterances[count + 1].damsl_act_tag() + " " + trans.utterances[
                                    count + 1].caller + " : " + str(trans.utterances[count + 1].text_words()) + "\n")
                     occs += 1
                 count += 1
-        print occs, "occurences"
+        print(occs, "occurences")
         file.write(str(occs) + "occurences")
 
     def dialogue_act_repairs(self, string):
         # retrieves the utterance texts for particular dialogue act
         for list in self.__repairlist__:
             if list[3] == string:
-                print list[5].text_words(filter_disfluency=False)
+                print(list[5].text_words(filter_disfluency=False))
 
     def forward_backward(self, DA):
         for string in self.forward_acts:

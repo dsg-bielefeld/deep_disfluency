@@ -24,8 +24,8 @@ def ngrams(tokens,max_order,ngram_maps):
         """This function counts the ngrams in tokens (a list of things) 
         for each order between 1 and max_order"""
         l = len(tokens)
-        for i in xrange(l):
-            for d in xrange(1,max_order+1):
+        for i in range(l):
+            for d in range(1,max_order+1):
                 ngram_map = ngram_maps[d]
                 j=i+d
                 if not j > l:
@@ -227,16 +227,16 @@ def is_the_corpus_tagged(stream):
             line = stream.readline()
 	stream.seek(0)
 	tokens = line.split()
-	if any(map(lambda x : tag_separator in x,tokens)):
+	if any([tag_separator in x for x in tokens]):
 		return True
 	else:
 		return False
 
 def add_seed_argument(parser):
-    parser.add_argument('-s','--seed', type=long,metavar='SEED',
+    parser.add_argument('-s','--seed', type=int,metavar='SEED',
 			    help='the seed used to initialize the number generator. \
 			    Define it for reproducibility of results \
-			    (it defaults to 5489 in any case)',default=5489L)
+			    (it defaults to 5489 in any case)',default=5489)
 
 # statistical stuff
 
@@ -291,7 +291,7 @@ def pointwiseFold(f,x,n,listOfLists):
     """
     res = [x] * n
     for l in listOfLists:
-        for i in xrange(n):
+        for i in range(n):
             res[i] = f(res[i],l[i])
     return res
 
@@ -305,10 +305,10 @@ def sync_parallel_map_file(f,file,pool=None,n_processes=None,timer=None):
     if pool is None:
         pool = multiprocessing.Pool(processes=n_processes)
         
-    for lines in itertools.izip_longest(*[file]*n_processes):
-        pool.map(f,filter(lambda x : not x is None,lines))
+    for lines in itertools.zip_longest(*[file]*n_processes):
+        pool.map(f,[x for x in lines if not x is None])
         if not timer is None:
-            for i in xrange(n_processes):
+            for i in range(n_processes):
                 timer.advance()
 
 def concurrent_process_file(f,file,pool=None):
@@ -359,8 +359,8 @@ def collect_ngrams(corpus_file,max_order,glue_tokens,tokenize_sentence):
         n_lines += 1
         tokens = tokenize_sentence(line)
         l = len(tokens)
-        for i in xrange(l):
-            for d in xrange(1,max_order+1):
+        for i in range(l):
+            for d in range(1,max_order+1):
                 j=i+d
                 if not j > l:
                     ngrams.add(glue_tokens(tokens[i:j],d))

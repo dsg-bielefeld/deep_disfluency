@@ -14,10 +14,10 @@ class FakeIBMWatsonStreamer(fluteline.Producer):
         self.fake_stream = fake_stream  # a list of updates to be fired
 
     def enter(self):
-        print "starting fake streaming"
+        print("starting fake streaming")
 
     def exit(self):
-        print "finished fake streaming"
+        print("finished fake streaming")
 
     def produce(self):
         if len(self.fake_stream) > 0:
@@ -82,9 +82,9 @@ class IBMWatsonAdapter(fluteline.Consumer):
         return word
 
     def is_new(self, start_time):
-        if len(self.memory.keys()) == 0:
+        if len(list(self.memory.keys())) == 0:
             return True
-        last_update = sorted(self.memory.keys(), reverse=True)[0]
+        last_update = sorted(list(self.memory.keys()), reverse=True)[0]
         return start_time >= self.memory[last_update]['end_time']
 
     def get_id_if_update(self, start_time, end_time, word):
@@ -101,7 +101,7 @@ class IBMWatsonAdapter(fluteline.Consumer):
                 return None  # a repeated word
         update_id = None
         update_start_times_to_revoke = []
-        for old_id in sorted(self.memory.keys(), reverse=True):
+        for old_id in sorted(list(self.memory.keys()), reverse=True):
             if start_time >= self.memory[old_id]['end_time']:
                 # we've found the update
                 break
@@ -180,7 +180,7 @@ if __name__ == '__main__':
     fluteline.connect(nodes)
     fluteline.start(nodes)
 
-    print time.clock() - tic, "seconds"
+    print(time.clock() - tic, "seconds")
 
     time.sleep(1)
     fluteline.stop(nodes)

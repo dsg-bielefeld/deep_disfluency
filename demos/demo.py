@@ -6,7 +6,7 @@
 try:
     import deep_disfluency
 except ImportError:
-    print "no installed deep_disfluency package, pathing to source"
+    print("no installed deep_disfluency package, pathing to source")
     import sys
     sys.path.append("../")
 from deep_disfluency.tagger.deep_tagger import DeepDisfluencyTagger
@@ -20,7 +20,7 @@ MESSAGE = """1. Disfluency tagging on pre-segmented utterances
 tags repair structure incrementally and other edit terms <e/>
 (Hough and Schlangen Interspeech 2015 with an RNN)
 """
-print MESSAGE
+print(MESSAGE)
 disf = DeepDisfluencyTagger(
     config_file="../deep_disfluency/experiments/experiment_configs.csv",
     config_number=21,
@@ -34,35 +34,35 @@ disf = DeepDisfluencyTagger(
 # Notice the incremental diff
 # Set diff_only to False if you want the whole utterance's tag each time
 with_pos = False
-print "tagging..."
+print("tagging...")
 if with_pos:
     # if POS is provided use this:
-    print disf.tag_new_word("john", pos="NNP")
-    print disf.tag_new_word("likes", pos="VBP")
-    print disf.tag_new_word("uh", pos="UH")
-    print disf.tag_new_word("loves", pos="VBP")
-    print disf.tag_new_word("mary", pos="NNP")
+    print(disf.tag_new_word("john", pos="NNP"))
+    print(disf.tag_new_word("likes", pos="VBP"))
+    print(disf.tag_new_word("uh", pos="UH"))
+    print(disf.tag_new_word("loves", pos="VBP"))
+    print(disf.tag_new_word("mary", pos="NNP"))
 else:
     # else the internal POS tagger tags the words incrementally
-    print disf.tag_new_word("john")
-    print disf.tag_new_word("likes")
-    print disf.tag_new_word("uh")
-    print disf.tag_new_word("loves")
-    print disf.tag_new_word("mary")
-print "final tags:"
+    print(disf.tag_new_word("john"))
+    print(disf.tag_new_word("likes"))
+    print(disf.tag_new_word("uh"))
+    print(disf.tag_new_word("loves"))
+    print(disf.tag_new_word("mary"))
+print("final tags:")
 for w, t in zip("john likes uh loves mary".split(), disf.output_tags):
-    print w, "\t", t
+    print(w, "\t", t)
 disf.reset()  # resets the whole tagger for new utterance
 
 
 # In[4]:
 
 # More complex set-up:
-print "\n", "*" * 30
+print("\n", "*" * 30)
 MESSAGE = """2. Joint disfluency tagger and utterance semgenter
 Simple disf tags <e/>, <i/> and repair onsets <rps
 LSTM simple from Hough and Schlangen EACL 2017"""
-print MESSAGE
+print(MESSAGE)
 disf = DeepDisfluencyTagger(
         config_file="../deep_disfluency/experiments/experiment_configs.csv",
         config_number=35,
@@ -73,26 +73,26 @@ disf = DeepDisfluencyTagger(
 
 # In[5]:
 
-print "tagging..."
-print disf.tag_new_word("john", pos="NNP", timing=0.3)
-print disf.tag_new_word("likes", pos="VBP", timing=0.3)
-print disf.tag_new_word("uh", pos="UH", timing=0.3)
-print disf.tag_new_word("loves", pos="VBP", timing=0.3)
-print disf.tag_new_word("mary", pos="NNP", timing=0.3)
-print disf.tag_new_word("yeah", pos="UH", timing=2.0)
-print "final tags:"
+print("tagging...")
+print(disf.tag_new_word("john", pos="NNP", timing=0.3))
+print(disf.tag_new_word("likes", pos="VBP", timing=0.3))
+print(disf.tag_new_word("uh", pos="UH", timing=0.3))
+print(disf.tag_new_word("loves", pos="VBP", timing=0.3))
+print(disf.tag_new_word("mary", pos="NNP", timing=0.3))
+print(disf.tag_new_word("yeah", pos="UH", timing=2.0))
+print("final tags:")
 for w, t in zip("john likes uh loves mary yeah".split(), disf.output_tags):
-    print w, "\t", t
+    print(w, "\t", t)
 disf.reset()  # resets the whole tagger for next dialogue or turn
 
 
 # In[6]:
 
-print "\n", "*" * 30
+print("\n", "*" * 30)
 MESSAGE = """3. Joint disfluency tagger and utterance semgenter"
 Full complex tag set with disfluency structure"
 LSTM complex from Hough and Schlangen EACL 2017"""
-print MESSAGE
+print(MESSAGE)
 disf = DeepDisfluencyTagger(
     config_file="../deep_disfluency/experiments/experiment_configs.csv",
     config_number=36,
@@ -103,16 +103,16 @@ disf = DeepDisfluencyTagger(
 
 # In[7]:
 
-print "tagging..."
-print disf.tag_new_word("i", pos="PRP", timing=0.3)
-print disf.tag_new_word("uh", pos="UH", timing=0.3)
-print disf.tag_new_word("i", pos="PRP", timing=0.3)
-print disf.tag_new_word("love", pos="VBP", timing=0.3)
-print disf.tag_new_word("mary", pos="NNP", timing=0.3)
-print disf.tag_new_word("yeah", pos="UH", timing=2.0)
-print "final tags:"
+print("tagging...")
+print(disf.tag_new_word("i", pos="PRP", timing=0.3))
+print(disf.tag_new_word("uh", pos="UH", timing=0.3))
+print(disf.tag_new_word("i", pos="PRP", timing=0.3))
+print(disf.tag_new_word("love", pos="VBP", timing=0.3))
+print(disf.tag_new_word("mary", pos="NNP", timing=0.3))
+print(disf.tag_new_word("yeah", pos="UH", timing=2.0))
+print("final tags:")
 for w, t in zip("i uh i love mary yeah".split(), disf.output_tags):
-    print w, "\t", t
+    print(w, "\t", t)
 disf.reset()  # resets the whole tagger
 
 
