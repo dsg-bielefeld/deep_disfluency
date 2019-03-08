@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
+
 # Methods to load in both language model and disfluency detection corpora,
 # and to split them
 import csv
@@ -13,7 +13,7 @@ def get_tag_data_from_corpus_file(f):
     one for tags (targets)."""
 
     f = open(f)
-    print "loading data", f.name
+    print("loading data", f.name)
     count_seq = 0
     IDs = []
     seq = []
@@ -57,7 +57,7 @@ def get_tag_data_from_corpus_file(f):
         IDs.append(utt_reference)
 
     assert len(seq) == len(targets) == len(pos_seq)
-    print "loaded " + str(len(seq)) + " sequences"
+    print("loaded " + str(len(seq)) + " sequences")
     f.close()
     return (IDs, seq, pos_seq, targets)
 

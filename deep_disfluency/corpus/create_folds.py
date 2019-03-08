@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
+
 
 
 def swbd_folds_disfluency_corpus(corpus_input, num_files=496, num_folds=10):
@@ -35,7 +35,7 @@ def swbd_folds_disfluency_corpus(corpus_input, num_files=496, num_folds=10):
         currentSection = line.split(",")[0].split(":")[0]
         current = currentSection
         ranges = []
-        print currentSection
+        print(currentSection)
         while index <= targetstop:
             ranges.append(current)
             while current == currentSection:
@@ -52,7 +52,7 @@ def swbd_folds_disfluency_corpus(corpus_input, num_files=496, num_folds=10):
         # fold always has structure (ranges,wordsubcorpus(big
         # string),posSubcorpus(big string))
 
-    print "no of folds = ", str(len(folds))
+    print("no of folds = ", str(len(folds)))
     for i in range(0, len(folds)):
         test = i
         if i == len(folds) - 1:
@@ -66,7 +66,7 @@ def swbd_folds_disfluency_corpus(corpus_input, num_files=496, num_folds=10):
         # config is always (list of training indices),heldoutout index,
         # test(i.e. where we're assigning probs to)
         config.append((tuple(training), heldout, test))
-    print "config size", str(len(config))
+    print("config size", str(len(config)))
     input.close()
     return config, folds
 
@@ -105,7 +105,7 @@ def bnc_folds():
             continue
         if pos == True:
             if not len(possline.split()) == len(normalline.split()):
-                print possline, normalline
+                print(possline, normalline)
                 continue
             # Could ignore filled pauses, as these are different, 
             #though could do normalization
@@ -119,8 +119,8 @@ def bnc_folds():
             uttcount += 1
         # else:
             # if count > 3000000: break
-    print count
-    print uttcount
+    print(count)
+    print(uttcount)
 
     fold.close()
     source.close()

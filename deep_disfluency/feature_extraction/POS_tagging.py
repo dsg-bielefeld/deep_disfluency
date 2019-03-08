@@ -1,4 +1,4 @@
-from __future__ import division
+
 import os
 import sys
 
@@ -55,22 +55,22 @@ if TRAIN:
         word_pos_data[dialogue] = (a, b, c, d)
 
     training_data = []
-    for speaker in word_pos_data.keys():
+    for speaker in list(word_pos_data.keys()):
         sp_data = []
         prefix = []
         for word, pos in zip(word_pos_data[speaker][1],
                              word_pos_data[speaker][2]):
             prefix.append(word.replace("$unc$", ""))
-            sp_data.append((unicode(word.replace("$unc$", "")
+            sp_data.append((str(word.replace("$unc$", "")
                                     .encode("utf8")),
-                            unicode(pos.encode("utf8"))))
+                            str(pos.encode("utf8"))))
         training_data.append(deepcopy(sp_data))
-    print "training tagger..."
+    print("training tagger...")
     ct.train(training_data, TAGGER_PATH)
 
 
 if TEST:
-    print "testing tagger..."
+    print("testing tagger...")
     ct = CRFTagger()  # initialize tagger
     ct.set_model_file(TAGGER_PATH)
     dialogue_speakers = []
@@ -86,22 +86,22 @@ if TEST:
     for data in dialogue_speakers:
         dialogue, a, b, c, d = data
         word_pos_data[dialogue] = (a, b, c, d)
-    ct.tag([unicode(w) for w in "uh my name is john".split()])
+    ct.tag([str(w) for w in "uh my name is john".split()])
     # either gather training data or test data
     training_data = []
-    for speaker in word_pos_data.keys():
+    for speaker in list(word_pos_data.keys()):
         # print speaker
         sp_data = []
         prefix = []
         predictions = []
         for word, pos in zip(word_pos_data[speaker][1],
                              word_pos_data[speaker][2]):
-            prefix.append(unicode(word.replace("$unc$", "")
+            prefix.append(str(word.replace("$unc$", "")
                                   .encode("utf8")))
             prediction = ct.tag(prefix[-5:])[-1][1]
-            sp_data.append((unicode(word.replace("$unc$", "")
+            sp_data.append((str(word.replace("$unc$", "")
                                     .encode("utf8")),
-                            unicode(pos.encode("utf8"))))
+                            str(pos.encode("utf8"))))
             predictions.append(prediction)
         training_data.append(deepcopy([(r, h)
                                        for r, h in zip(predictions, sp_data)]))
@@ -129,25 +129,25 @@ if TEST:
                 overall_tp += 1
             else:
                 c[hyp + "-" + r[1]] += 1
-    print tp, fn, tp
+    print(tp, fn, tp)
     p = (tp/(tp+fp))
     r = (tp/(tp+fn))
-    print "UH p, r, f=", p, r, (2 * p * r)/(p+r)
-    print "overall accuracy", overall_tp/overall_count
-    print "most common errors hyp-ref", c.most_common()[:20]
+    print("UH p, r, f=", p, r, (2 * p * r)/(p+r))
+    print("overall accuracy", overall_tp/overall_count)
+    print("most common errors hyp-ref", c.most_common()[:20])
 
 if TAG_ASR_RESULTS:
     def get_diff_and_new_prefix(current, newprefix, verbose=False):
         """Only get the different right frontier according to the timings
         and change the current hypotheses"""
         if verbose:
-            print "current", current
-            print "newprefix", newprefix
+            print("current", current)
+            print("newprefix", newprefix)
         rollback = 0
         original_length = len(current)
         for i in range(len(current)-1, -2, -1):
             if verbose:
-                print "oooo", current[i], newprefix[0]
+                print("oooo", current[i], newprefix[0])
             if i == -1 or (float(newprefix[0][1]) >= float(current[i][2])):
                 if i == len(current)-1:
                     current = current + newprefix
@@ -158,13 +158,13 @@ if TAG_ASR_RESULTS:
                     if k == len(newprefix):
                         break
                     if verbose:
-                        print "...", j, k, current[j], newprefix[k]
-                        print len(newprefix)
+                        print("...", j, k, current[j], newprefix[k])
+                        print(len(newprefix))
                     if not current[j] == newprefix[k]:
                         break
                     else:
                         if verbose:
-                            print "repeat"
+                            print("repeat")
                         k += 1
                         marker = j+1
                 rollback = original_length - marker
@@ -173,7 +173,7 @@ if TAG_ASR_RESULTS:
                 break
         return (current, newprefix, rollback)
 
-    print "tagging ASR results..."
+    print("tagging ASR results...")
     ct = CRFTagger()  # initialize tagger
     ct.set_model_file(TAGGER_PATH)
     # now tag the incremental ASR result files of interest
@@ -209,7 +209,7 @@ if TAG_ASR_RESULTS:
                                                 deepcopy(increment),
                                                 verb)
                 for i in range(right_frontier - rollback, len(current)):
-                    test = [unicode(x[0].lower().replace("'", ""))
+                    test = [str(x[0].lower().replace("'", ""))
                             for x in current[max([i-4, 0]):i+1]]
                     # if "4074A" in dialogue:
                     #    print "test", test

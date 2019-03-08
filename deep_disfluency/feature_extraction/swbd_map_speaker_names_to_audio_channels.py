@@ -75,7 +75,7 @@ pair = []
 #NB this can be adjusted to rename the separate channel wav files too
 for audio in sorted(audio_feature_files):
     dialogue_number = audio[3:7]
-    print dialogue_number
+    print(dialogue_number)
     if "A.csv" in audio or "B.csv" in audio: continue
     #if not int(dialogue_number) in [2241, 3011]:
     #    continue
@@ -93,10 +93,10 @@ for audio in sorted(audio_feature_files):
     #from each l/r file
     #map each A and B accordingly to which file has the highest intensity for both first 5 words/
     #sanity check is that one should win one, one should win the other
-    timing_files = filter(lambda x : dialogue_number in x, wordtimingfiles)
+    timing_files = [x for x in wordtimingfiles if dialogue_number in x]
     #print "timing", timing_files
     if not len(timing_files)==2:
-        print dialogue_number, "missing"
+        print(dialogue_number, "missing")
         missed.append(csv)
         pair = []
         continue
@@ -111,7 +111,7 @@ for audio in sorted(audio_feature_files):
             intensity_scores[p[0]].append((speaker,score))
     #print intensity_scores.items()
     winner = {}
-    for p in intensity_scores.keys():
+    for p in list(intensity_scores.keys()):
         winner[p] = max(intensity_scores[p], key=lambda x: x[1])[0]
     #print winner
     if winner[pair[0][0]] == winner[pair[1][0]]:
@@ -125,7 +125,7 @@ for audio in sorted(audio_feature_files):
         for filename in p:
             if not filename: continue
             c = "mv {} {}".format(filename,filename.replace(leftright,speaker))
-            print c
+            print(c)
             os.system(c)
     pair= [] #reset
     #h = raw_input()
@@ -133,5 +133,5 @@ for audio in sorted(audio_feature_files):
 
 
 # In[25]:
-print "missed"
-print missed
+print("missed")
+print(missed)

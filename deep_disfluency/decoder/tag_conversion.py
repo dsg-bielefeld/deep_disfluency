@@ -43,7 +43,7 @@ def convert_to_disfluency_tag(previous, tag):
         return "rpM"
     elif "<rpEnd" in tag:
         return "rpE"
-    print "NO TAG for" + tag
+    print("NO TAG for" + tag)
 
 
 def convert_to_uttseg_tag(previous, tag):
@@ -82,7 +82,7 @@ def convert_to_disfluency_uttseg_tag(previous, tag):
         return trp_tag.format("rpM")
     elif "<rpEnd" in tag:
         return trp_tag.format("rpE")
-    print "NO TAG for" + tag
+    print("NO TAG for" + tag)
 
 
 def convert_to_disfluency_tag_simple(previous, tag):
@@ -96,7 +96,7 @@ def convert_to_disfluency_tag_simple(previous, tag):
         return "e"
     elif "<rm-" in tag:
         return "rpSE"
-    print "NO TAG for" + tag
+    print("NO TAG for" + tag)
 
 
 def convert_to_disfluency_uttseg_tag_simple(previous, tag):
@@ -120,7 +120,7 @@ def convert_to_diact_tag(previous, tag):
     if m:
         diact = m.group(1)
         return diact
-    print "NO TAG for" + tag
+    print("NO TAG for" + tag)
 
 
 def convert_to_diact_uttseg_tag(previous, tag):
@@ -144,7 +144,7 @@ def convert_to_diact_interactive_tag(previous, tag):
     m = re.search(r'speaker floor="([^\s]*)"/>', tag)
     if m:
         return diact + "_" + m.group(1)
-    print "NO TAG for" + tag
+    print("NO TAG for" + tag)
 
 
 def convert_to_diact_uttseg_interactive_tag(previous, tag):

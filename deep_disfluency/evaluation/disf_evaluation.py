@@ -91,21 +91,21 @@ or ground truth files, there are methods in
 eval_utils.py to transform the file first into a fake format.
 for both the incremental and non-incremental versions.
 """
-from __future__ import division
+
 
 import os.path
 from copy import deepcopy
 from scipy.stats.stats import pearsonr, spearmanr
 import numpy as np
 
-from eval_utils import get_tag_data_from_corpus_file
-from eval_utils import load_incremental_outputs_from_increco_file
-from eval_utils import load_final_output_from_file
-from eval_utils import p_r_f, NIST_SU, DSER
-from eval_utils import final_output_accuracy_interval_level
-from eval_utils import final_output_accuracy_word_level
-from eval_utils import final_hyp_from_increco_and_incremental_metrics
-from eval_utils import rename_all_repairs_in_line_with_index
+from .eval_utils import get_tag_data_from_corpus_file
+from .eval_utils import load_incremental_outputs_from_increco_file
+from .eval_utils import load_final_output_from_file
+from .eval_utils import p_r_f, NIST_SU, DSER
+from .eval_utils import final_output_accuracy_interval_level
+from .eval_utils import final_output_accuracy_word_level
+from .eval_utils import final_hyp_from_increco_and_incremental_metrics
+from .eval_utils import rename_all_repairs_in_line_with_index
 
 # individual tags of interest
 ACC_TAGS = ["<rms", "<rm", "<i", "<e", "<rps", "<rp", "<rpn",
@@ -238,8 +238,8 @@ def final_output_disfluency_eval(prediction_speakers_dict,
      outputfilename -- path to file where final outputs are saved as
      text
     """
-    print "final output disfluency evaluation"
-    print "word=", word, "interval=", interval, "utt_eval=", utt_eval
+    print("final output disfluency evaluation")
+    print("word=", word, "interval=", interval, "utt_eval=", utt_eval)
     ttd_tags = deepcopy(TTD_TAGS)
     acc_tags = deepcopy(ACC_TAGS)
     relaxed_tags = deepcopy(RELAXED_TAGS)
@@ -307,7 +307,7 @@ def final_output_disfluency_eval(prediction_speakers_dict,
         if gold_speakers_dict.get(s) == None:
             s_test = s.replace("-", "")
             if gold_speakers_dict.get(s_test) == None:
-                print s, "not in gold"
+                print(s, "not in gold")
                 continue
             else:
                 gold = gold_speakers_dict[s_test]
@@ -387,7 +387,7 @@ def final_output_disfluency_eval(prediction_speakers_dict,
             this_tag_dict = tag_dict_interval
         else:
             this_tag_dict = tag_dict
-        print eval_mode
+        print(eval_mode)
         for tag in acc_tags:
             p, r, f1 = p_r_f(this_tag_dict[tag][0],
                              this_tag_dict[tag][1],
@@ -435,7 +435,7 @@ def final_output_disfluency_eval(prediction_speakers_dict,
     hyp_rate_word_all = []
     gold_rate_word_all = []
 
-    for key, val in speaker_rate_dict.items():
+    for key, val in list(speaker_rate_dict.items()):
         hyp_rate_turn = 0 if val[0] == 0 or val[2] == 0 else val[0] / val[2]
         hyp_rate_word = 0 if val[0] == 0 or val[4] == 0 else val[0] / val[4]
         gold_rate_turn = 0 if val[1] == 0 or val[5] == 0 else val[1] / val[3]
@@ -525,8 +525,8 @@ def incremental_output_disfluency_eval(prediction_speakers_dict,
      outputfilename -- path to file where final outputs are saved as
      text
     """
-    print "incremental output disfluency evaluation"
-    print "word=", word, "interval=", interval, "utt_eval=", utt_eval
+    print("incremental output disfluency evaluation")
+    print("word=", word, "interval=", interval, "utt_eval=", utt_eval)
     ttd_tags = deepcopy(TTD_TAGS)
     acc_tags = deepcopy(ACC_TAGS)
     relaxed_tags = deepcopy(RELAXED_TAGS)
@@ -572,7 +572,7 @@ def incremental_output_disfluency_eval(prediction_speakers_dict,
         if not carry_on:
             continue
         if gold_speakers_dict.get(s) == None:
-            print s, "not in gold"
+            print(s, "not in gold")
             continue
         hyp = prediction_speakers_dict[s]
         gold = [(x, y[0], y[1])
@@ -624,13 +624,13 @@ def incremental_output_disfluency_eval(prediction_speakers_dict,
 #         results=results,
 #         outputfilename=outputfilename)
     if outputfilename:
-        print "writing final output to file", outputfilename
+        print("writing final output to file", outputfilename)
         outputfile = open(outputfilename, "w")
         for s in sorted(prediction_speakers_dict.keys()):
 
             # print s
             if gold_speakers_dict.get(s) == None:
-                print s, "not in gold"
+                print(s, "not in gold")
                 continue
             if outputfilename:
                 outputfile.write("Speaker: " + s + "\n")
@@ -705,7 +705,7 @@ def save_results_to_file(test_filename,
     else:
         speaker_rate_file = open(speaker_rate_file, "w")
         speaker_rate_file.write(SPEAKER_RATE_HEADER + "\n")
-    for key, val in sorted(speaker_rate_dict.items(), key=lambda x: x[0]):
+    for key, val in sorted(list(speaker_rate_dict.items()), key=lambda x: x[0]):
         # split into the convo + participant to see how the two in the same
         # dialogue compare
         conv_no = key.split(":")[0]
@@ -764,5 +764,5 @@ if __name__ == '__main__':
                 outputfilename=hyp_dir +
                 "epoch_{0}/{1}{2}_output_final.text".format(e, key,
                                                             partial_string))
-        for k, v in results.items():
-            print k, v
+        for k, v in list(results.items()):
+            print(k, v)

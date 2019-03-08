@@ -17,9 +17,10 @@ from copy import deepcopy
 #from mumodo.mumodoIO import open_intervalframe_from_textgrid
 ##from mumodo.mumodoIO import save_intervalframe_to_textgrid
 
-from word_alignment import align
-from feature_utils import load_data_from_disfluency_corpus_file
-from feature_utils import sort_into_dialogue_speakers
+from .word_alignment import align
+from .feature_utils import load_data_from_disfluency_corpus_file
+from .feature_utils import sort_into_dialogue_speakers
+from functools import reduce
 
 def get_best_word_alignment(ms_words,swda_words,ms_start_times,
                             ms_end_times,swda_mappings=None,MSUttIndex=None,
@@ -31,16 +32,16 @@ def get_best_word_alignment(ms_words,swda_words,ms_start_times,
     """
     if debug:
         if any(["<laughter>" in x for x in ms_words]):
-            print "laughter before mapping"
-            print ms_words, swda_words
+            print("laughter before mapping")
+            print(ms_words, swda_words)
             #raw_input()
     alignment = align(ms_words,swda_words) #gets best alignment
     if debug:
         if any(["<laughter>" in x for x in ms_words]):
-            print "laughter after alignment"
-            print ms_words, swda_words
-            print alignment
-            print swda_mappings
+            print("laughter after alignment")
+            print(ms_words, swda_words)
+            print(alignment)
+            print(swda_mappings)
             #raw_input()
     #final_alignment = [[word] for word in ms_words]
     
@@ -204,7 +205,7 @@ def timings_for_MS_SWDAwords_from_MSwords(current_MSwords,
                 current_MS_start_times[j]  = current_time 
                 # adjust the word whose time was shared
                 if current_MS_end_times[j]-current_MS_start_times[j]>0.0:
-                    print "TIMING ERROR", data, "prev time", current_MS_end_times[j]
+                    print("TIMING ERROR", data, "prev time", current_MS_end_times[j])
             else:
                 #print "INS case 3"
                 final_insert = inserted_words
@@ -392,29 +393,29 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
         data = line.split("\t")
         assert(len(data)==7),data
         if debug:
-            print data
-            print currentUttIndex
+            print(data)
+            print(currentUttIndex)
         
         #1. check for bad annotations
         if "<DEL>" in data[4] and continuation_number == 1:
-            print "ANNOTATION ERROR, changing from DEL to CONT"
-            print "\t" + str(data)
+            print("ANNOTATION ERROR, changing from DEL to CONT")
+            print("\t" + str(data))
             data[4] = "<CONT>"
-            print "\t" + "changed to"
-            print "\t" + str(data)
+            print("\t" + "changed to")
+            print("\t" + str(data))
         if "<DEL>" in data[4] and not "---" in data[5]:
             #account for incorrect labels: e.g. <DEL>    Uh-huh    um-hum
-            print "ANNOTATION ERROR, changing from DEL to SUB"
-            print "\t" + str(data)
+            print("ANNOTATION ERROR, changing from DEL to SUB")
+            print("\t" + str(data))
             data[4] = "<SUB>"
-            print "\t" + "changed to"
-            print "\t" + str(data)
+            print("\t" + "changed to")
+            print("\t" + str(data))
         if "<INS>" in data[4] and not "---" in data[6]:
-            print "ANNOTATION ERROR, changing from INS to SUB"
-            print "\t" + str(data)
+            print("ANNOTATION ERROR, changing from INS to SUB")
+            print("\t" + str(data))
             data[4] = "<SUB>"
-            print "\t" + "changed to"
-            print "\t" + str(data)
+            print("\t" + "changed to")
+            print("\t" + str(data))
         if "<CONT>" in data[4]:
             continuation_number+=1
         else:
@@ -431,7 +432,7 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
             #laughter bout a special case
             if "[laughter]" in data[6] and laughter:
                 if debug: 
-                    print "MS laughter turn"
+                    print("MS laughter turn")
                 laughter_status = True
             else:
                 MSskip = True
@@ -442,23 +443,23 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
         SWDAskip = False
         if "[silence]" in data[5] or "noise]" in data[5]: 
             if debug:
-                print "swdaskip silence or noise"
+                print("swdaskip silence or noise")
             SWDAskip = True
         elif "[laughter]" in data[5] or "<e_aside>" in data[5] or\
          "<b_aside>" in data[5]:
             #TODO Laughter- is it always marked up in old swda?
             if "[laughter]" in data[5]:
                 if debug: 
-                    print "SWDA laughter turn"
+                    print("SWDA laughter turn")
                 pass
             else:
                 if debug:
-                    print "swdaskip silence or noise"
+                    print("swdaskip silence or noise")
                 SWDAskip = True
         elif "+++" in data[5] or "---" in data[5]: 
             #delete or continuation in MS version, already detected
             if debug:
-                print "swdaskip silence or noise"
+                print("swdaskip silence or noise")
             SWDAskip = True
         
         #3. get the data
@@ -486,13 +487,13 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
             word = word.replace("[laughter-","")[:-1]
             word = "<laughter>" + word + "</laughter>"
             if debug:
-                print "word", word
+                print("word", word)
         if "[laughter-" in MSword:
             #TODO LAUGHTER WORD
             MSword = MSword.replace("[laughter-","")[:-1]
             MSword = "<laughter>" + MSword + "</laughter>"
             if debug:
-                print "MSword", MSword
+                print("MSword", MSword)
                 #raw_input()
         #if utterance changes, add the last one
         if data[1].split(".")[1] != currentUttIndex and \
@@ -502,7 +503,7 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
             #here just carry on, 
             #treating it as part of the last utt.
             if debug:
-                if debug: print "adding last one"
+                if debug: print("adding last one")
             if currentUttIndex!= "": 
                 # not the first time as the previous one doesn't exist
                 #1st alignment- returns lists the same length as 
@@ -510,11 +511,11 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
                 #approximation to the word start and end times for 
                 #those based on the MS timings/transcripts
                 if debug: 
-                    print "*"* 8, "current before first adjust"
-                    print len(current_MSwords), len(current_MS_SWDAwords)
-                    print len(current_start_times), len(current_end_times)
-                    print current_MSwords, current_MS_SWDAwords
-                    print "*"* 4
+                    print("*"* 8, "current before first adjust")
+                    print(len(current_MSwords), len(current_MS_SWDAwords))
+                    print(len(current_start_times), len(current_end_times))
+                    print(current_MSwords, current_MS_SWDAwords)
+                    print("*"* 4)
                 current_MS_SWDAwords,\
                 current_start_times,\
                 current_end_times,\
@@ -526,11 +527,11 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
                                                     current_end_times,
                                                     data=data)
                 if debug: 
-                    print "*"* 8, "current after first adjust"
-                    print len(current_MSwords), len(current_MS_SWDAwords)
-                    print len(current_start_times), len(current_end_times)
-                    print current_MSwords, current_MS_SWDAwords
-                    print "*"* 4
+                    print("*"* 8, "current after first adjust")
+                    print(len(current_MSwords), len(current_MS_SWDAwords))
+                    print(len(current_start_times), len(current_end_times))
+                    print(current_MSwords, current_MS_SWDAwords)
+                    print("*"* 4)
                 #print current_MSwords, current_MS_SWDAwords
                 #2nd alignment- produces a mapping the same 
                 #length as current_MS_SWDAwords
@@ -547,13 +548,13 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
                                                         current_end_times)
                     
                     if debug: 
-                        print "*"* 8, "after alignment"
-                        print temp_current_MS_SWDAwords
-                        print temp_current_SWDAwords
-                        print current_start_times
-                        print current_end_times
-                        print current_SWDAindices 
-                        print "*"* 8
+                        print("*"* 8, "after alignment")
+                        print(temp_current_MS_SWDAwords)
+                        print(temp_current_SWDAwords)
+                        print(current_start_times)
+                        print(current_end_times)
+                        print(current_SWDAindices) 
+                        print("*"* 8)
                     #redo the start times again, this time the length of 
                     #SWDA words, with the right approximations?
                     temp_current_SWDAwords, current_start_times, \
@@ -565,12 +566,12 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
                                                 current_end_times,
                                                 data=data)
                     if debug: 
-                        print "*"* 8, "after re-adjust"
-                        print temp_current_SWDAwords
-                        print current_start_times
-                        print current_end_times
-                        print current_SWDAindices #what happens to these?
-                        print "*"* 8
+                        print("*"* 8, "after re-adjust")
+                        print(temp_current_SWDAwords)
+                        print(current_start_times)
+                        print(current_end_times)
+                        print(current_SWDAindices) #what happens to these?
+                        print("*"* 8)
                     
                     assert current_SWDAwords==[x.replace("<laughter>","").
                                         replace("</laughter>","")
@@ -586,7 +587,7 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
                     end_times.extend(current_end_times)
                     words.extend(current_SWDAwords)
                 else:
-                    if debug: print "MSSWDA words empty"
+                    if debug: print("MSSWDA words empty")
                     SWDA_left_over = deepcopy(current_SWDAwords)
                     SWDA_left_over_indices = deepcopy(current_SWDAindices)
 
@@ -595,7 +596,7 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
                 
                 currentUttIndex = data[1].split(".")[1]
                 if debug:
-                    print "utt Index now", currentUttIndex
+                    print("utt Index now", currentUttIndex)
                 
             current_start_times = []
             current_end_times = []
@@ -642,14 +643,14 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
                     if SWDAindices == [] : break
             if current_SWDAindices == []:
                 if debug:
-                    print "no swda words for", currentUttIndex, MSfilename
+                    print("no swda words for", currentUttIndex, MSfilename)
                 pass
         
         if MSskip:
             MSword = ""
             if SWDAskip: 
                 if debug:
-                    print "swda skip continue"
+                    print("swda skip continue")
                 continue #don't deal with this as no word for either one
         else:
             MSword = clean_word(MSword)
@@ -711,7 +712,7 @@ def map_MS_to_SWDA(MSfilename,SWDAindices,SWDAwords,laughter=False,
         end_times.extend(current_end_times)
         words.extend(current_SWDAwords)
     else:
-        print "MSSWDA words empty"
+        print("MSSWDA words empty")
         #one has to add on the remaining time
         SWDA_left_over = deepcopy(current_SWDAwords)
         SWDA_left_over_indices = deepcopy(current_SWDAindices)
@@ -781,7 +782,7 @@ if __name__ == '__main__':
 
     ranges = sorted([line.strip("\n") for line in open(range_file)])
 
-    print len(ranges), "files to process"
+    print(len(ranges), "files to process")
 
     dialogue_speakers = []
     #for disf_file in disfluency_files:
@@ -791,7 +792,7 @@ if __name__ == '__main__':
     dialogue_speakers.extend(sort_into_dialogue_speakers(IDs, mappings, utts,
                                                          pos_tags, labels,
                                                  convert_to_dnn_tags=False))
-    print len(dialogue_speakers), "dialogue speakers"
+    print(len(dialogue_speakers), "dialogue speakers")
     #The main loop- has every word in both formats, needs to map from MS file
     # timings to the SWDA ones
     #Given the original SWDA transcripts are IN the MSaligned files, it's safer 
@@ -800,7 +801,7 @@ if __name__ == '__main__':
     #So the mapping is MSnew -> MSSWDAold -> SWDAold, 
     #where the last mapping is done through min. edit distance string alignment
     tests = ["2549B"]
-    print "Creating word timing aligned corpus..."
+    print("Creating word timing aligned corpus...")
     for dialogue_triple in sorted(dialogue_speakers, key=lambda x: x[0]):
         dialogue_speakerID, SWDAindices, SWDAwords, SWDApos, SWDAlabels = \
                                                         dialogue_triple
@@ -846,12 +847,12 @@ if __name__ == '__main__':
     
         if not len(origSWDAwords)==len(start_times):
             c = 0
-            print "ERROR uneven lengths!", len(origSWDAwords),len(SWDAwords)
+            print("ERROR uneven lengths!", len(origSWDAwords),len(SWDAwords))
             for x,y in zip(origSWDAwords,SWDAwords):
                 if x != y:
-                    print x,y
+                    print(x,y)
                 c+=1
-            print dialogue_speakerID
+            print(dialogue_speakerID)
             raise Exception
         #break
         if write_mapping:
@@ -904,4 +905,4 @@ if __name__ == '__main__':
     
     if write_mapping: 
         timings_corpus_file.close()
-    print "Timing aligned corpus complete."
+    print("Timing aligned corpus complete.")

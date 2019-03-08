@@ -1,5 +1,5 @@
-from __future__ import division
-from deep_tagger import DeepDisfluencyTagger
+
+from .deep_tagger import DeepDisfluencyTagger
 import fluteline
 
 
@@ -36,7 +36,7 @@ class DeepTaggerModule(fluteline.Consumer):
             saved_model_dir=saved_model_dir,
             use_timing_data=use_timing_data
         )
-        print "Deep Tagger Module ready"
+        print("Deep Tagger Module ready")
         self.latest_word_ID = -1
         self.word_graph = []
 
@@ -69,7 +69,7 @@ class DeepTaggerModule(fluteline.Consumer):
             word = word_update['word']
             new_tags = self.disf_tagger.tag_new_word(word, timing=timing)
             start_id = self.latest_word_ID - (len(new_tags) - 1)
-            word_update_indices = range(start_id, self.latest_word_ID+1)
+            word_update_indices = list(range(start_id, self.latest_word_ID+1))
             # print "\nnew tags:"
             for idx, new_tag in zip(word_update_indices, new_tags):
                 # update the disf tag and pos tag for new tag updates
@@ -81,5 +81,5 @@ class DeepTaggerModule(fluteline.Consumer):
                 # output the new tags for the updated word
                 self.output.put(self.word_graph[idx])
         except:
-            print "Disfluency tagger failed to update with new word"
+            print("Disfluency tagger failed to update with new word")
 

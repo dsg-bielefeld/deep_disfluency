@@ -7,11 +7,11 @@ import argparse
 import re
 from collections import defaultdict
 
-from feature_utils import load_data_from_corpus_file
-from feature_utils import load_data_from_disfluency_corpus_file
-from feature_utils import get_tags
-from feature_utils import concat_all_data_all_speakers
-from feature_utils import sort_into_dialogue_speakers
+from .feature_utils import load_data_from_corpus_file
+from .feature_utils import load_data_from_disfluency_corpus_file
+from .feature_utils import get_tags
+from .feature_utils import concat_all_data_all_speakers
+from .feature_utils import sort_into_dialogue_speakers
 from deep_disfluency.utils.tools import convert_to_simple_label
 
 
@@ -24,7 +24,7 @@ def create_word_or_pos_representation(wordrepfilepath,
     else set to the unknown token automatically externally.
     """
     tag_dict = defaultdict(int)  # tag and the number of times it occur
-    print "creating word or pos tag file..."
+    print("creating word or pos tag file...")
     i = 0
     for tag_sequence in words_or_pos:
         i += 1
@@ -37,11 +37,11 @@ def create_word_or_pos_representation(wordrepfilepath,
     vocab = [str(i)+","+str(vocab_allowed[i])
              for i in range(0, len(vocab_allowed))]
     tagstring = "\n".join(vocab)
-    print "vocab_size", len(vocab)
+    print("vocab_size", len(vocab))
     myfile = open(wordrepfilepath, "w")
     myfile.write(tagstring)
     myfile.close()
-    print "word or pos tag file complete."
+    print("word or pos tag file complete.")
 
 
 def create_tag_representations(tag_rep_filepath, tags,
@@ -60,10 +60,10 @@ def create_tag_representations(tag_rep_filepath, tags,
     3=same as 2 but with a 'c' tag after edit terms have ended.
     """
     tag_dict = defaultdict(int)  # tag and the number of times it occurs
-    print "creating tag file:", representation, "..."
+    print("creating tag file:", representation, "...")
     # print len(tags)
     if tag_corpus_file:
-        print "(and creating tag corpus file)"
+        print("(and creating tag corpus file)")
         tag_corpus_file = open(tag_corpus_file, "w")
 
     i = 0
@@ -83,7 +83,7 @@ def create_tag_representations(tag_rep_filepath, tags,
                                 r'<speechLaugh/>|<laughter/>', t)\
                             and not re.search(r'<speaker floor="[^\s]*"/>', t):
                         if "<speaker" in t:
-                            print "WARNING speaker getting through"
+                            print("WARNING speaker getting through")
                         tag += t
             if "disf" in representation and "simple" in representation:
                 tag = convert_to_simple_label(tag, "disf1")
@@ -104,15 +104,15 @@ def create_tag_representations(tag_rep_filepath, tags,
                 else:
                     if "<laugh" in a_tag:
                         continue
-                    print "No utt seg found", a_tag
+                    print("No utt seg found", a_tag)
                     continue
             if tag == "":
                 if "<laugh" not in a_tag:
-                    print "warning no tag", a_tag
+                    print("warning no tag", a_tag)
                 continue
             if "interactive" in representation:
                 if "speaker" in tag:
-                    print "in tag already", a_tag, tag
+                    print("in tag already", a_tag, tag)
                 m = re.search(r'<speaker floor="[^\s]*"/>', a_tag)
                 if m:
                     # if "<speaker" in tag:
@@ -139,13 +139,13 @@ def create_tag_representations(tag_rep_filepath, tags,
     if tag_corpus_file:
         tag_corpus_file.write(tag_corpus)
         tag_corpus_file.close()
-    print tag_dict
+    print(tag_dict)
     tagstring = "\n".join([str(i)+","+str(sorted(tag_dict.keys())[i])
-                           for i in range(0, len(tag_dict.keys()))])
+                           for i in range(0, len(list(tag_dict.keys())))])
     tag_rep_file = open(tag_rep_filepath, "w")
     tag_rep_file.write(tagstring)
     tag_rep_file.close()
-    print "tag file complete."
+    print("tag file complete.")
 
 
 if __name__ == '__main__':
@@ -178,7 +178,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     corpus_file = args.corpusFile
-    print "creating tag files. Using file:", corpus_file
+    print("creating tag files. Using file:", corpus_file)
     word_rep_file = args.tagFolder + "/swbd_word_rep.csv"
     pos_rep_file = args.tagFolder + "/swbd_pos_rep.csv"
     disf_tag_rep_file = args.tagFolder + "/swbd_disf1_tags.csv"

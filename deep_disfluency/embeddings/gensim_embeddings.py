@@ -17,7 +17,7 @@ class MySentences(object):
 
     def __iter__(self):
         for fname in training_files:
-            print fname
+            print(fname)
             for line in open(fname):
                 if "clean" in fname:
                     ID, text = line.split(",")
@@ -34,8 +34,8 @@ sentences = MySentences(training_files)
 emb_size = 50
 model = gensim.models.Word2Vec(sentences, min_count=2, size=emb_size)
 model.save('swbd_clean_50')
-print model.index2word[0]
-print len(model.index2word)
+print(model.index2word[0])
+print(len(model.index2word))
 # print model['um']
 
 # for i in model.index2word:

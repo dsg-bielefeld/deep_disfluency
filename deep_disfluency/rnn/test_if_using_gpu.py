@@ -18,8 +18,8 @@ def test_if_using_GPU(verbose=False):
     t1 = time.time()
     dur = t1 - t0
     if verbose:
-        print("Looping %d times took %f seconds" % (iters, dur))
-        print("Result is %s" % (r,))
+        print(("Looping %d times took %f seconds" % (iters, dur)))
+        print(("Result is %s" % (r,)))
     if numpy.any([isinstance(x.op, tensor.Elemwise) and
                   ('Gpu' not in type(x.op).__name__)
                   for x in f.maker.fgraph.toposort()]):

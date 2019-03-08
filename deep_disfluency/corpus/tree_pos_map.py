@@ -54,11 +54,11 @@ class TreeMap(list):
                         mypos = mytree.pos()
                         previous = wordMap[1][0][0]
                 except IndexError:
-                    print "ERROR can't get tree from index"
-                    print "TreeMap.get_POS(utt)"
-                    print utt.swda_filename
-                    print utt.transcript_index
-                    raw_input()
+                    print("ERROR can't get tree from index")
+                    print("TreeMap.get_POS(utt)")
+                    print(utt.swda_filename)
+                    print(utt.transcript_index)
+                    input()
                 pos = ""
                 #concatenating now
                 for n in wordMap[1]:
@@ -69,10 +69,10 @@ class TreeMap(list):
             else:
                 POS.append("null")
         if not len(POS) == len(utt.text_words()):
-            print "ERROR: uneven lengths: TreeMap.get_POS"
-            print utt.swda_filename
-            print utt.transcript_index
-            raw_input()
+            print("ERROR: uneven lengths: TreeMap.get_POS")
+            print(utt.swda_filename)
+            print(utt.transcript_index)
+            input()
         return POS
             
     def get_last_TreeNumber(self):
@@ -81,7 +81,7 @@ class TreeMap(list):
             pair = self[i]
             if len(pair[1]) > 0:
                 return pair[1][-1][0]
-        print "WARNING: no trees mapped to in this utt!"
+        print("WARNING: no trees mapped to in this utt!")
         return None
 
     def get_first_TreeNumber(self):
@@ -90,7 +90,7 @@ class TreeMap(list):
             pair = self[i]
             if len(pair[1]) > 0:
                 return pair[1][0][0]
-        print "WARNING: no trees mapped to in this utt!"
+        print("WARNING: no trees mapped to in this utt!")
         return None
         
     def get_ancestor_nodes(self, mytree, nodeposition):
@@ -389,10 +389,10 @@ class TreeMapCorpus(dict):
         dict.__init__(self, args)
         self.errorlog = errorLog
         if readIn:
-            print "loading treemap files..."
+            print("loading treemap files...")
             for filename in sorted(iglob(os.path.join(mapdir,"Tree_map*"))):
                 self.iter_treemaps_from_file(filename)
-            print "treemaplist length: " + str(len(self))
+            print("treemaplist length: " + str(len(self)))
         
     def get_treemap(self, trans, utt):
         if utt == None:
@@ -404,12 +404,12 @@ class TreeMapCorpus(dict):
             if len(treemap) != len(utt.text_words()):
                 warning  = "ERROR: TREEMAP HERE NOT IN LINE WITH UTT"  +\
                  utt.swda_filename  + str(utt.transcript_index)+"\n"
-                print warning
-                print utt.text_words()
-                print treemap
+                print(warning)
+                print(utt.text_words())
+                print(treemap)
                 if not self.errorlog == None:
                     self.errorlog.write(warning)
-                raw_input()
+                input()
                 return None
             return treemap
         except:
@@ -417,7 +417,7 @@ class TreeMapCorpus(dict):
                 warning = "WARNING NO TREE MAP FOR" +  utt.swda_filename  +\
                 str(utt.transcript_index) +  " from map key" +\
                  str(map_key) + "\n"
-                print warning
+                print(warning)
                 if not self.errorlog == None:
                     self.errorlog.write(warning)
             return None
@@ -522,7 +522,7 @@ class TreeMapCorpus(dict):
             self[filestring] = TreeMap(myTreemap,treeNumbers)
         
     def iter_treemaps(self):
-        for t in self.keys():
+        for t in list(self.keys()):
             yield self[t]
     
 class POSMap(list):
@@ -549,17 +549,17 @@ class POSMap(list):
                         if not mypos[n][1] in punctuation_pos: pos+=mypos[n][1]
                     POS.append(pos)
                 except IndexError:
-                    print "can't get POS from index: POSMap.get_POS(utt)"
-                    print utt.swda_filename
-                    print utt.transcript_index
-                    raw_input()
+                    print("can't get POS from index: POSMap.get_POS(utt)")
+                    print(utt.swda_filename)
+                    print(utt.transcript_index)
+                    input()
             else:
                 POS.append("null")
         if not len(POS) == len(utt.text_words()):
-            print "uneven lengths: POSMap.get_POS mytree.py"
-            print utt.swda_filename
-            print utt.transcript_index
-            raw_input()
+            print("uneven lengths: POSMap.get_POS mytree.py")
+            print(utt.swda_filename)
+            print(utt.transcript_index)
+            input()
         return POS
     
 class POSMapCorpus(dict):
@@ -568,10 +568,10 @@ class POSMapCorpus(dict):
         dict.__init__(self, args)
         self.errorlog = errorLog 
         if readIn:
-            print "loading posmap files..."
+            print("loading posmap files...")
             for filename in sorted(iglob(os.path.join(mapdir,"POS_map*"))):
                 self.iter_POSmaps_from_file(filename)
-            print "posmaplist length: " + str(len(self))
+            print("posmaplist length: " + str(len(self)))
     
     def get_POSmap(self, trans, utt):
         if utt == None:
@@ -583,26 +583,26 @@ class POSMapCorpus(dict):
             if len(posmap) != len(utt.text_words()):
                 warning = "WARNING: posMAP HERE NOT IN LINE WITH UTT" +\
                  str(utt.swda_filename) + str(utt.transcript_index)+"\n"
-                print warning
-                print utt.text_words()
-                print posmap
-                print sorted(self.keys())
+                print(warning)
+                print(utt.text_words())
+                print(posmap)
+                print(sorted(self.keys()))
                 if not self.errorlog == None:
                     self.errorlog.write(warning)
-                raw_input()
+                input()
                 return None
             return posmap
         else:
             if not len(utt.pos) == 0 and not utt.pos[0] == ".//.":
                 warning = "WARNING NO POS FOR " + str(utt.conversation_no)+\
                 "-"+ str(utt.transcript_index)+"\n"
-                print warning
-                print utt.text_words()
-                print sorted(self.keys())[:20]
-                print "map key", map_key
+                print(warning)
+                print(utt.text_words())
+                print(sorted(self.keys())[:20])
+                print("map key", map_key)
                 if not self.errorlog == None:
                     self.errorlog.write(warning)
-                raw_input()
+                input()
             return None
       
     def append(self, transFilename, uttTransNumber, wordPOSMap):
@@ -669,5 +669,5 @@ class POSMapCorpus(dict):
             self[filestring] = POSMap(myPOSmap)  # POSmaps
         
     def iter_POSmaps(self):
-        for t in self.keys():
+        for t in list(self.keys()):
             yield self[t]    

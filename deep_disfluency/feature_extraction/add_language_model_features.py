@@ -1,5 +1,5 @@
 
-from __future__ import division
+
 #Script to add STIR (Hough and Purver 2014 EMNLP) Language Model features tos
 #the input from ASR results/simulated ASR results
 #this should work in an OOP style manner in that an object should be 
@@ -16,8 +16,8 @@ from copy import deepcopy
 
 from deep_disfluency.language_model.ngram_language_model import KneserNeySmoothingModel
 from deep_disfluency.language_model.ngram_language_model import NgramGraph
-from feature_utils import get_diff_and_new_prefix, simulate_increco_data
-from feature_utils import load_data_from_corpus_file
+from .feature_utils import get_diff_and_new_prefix, simulate_increco_data
+from .feature_utils import load_data_from_corpus_file
 
 def save_vector_to_pickle(features, pkl_file):
     """Takes a list of lists and turns it into a np array to save."""
@@ -61,7 +61,7 @@ def swbd_folds_disfluency_corpus(input,num_files=496,num_folds=10):
         currentSection = line.split(",")[0].split(":")[0]
         current = currentSection
         ranges = []
-        print currentSection
+        print(currentSection)
         while index <= targetstop:
             ranges.append(current)
             while current == currentSection:
@@ -77,7 +77,7 @@ def swbd_folds_disfluency_corpus(input,num_files=496,num_folds=10):
         #fold always has structure (ranges,wordsubcorpus(big string),
         #posSubcorpus(big string))   
         
-    print "no of folds = ", str(len(folds))
+    print("no of folds = ", str(len(folds)))
     for i in range(0,len(folds)):
         test = i
         if i == len(folds)-1: heldout = i-1
@@ -87,7 +87,7 @@ def swbd_folds_disfluency_corpus(input,num_files=496,num_folds=10):
             if not index == heldout and not index == test:
                 training.append(index) #just appends an index
         config.append((tuple(training),heldout,test))
-    print "config size", str(len(config))
+    print("config size", str(len(config)))
     input.close()
     return config, folds
 
@@ -131,7 +131,7 @@ class IncrementalLanguageModelFeatureExtractor():
         POSdelta = self.pos_model.order - 1
         #then go through the new prefix
         for i in range(0,len(new_word_prefix)):
-            print new_word_prefix[i]
+            print(new_word_prefix[i])
             if new_word_prefix[i] == "<laughter/>":
                 #just add default values via copying or 0's
                 if len(results)>0:
@@ -440,7 +440,7 @@ class IncrementalLanguageModelFeatureExtractor():
                                         POSLocalEntropyReduce,POSRM0Entropy,
                                         rm3rp3POS])
                 j-=1
-        print len(results), len(results[0])
+        print(len(results), len(results[0]))
         return results 
             
 def extract_lang_model_features_from_increco(data,
@@ -470,8 +470,8 @@ def extract_lang_model_features_from_increco(data,
     lex_data = deepcopy([[x[0][1]] for x in lex_data]) # simulating prefix
     pos_data = deepcopy([[x[1]] for x in pos_data])
     for word_prefix,pos_prefix,label in zip(lex_data,pos_data,labels_data):
-        print "word_prefix", word_prefix
-        print "pos_prefix", pos_prefix
+        print("word_prefix", word_prefix)
+        print("pos_prefix", pos_prefix)
         r = f_extractor.new_features_from_new_prefix(
                                                      word_prefix,
                                                      new_pos_prefix=pos_prefix,
@@ -507,7 +507,7 @@ def extract_language_model_string(clean_model_file,
             current_pos_line = cells[1].strip("\n")
         if not key in dialogue_ranges:
             continue
-        print "dialogue",key
+        print("dialogue",key)
         corpus_string+=current_line+"\n"
         pos_string+=current_pos_line+"\n"
                 
@@ -572,11 +572,11 @@ if __name__ == '__main__':
     try:
         os.mkdir(args.vectorFolder)
     except Exception:
-        print "couldn't create", args.vectorFolder,"might already be there"
+        print("couldn't create", args.vectorFolder,"might already be there")
     
         
     if args.edit_input:
-        print "Training edit term Language Model..."
+        print("Training edit term Language Model...")
         #stays the same across folds
         edit_lm_corpus_file = open(args.cleanModelDir + \
                                    "/swbd_disf_train_1_edit.text")
@@ -593,7 +593,7 @@ if __name__ == '__main__':
     dialogues = sorted(load_data_from_corpus_file(args.corpusFile))
     num_folds = 10
     fold_size = int(len(dialogues) * 1/num_folds) # 10 fold cross lm
-    print "fold_size",fold_size
+    print("fold_size",fold_size)
     folds = {}
     lm_corpus = {} #lm corpus always
     pos_lm_corpus = {} #pos tags corpus
@@ -607,7 +607,7 @@ if __name__ == '__main__':
     
         fold_ranges = [x[0] for x in dialogues[previous_split : split]]
         folds[f] = fold_ranges
-        print "current range", previous_split,split
+        print("current range", previous_split,split)
         lm_string, pos_string =  extract_language_model_string(
                         args.cleanModelDir + "/swbd_disf_train_1_clean.text",
                         fold_ranges,
@@ -615,7 +615,7 @@ if __name__ == '__main__':
                         utt_sep=args.utt_sep)
         lm_corpus[f]  = lm_string
         pos_lm_corpus[f] = pos_string
-        print "number of strings",len(lm_string.split("\n"))
+        print("number of strings",len(lm_string.split("\n")))
         split+=fold_size
         previous_split+=fold_size
     
@@ -629,14 +629,14 @@ if __name__ == '__main__':
             a_pos_heldout_corpus = ""
             heldout_key = [x for x in sorted(folds.keys())\
                             if x != config_key][-1]
-            for lm_key in lm_corpus.keys():
+            for lm_key in list(lm_corpus.keys()):
                 if lm_key == config_key or lm_key == heldout_key: continue
                 a_corpus+=lm_corpus[lm_key]+'\n'
                 a_pos_corpus+=pos_lm_corpus[lm_key]+"\n"
             a_heldout_corpus = lm_corpus[heldout_key]
             a_pos_heldout_corpus = pos_lm_corpus[heldout_key]
-            print "training sub lm"
-            print a_corpus
+            print("training sub lm")
+            print(a_corpus)
             sublm = KneserNeySmoothingModel(order=args.order,
                                         discount=discount,
                                         partial_words=args.partial_words,
@@ -654,14 +654,14 @@ if __name__ == '__main__':
             for d in dialogues:
                 speaker_id, data = d
                 if not speaker_id in folds[f]: continue
-                print "processing",speaker_id
+                print("processing",speaker_id)
                 dialogue_features = extract_lang_model_features_from_increco(
                                                     data,
                                                     sublm, 
                                                     pos_model=subposlm, 
                                                     edit_model=edit_lm,
                                                     reset_at_utterance=True)
-                print "saving",speaker_id
+                print("saving",speaker_id)
                 save_vector_to_pickle(dialogue_features,
                                 args.vectorFolder + "/" + speaker_id + ".pkl")
         

@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import theano
+theano.config.gcc.cxxflags = "-Wno-c++11-narrowing"
 import theano.tensor as T
 from theano import shared
 from collections import OrderedDict

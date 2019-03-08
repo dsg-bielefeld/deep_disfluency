@@ -39,8 +39,8 @@ class Repair:
         assert len(self.reparandumWords) > 0
         if len(self.repairWords) == 0:
             return "del"
-        elif map(lambda x: x[0],self.repairWords) \
-            == map(lambda x:x[0],self.reparandumWords):
+        elif [x[0] for x in self.repairWords] \
+            == [x[0] for x in self.reparandumWords]:
             return "rep"
         else: return "sub"
     

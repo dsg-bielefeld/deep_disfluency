@@ -7,7 +7,7 @@ Deep Disfluency module, detect disfluencies in real time.
 try:
     import deep_disfluency
 except ImportError:
-    print "no installed deep_disfluency package, pathing to source"
+    print("no installed deep_disfluency package, pathing to source")
     import sys
     sys.path.append("../")
 

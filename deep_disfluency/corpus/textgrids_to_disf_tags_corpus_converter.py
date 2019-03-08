@@ -126,7 +126,7 @@ def convert_to_disfluency_word_tag_tuples_from_raw(text, start='(', end=')'):
         if label == "":
             label = "<f/>"
     if inRepair != 0:
-        print "non 0 bracket depth/too few or too many!", inRepair
+        print("non 0 bracket depth/too few or too many!", inRepair)
     return inRepair
 
 
@@ -169,12 +169,12 @@ global_tag_count = Counter()
 log_file = open("{}_errors.log".format(lang), "w")
 
 for experiment_name in sorted(os.listdir(transcription_dir)):
-    print experiment_name
+    print(experiment_name)
     if ".DS_Store" in experiment_name:
         continue
     textgrid_file_name = transcription_dir + os.sep + experiment_name + os.sep + experiment_name + ".TextGrid"
     textgrid_file_name_target = target_dir + os.sep + experiment_name + os.sep + experiment_name + ".TextGrid"
-    print textgrid_file_name
+    print(textgrid_file_name)
     tasks = task_index.values() #NB idio syncratic to DUEL
     if not os.path.isfile(textgrid_file_name):
         #already sliced, so just add all the corresponding files
@@ -189,7 +189,7 @@ for experiment_name in sorted(os.listdir(transcription_dir)):
             if not "correctedTODO.TextGrid" in textgrid_file_name:
                 #print "ommitting", textgrid_file_name
                 continue
-            print "File:",textgrid_file_name
+            print("File:",textgrid_file_name)
             #part_transcription = open_intervalframe_from_textgrid(textgrid_file_name)
             #for k in part_transcription.keys():
             #    c[k]+=1
@@ -200,8 +200,8 @@ for experiment_name in sorted(os.listdir(transcription_dir)):
                 #part_transcription = open_intervalframe_from_textgrid(textgrid_file_name)
                 trans, missing = verify_file(textgrid_file_name, global_tag_count, log_file, translator)
                 #WARNING WARNING be careful to not overwrite!!
-                print "saving to", textgrid_file_name_target
-                print "names:", trans.keys()
+                print("saving to", textgrid_file_name_target)
+                print("names:", trans.keys())
                 
                 # save_intervalframe_to_textgrid(trans,textgrid_file_name_target)
                 
@@ -221,36 +221,34 @@ for experiment_name in sorted(os.listdir(transcription_dir)):
         if not "correctedTODO.TextGrid" in textgrid_file_name:
             #print "ommitting", textgrid_file_name
             continue
-        print "File",textgrid_file_name
+        print("File",textgrid_file_name)
         trans, missing = verify_file(textgrid_file_name, global_tag_count, log_file, translator)
         missing_c[experiment_name].extend(missing)
         #WARNING WARNING be careful to not overwrite!!
         #save_intervalframe_to_textgrid(trans,textgrid_file_name)
-        print "saving to", textgrid_file_name_target
-        print "names", trans.keys()
+        print("saving to", textgrid_file_name_target)
+        print("names", trans.keys())
         
         # save_intervalframe_to_textgrid(trans, textgrid_file_name_target)
 
 
         #just one file, so slice into tasks/parts according to the 'part tier'
         #transcription = open_intervalframe_from_textgrid(textgrid_file_name)
-print "*********tiers"
+print("*********tiers")
 for k,v in sorted(c.items(),key=lambda x: x[1], reverse=True):
     if v == []: continue
-    print k,v
-print "******missing"
+    print(k,v)
+print("******missing")
 for k,v in sorted(missing_c.items(),key=lambda x: x[0]):
     if v == []: continue
-    print k,v
-print "*********tags"
+    print(k,v)
+print("*********tags")
 for k,v in sorted(global_tag_count.items(),key=lambda x: x[1], reverse=True):
     if v == []: continue
-    print k,v
+    print(k,v)
 log_file.close()
 
 
 if __name__ == '__main__':
     # 
-    
-    
-    
+    pass

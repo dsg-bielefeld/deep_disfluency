@@ -79,11 +79,11 @@ def detection_corpus_format(uttRef, words, pos, tags, indices):
             tags[i] = "<f/>"
     final_string = "\t".join(
         [uttRef, indices.pop(0), words.pop(0), pos.pop(0), tags.pop(0)]) + "\n"
-    print len(indices), len(words), len(pos), len(tags)
-    print indices
-    print words
-    print pos
-    print tags
+    print(len(indices), len(words), len(pos), len(tags))
+    print(indices)
+    print(words)
+    print(pos)
+    print(tags)
     for i in range(0, len(tags)):
         final_string += "\t".join(["", indices[i],
                                    words[i], pos[i], tags[i]]) + "\n"
@@ -163,7 +163,7 @@ def verify_disfluency_tags(tags, normalize_ID=False):
     # key: old repair ID, value, list [reparandum,interregnum,repair] all True
     # when repair is all there
     repairs = defaultdict(list)
-    for r in id_map.keys():
+    for r in list(id_map.keys()):
         repairs[r] = [None, None, None]  # three valued None<False<True
     # print repairs
     # second pass verify the validity of the tags and (optionally) modify the
@@ -172,8 +172,8 @@ def verify_disfluency_tags(tags, normalize_ID=False):
         new_tags = []
         if tags[i] == "":
             all([repairs[ID][2] or repairs[ID] == [None, None, None] 
-                 for ID in repairs.keys(
-            )]), "Unresolved repairs at fluent tag\n\t" + str(repairs)
+                 for ID in list(repairs.keys(
+            ))]), "Unresolved repairs at fluent tag\n\t" + str(repairs)
         # iterate over all tags in this tag string
         for tag in get_tags(tags[i]):
             # print i, tag
@@ -234,7 +234,7 @@ def verify_disfluency_tags(tags, normalize_ID=False):
             new_tags.append(tag.replace(ID, id_map[ID]))
         if normalize_ID:
             tags[i] = "".join(new_tags)
-    assert all([repairs[ID][2] for ID in repairs.keys()]
+    assert all([repairs[ID][2] for ID in list(repairs.keys())]
                ), "Unresolved repairs:\n\t" + str(repairs)
 
 
@@ -254,7 +254,7 @@ def orthography_normalization(word, pos, spelling_dict, lang='en'):
         raise NotImplementedError(
             'No filled pause normalization for lang: ' + lang)
 
-    for key in spelling_dict.keys():
+    for key in list(spelling_dict.keys()):
         if re.match(key, word):
             word = spelling_dict[key]
             # make sure filled pauses have the right POS tags
@@ -414,7 +414,7 @@ def find_repair_end_in_previous_utts(repair, overallTagList, uttlist):
     while not repair.complete == True:
         search += 1
         if search >= len(overallTagList):
-            print 'Repair not found!'
+            print('Repair not found!')
             raise Exception
         # print "search " + str(search)
         # get the tag list *search* utterances back
@@ -1004,7 +1004,7 @@ def graph_viz_repair(maps, reparandum, repair, continuation):
     reparandumSequence = ""
     if len(repair) == 0:
         if len(continuation) == 0:
-            raw_input("no continuation for rep in classify")
+            input("no continuation for rep in classify")
         repair = [continuation[0]]  # add the first one
     for i in range(len(reparandum)):
         reparandumSequence += str(i)

@@ -4,9 +4,9 @@ import numpy as np
 import argparse
 
 from deep_disfluency.load.load import load_word_rep, load_tags
-from feature_utils import load_data_from_disfluency_corpus_file
-from feature_utils import load_data_from_corpus_file
-from feature_utils import sort_into_dialogue_speakers
+from .feature_utils import load_data_from_disfluency_corpus_file
+from .feature_utils import load_data_from_corpus_file
+from .feature_utils import sort_into_dialogue_speakers
 
 
 def open_with_pandas_read_csv(filename, header=None, delim="\t"):
@@ -51,7 +51,7 @@ def get_audio_features(filename, features=[0, 2, 3, 4, 5, 6, 7, 8],
     frameIndex; frameTime; pcm_RMSenergy_sma; pcm_LOGenergy_sma;
     F0final_sma; voicingFinalUnclipped_sma; F0raw_sma; pcm_intensity_sma;
     pcm_loudness_sma"""
-    print filename
+    print(filename)
     data = open_with_pandas_read_csv(filename, header=True, delim=";")
     final_data = []
     data = data[:, features]  # just get the features of interest
@@ -63,11 +63,11 @@ def get_audio_features(filename, features=[0, 2, 3, 4, 5, 6, 7, 8],
         # print my_data
         # print my_data.shape
         if start < 0 and my_data.shape[0] < 50:
-            print "beneath 0 starting context, add padding"
+            print("beneath 0 starting context, add padding")
             padding = np.zeros((0-start, data.shape[1]))
             my_data = np.concatenate([padding, my_data])
         if my_data.shape[0] < 50:
-            print "adding end padding"
+            print("adding end padding")
             padding = np.zeros((50-my_data.shape[0], data.shape[1]))
             my_data = np.concatenate([my_data, padding])
         assert my_data.shape[0] == 50, my_data.shape[0]
@@ -143,7 +143,7 @@ def save_feature_matrices(target_dir,
             # print word_ix
             pos_ix = pos_2_idx_dict.get(pos_data[i])
             if pos_ix is None:
-                print "unknown pos", "%%%" + pos_data[i] + "%%%"
+                print("unknown pos", "%%%" + pos_data[i] + "%%%")
                 pos_ix = pos_2_idx_dict.get("<unk>")
                 unknown_pos += 1
             # print pos_ix
@@ -151,7 +151,7 @@ def save_feature_matrices(target_dir,
             label_ix = label_2_idx_dict.get(tag)
             if label_ix is None:
                 # TODO not looking at 1-shot learning for now
-                print "no label for", tag
+                print("no label for", tag)
                 raise Exception
             # final_lexical = np.asarray([[word_ix, pos_ix]])\
             #    .reshape((2, 1))
@@ -183,9 +183,9 @@ def save_feature_matrices(target_dir,
         dialogue_matrix = np.concatenate([all_features])
         np.save(target_dir+"/"+d_name+".npy", dialogue_matrix)
     if missed:
-        print "dialogues missed", missed
-    print unknown_words, "unknown words in corpus"
-    print unknown_pos, "unknown pos in corpus"
+        print("dialogues missed", missed)
+    print(unknown_words, "unknown words in corpus")
+    print(unknown_pos, "unknown pos in corpus")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Combine all features\
@@ -232,13 +232,13 @@ if __name__ == '__main__':
     pos_dict = load_word_rep(args.pos_rep_file)
     label_dict = load_tags(args.label_rep_file)
 
-    print 'tags', args.label_rep_file
+    print('tags', args.label_rep_file)
     use_timing_data = False
     if "timings" in args.corpus_file:
         dialogues = load_data_from_corpus_file(args.corpus_file)
         use_timing_data = True
     else:
-        print "no timings"
+        print("no timings")
         IDs, timings, seq, pos_seq, targets = \
             load_data_from_disfluency_corpus_file(
                                                 args.corpus_file,

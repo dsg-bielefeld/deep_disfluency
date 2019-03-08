@@ -4,8 +4,8 @@ import os
 import shutil
 import numpy as np
 from copy import deepcopy
-from feature_utils import load_data_from_disfluency_corpus_file
-from feature_utils import sort_into_dialogue_speakers, wer, get_diff_and_new_prefix
+from .feature_utils import load_data_from_disfluency_corpus_file
+from .feature_utils import sort_into_dialogue_speakers, wer, get_diff_and_new_prefix
 
 asr_dir =  "/home/dsg-labuser/git/simple_rnn_disf/rnn_disf_detection/data/asr_results/"
 div_dir = "/home/dsg-labuser/git/simple_rnn_disf/rnn_disf_detection/data/disfluency_detection/swda_divisions_disfluency_detection/"
@@ -35,8 +35,8 @@ for data in dialogue_speakers:
     word_pos_data[dialogue] = (a,b,c,d)
         
 for key in sorted(word_pos_data.keys()):
-    print key
-    print word_pos_data[key][1][:100]
+    print(key)
+    print(word_pos_data[key][1][:100])
     break
 #quit()
 
@@ -46,21 +46,21 @@ pair = [] #pair of files
 for filename in sorted(os.listdir(asr_dir)):
     if not ".json.txt" in filename: continue
     conv_no = filename.replace(".json.txt","")[3:]
-    print conv_no
+    print(conv_no)
     resultsfile = open(asr_dir + "/" + filename)
     json_string = "[" + "".join([line for line in resultsfile ]) + "]"
     #print json_string
     resultsdict = json.loads(json_string.replace("}{","},{"))
     resultsfile.close()
     if conv_no.replace("_r","").replace("_l","") in leftout_ranges:
-        print "leaving out file"
+        print("leaving out file")
         continue
     if conv_no.replace("_r","").replace("_l","") in heldout_ranges:
         file = heldout_file
     elif conv_no.replace("_r","").replace("_l","") in test_ranges:
         file = test_file
     else:
-        print "not in either range"
+        print("not in either range")
         continue
     
     current = []
@@ -99,8 +99,8 @@ for filename in sorted(os.listdir(asr_dir)):
         #could also do mean deviation from timings
         assigned = ""
         for single in pair:
-            p = single.keys()[0]
-            print p
+            p = list(single.keys())[0]
+            print(p)
             conv_no_overall = p.replace("_r","").replace("_l","")
             bestWER = 1000
             best = ""
@@ -122,12 +122,12 @@ for filename in sorted(os.listdir(asr_dir)):
                         #print first100results
                         #raw_input()
                     
-                    print len(first100)
-                    print len(first100results)
+                    print(len(first100))
+                    print(len(first100results))
                     WER = wer(" ".join(first100).split()," ".join(first100results).split())
-                    print first100
-                    print first100results
-                    print "wer",WER
+                    print(first100)
+                    print(first100results)
+                    print("wer",WER)
                     if WER < bestWER:
                         bestWER = WER
                         best = conv_no_overall + speaker
@@ -141,17 +141,17 @@ for filename in sorted(os.listdir(asr_dir)):
                 else:
                     single[p].extend([0,conv_no_overall + "A"])
                 
-        print pair[0][pair[0].keys()[0]][-1]
-        print pair[1][pair[1].keys()[0]][-1]
-        if pair[0][pair[0].keys()[0]][-1] == pair[1][pair[1].keys()[0]][-1]:
-            print "no winner!!!"
-            raw_input()
+        print(pair[0][list(pair[0].keys())[0]][-1])
+        print(pair[1][list(pair[1].keys())[0]][-1])
+        if pair[0][list(pair[0].keys())[0]][-1] == pair[1][list(pair[1].keys())[0]][-1]:
+            print("no winner!!!")
+            input()
             leftout.append(conv_no.replace("_r","").replace("_l",""))
         else:
             for single in pair:
-                filename = single[single.keys()[0]][-1]
-                results = single[single.keys()[0]][0].replace("%HESITATION","uh")
-                average_wer.append(single[single.keys()[0]][-2])
+                filename = single[list(single.keys())[0]][-1]
+                results = single[list(single.keys())[0]][0].replace("%HESITATION","uh")
+                average_wer.append(single[list(single.keys())[0]][-2])
                 file.write("File: " + filename +"\n")
                 file.write(results)
         pair = []
@@ -160,6 +160,6 @@ heldout_file.close()
 test_file.close()
 leftoutfile = open("leftout","w")
 for l in leftout:
-    print>>leftoutfile,l
+    print(l, file=leftoutfile)
 leftoutfile.close()
-print np.average(average_wer), "av WER"
+print(np.average(average_wer), "av WER")

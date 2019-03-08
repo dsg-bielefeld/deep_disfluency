@@ -89,7 +89,7 @@ def extract_features(args):
         c.append('-e')
         if args.uttSeg:
             c.append('-u')
-        print c
+        print(c)
         subprocess.call(c)
 
     if args.audioFolder:
@@ -203,4 +203,4 @@ if __name__ == '__main__':
                         help='location of the OpenSmile config file.')
     args = parser.parse_args()
     r = extract_features(args)
-    print r
+    print(r)
