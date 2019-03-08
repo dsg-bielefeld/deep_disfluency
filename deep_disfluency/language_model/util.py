@@ -191,7 +191,7 @@ class FrequencyDistribution(collections.defaultdict):
 
 
 class CountingList(collections.MutableSequence):
-	def __init__(self):
+        def __init__(self):
             self.count = 0
             self.list = list()
             
